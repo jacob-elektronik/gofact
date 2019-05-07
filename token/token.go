@@ -1,46 +1,52 @@
 package token
 
-import "jacob.de/gofact/token/tokentype"
+import (
+	"strconv"
+
+	"jacob.de/gofact/token/tokentype"
+)
 
 // Token struct
 type Token struct {
 	TokenType  int
 	TokenValue string
+	Column     int
+	Line       int
 }
 
 func (t Token) printToken() string {
 	ret := "("
 	switch t.TokenType {
 	case tokentype.ControlChars:
-		ret += "Type: ControlChars / Value: "
+		ret += "TokenType: ControlChars / Value: "
 	case tokentype.UserDataSegments:
-		ret += "Type: UserDataSegments / Value: "
+		ret += "TokenTypeType: UserDataSegments / Value: "
 	case tokentype.CompontentDelimiter:
-		ret += "Type: CompontentDelimiter / Value: "
+		ret += "TokenTypeType: CompontentDelimiter / Value: "
 	case tokentype.ElementDelimiter:
-		ret += "Type: ElementDelimiter / Value: "
+		ret += "TokenTypeType: ElementDelimiter / Value: "
 	case tokentype.SegmentTerminator:
-		ret += "Type: SegmentTerminator / Value: "
+		ret += "TokenTypeType: SegmentTerminator / Value: "
 	case tokentype.ReleaseIndicator:
-		ret += "Type: ReleaseIndicator / Value: "
+		ret += "TokenTypeType: ReleaseIndicator / Value: "
 	case tokentype.DecimalDelimiter:
-		ret += "Type: DecimalDelimiter / Value: "
+		ret += "TokenTypeType: DecimalDelimiter / Value: "
 	case tokentype.ServiceStringAdvice:
-		ret += "Type: ServiceStringAdvice / Value: "
+		ret += "TokenTypeType: ServiceStringAdvice / Value: "
 	case tokentype.InterchangeHeader:
-		ret += "Type: InterchangeHeader / Value: "
+		ret += "TokenTypeType: InterchangeHeader / Value: "
 	case tokentype.InterchangeTrailer:
-		ret += "Type: InterchangeTrailer / Value: "
+		ret += "TokenTypeType: InterchangeTrailer / Value: "
 	case tokentype.FunctionalGroupHeader:
-		ret += "Type: FunctionalGroupHeader / Value: "
+		ret += "TokenTypeType: FunctionalGroupHeader / Value: "
 	case tokentype.FunctionalGroupTrailer:
-		ret += "Type: FunctionalGroupTrailer / Value: "
+		ret += "TokenTypeType: FunctionalGroupTrailer / Value: "
 	case tokentype.MessageHeader:
-		ret += "Type: MessageHeader / Value: "
+		ret += "TokenTypeType: MessageHeader / Value: "
 	case tokentype.MessageTrailer:
-		ret += "Type: MessageTrailer / Value: "
+		ret += "TokenTypeType: MessageTrailer / Value: "
 	}
-	ret += string(t.TokenValue) + ")"
+	ret += string(t.TokenValue) + " Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column) + ")"
 	return ret
 }
 

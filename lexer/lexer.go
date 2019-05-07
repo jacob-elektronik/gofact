@@ -11,13 +11,17 @@ type Lexer struct {
 	CurrentRunePtr         *rune
 	CurrentRunePos         int
 	CurrentSeq             []rune
-	ControlRunes           *control
+	CtrlRunes              *ctrlRunes
 	releaseIndicatorActive bool
+	currentColumn          int
+	currentLine            int
 }
 
 // NewLexer generate a new lexer object
 func NewLexer(message string) *Lexer {
-	l := &Lexer{EdiFactMessage: []rune(message), CurrentRunePtr: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, ControlRunes: nil}
+	l := &Lexer{EdiFactMessage: []rune(message), CurrentRunePtr: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, CtrlRunes: nil}
+	l.currentColumn = 0
+	l.currentLine = 1
 	return l
 }
 
@@ -27,14 +31,13 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	var ctrlRunes []rune
 	if compareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
 		ctrlRunes = l.EdiFactMessage[3:9]
-		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA"})
-		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes)})
+		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 0, Line: 1})
+		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
 		l.EdiFactMessage = l.EdiFactMessage[9:]
 	} else {
 		ctrlRunes = []rune(defaultCtrlString) // user standard values
-		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes)})
 	}
-	l.ControlRunes = newControl(ctrlRunes)
+	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	l.CurrentRunePos = 0
 	l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 
@@ -64,21 +67,21 @@ func (l *Lexer) findControlToken() *token.Token {
 		return nil
 	}
 	switch *l.CurrentRunePtr {
-	case l.ControlRunes.CompontentDelimiter:
-		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr)}
-	case l.ControlRunes.ElementDelimiter:
-		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr)}
-	case l.ControlRunes.SegmentTerminator:
-		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr)}
-	case l.ControlRunes.ReleaseIndicator:
-		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr)}
+	case l.CtrlRunes.CompontentDelimiter:
+		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlRunes.ElementDelimiter:
+		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlRunes.SegmentTerminator:
+		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlRunes.ReleaseIndicator:
+		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	}
 	return nil
 }
 
 func (l *Lexer) findContentToken() *token.Token {
 	if len(l.CurrentSeq) > 0 {
-		t := &token.Token{TokenType: tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq)}
+		t := &token.Token{TokenType: tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: l.currentColumn, Line: l.currentLine}
 		l.CurrentSeq = []rune{}
 		return t
 	}
@@ -87,15 +90,17 @@ func (l *Lexer) findContentToken() *token.Token {
 
 // checkControlChar checks if the current rune is a control rune
 func (l *Lexer) checkControlRune() bool {
-	return l.ControlRunes.checkForControl(*l.CurrentRunePtr)
+	return l.CtrlRunes.checkForControl(*l.CurrentRunePtr)
 }
 
 // nextChar move the pointer to the next valid rune
 func (l *Lexer) nextRune() bool {
 	l.CurrentRunePos++
+	l.currentColumn++
 	if l.CurrentRunePos < len(l.EdiFactMessage) {
 		l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		for l.checkForIgnoreRune() {
+			l.currentLine++
 			l.CurrentRunePos++
 			l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		}

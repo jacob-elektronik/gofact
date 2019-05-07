@@ -1,6 +1,6 @@
 package lexer
 
-type control struct {
+type ctrlRunes struct {
 	CompontentDelimiter rune
 	ElementDelimiter    rune
 	SegmentTerminator   rune
@@ -8,12 +8,12 @@ type control struct {
 	DecimalDelimiter    rune
 }
 
-// newControl generate a new control struct from the characters
-func newControl(controlRunes []rune) *control {
-	return &control{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
+// newCtrlRunes generate a new control struct from the characters
+func newCtrlRunes(controlRunes []rune) *ctrlRunes {
+	return &ctrlRunes{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
 }
 
-func (c *control) checkForControl(r rune) bool {
+func (c *ctrlRunes) checkForControl(r rune) bool {
 	if r == c.CompontentDelimiter {
 		return true
 	}
