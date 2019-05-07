@@ -16,7 +16,7 @@ func NewParser(message string) *Parser {
 	return &Parser{EdiFactMessage: message, Tokens: nil}
 }
 
-// ParseEidMessage start parsing eid message
+// ParseEidMessage start parsing edi message
 func (p *Parser) ParseEidMessage() {
 	lexer := lexer.NewLexer(p.EdiFactMessage)
 	p.Tokens = lexer.GetEdiTokens()
