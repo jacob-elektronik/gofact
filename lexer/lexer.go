@@ -29,7 +29,7 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 		addToken(&tokens, token.Token{TokenType: token.ControlChars, TokenValue: string(ctrlRunes)})
 		l.EdiFactMessage = l.EdiFactMessage[9:]
 	} else {
-		ctrlRunes = []rune(defaultCtrlString) // user standart values
+		ctrlRunes = []rune(defaultCtrlString) // user standard values
 		addToken(&tokens, token.Token{TokenType: token.ControlChars, TokenValue: string(ctrlRunes)})
 	}
 	l.ControlRunes = newControl(ctrlRunes)
