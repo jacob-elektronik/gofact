@@ -55,9 +55,11 @@ func (l *Lexer) findControlToken() *token.Token {
 	case l.ControlRunes.CompontentDelimiter:
 		return &token.Token{TokenType: token.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr)}
 	case l.ControlRunes.ElementDelimiter:
-		return &token.Token{TokenType: token.DataDelimiter, TokenValue: string(*l.CurrentRunePtr)}
+		return &token.Token{TokenType: token.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr)}
 	case l.ControlRunes.SegmentTerminator:
-		return &token.Token{TokenType: token.Terminator, TokenValue: string(*l.CurrentRunePtr)}
+		return &token.Token{TokenType: token.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr)}
+	case l.ControlRunes.ReleaseIndicator:
+		return &token.Token{TokenType: token.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr)}
 	}
 	return nil
 }

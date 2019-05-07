@@ -5,8 +5,10 @@ const (
 	ControlChars = iota
 	Content
 	CompontentDelimiter
-	DataDelimiter
-	Terminator
+	ElementDelimiter
+	SegmentTerminator
+	ReleaseIndicator
+	DecimalDelimiter
 )
 
 // Token struct
@@ -24,10 +26,14 @@ func (t Token) printToken() string {
 		ret += "Type: Content / Value: "
 	case CompontentDelimiter:
 		ret += "Type: CompontentDelimiter / Value: "
-	case DataDelimiter:
-		ret += "Type: DataDelimiter / Value: "
-	case Terminator:
-		ret += "Type: Terminator / Value: "
+	case ElementDelimiter:
+		ret += "Type: ElementDelimiter / Value: "
+	case SegmentTerminator:
+		ret += "Type: SegmentTerminator / Value: "
+	case ReleaseIndicator:
+		ret += "Type: ReleaseIndicator / Value: "
+	case DecimalDelimiter:
+		ret += "Type: DecimalDelimiter / Value: "
 	}
 	ret += string(t.TokenValue) + ")"
 	return ret

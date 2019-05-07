@@ -10,7 +10,7 @@ type control struct {
 
 // newControl generate a new control struct from the characters
 func newControl(controlRunes []rune) *control {
-	return &control{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], releaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
+	return &control{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
 }
 
 func (c *control) checkForControl(r rune) bool {
