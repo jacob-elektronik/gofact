@@ -7,7 +7,7 @@ import (
 // Lexer lexer object with functions
 type Lexer struct {
 	EdiFactMessage []rune
-	CurrentRune    *rune
+	CurrentRunePtr *rune
 	CurrentRunePos int
 	CurrentSeq     []rune
 	ControlRunes   *control
@@ -15,7 +15,7 @@ type Lexer struct {
 
 // NewLexer generate a new lexer object
 func NewLexer(message string) *Lexer {
-	l := &Lexer{EdiFactMessage: []rune(message), CurrentRune: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, ControlRunes: nil}
+	l := &Lexer{EdiFactMessage: []rune(message), CurrentRunePtr: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, ControlRunes: nil}
 	return l
 }
 
@@ -34,19 +34,16 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	}
 	l.ControlRunes = newControl(ctrlRunes)
 	l.CurrentRunePos = 0
-	l.CurrentRune = &l.EdiFactMessage[l.CurrentRunePos]
+	l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 
 	for l.nextRune() {
-		cToken := l.findControlToken()
-		if cToken != nil {
-			if len(l.CurrentSeq) > 0 {
-				// we found a control token and there were content before, so generate content token
-				addToken(&tokens, token.Token{TokenType: token.Content, TokenValue: string(l.CurrentSeq)})
-				l.CurrentSeq = []rune{}
+		if ctrlToken := l.findControlToken(); ctrlToken != nil {
+			if contentToken := l.findContentToken(); contentToken != nil {
+				addToken(&tokens, *contentToken)
 			}
-			addToken(&tokens, *cToken)
+			addToken(&tokens, *ctrlToken)
 		} else {
-			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRune)
+			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
 		}
 	}
 	return tokens
@@ -54,30 +51,39 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 
 // findControlToken generate a control type token from current rune
 func (l *Lexer) findControlToken() *token.Token {
-	switch *l.CurrentRune {
+	switch *l.CurrentRunePtr {
 	case l.ControlRunes.CompontentDelimiter:
-		return &token.Token{TokenType: token.CompontentDelimiter, TokenValue: string(*l.CurrentRune)}
-	case l.ControlRunes.DataDelimiter:
-		return &token.Token{TokenType: token.DataDelimiter, TokenValue: string(*l.CurrentRune)}
-	case l.ControlRunes.Terminator:
-		return &token.Token{TokenType: token.Terminator, TokenValue: string(*l.CurrentRune)}
+		return &token.Token{TokenType: token.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr)}
+	case l.ControlRunes.ElementDelimiter:
+		return &token.Token{TokenType: token.DataDelimiter, TokenValue: string(*l.CurrentRunePtr)}
+	case l.ControlRunes.SegmentTerminator:
+		return &token.Token{TokenType: token.Terminator, TokenValue: string(*l.CurrentRunePtr)}
+	}
+	return nil
+}
+
+func (l *Lexer) findContentToken() *token.Token {
+	if len(l.CurrentSeq) > 0 {
+		t := &token.Token{TokenType: token.Content, TokenValue: string(l.CurrentSeq)}
+		l.CurrentSeq = []rune{}
+		return t
 	}
 	return nil
 }
 
 // checkControlChar checks if the current rune is a control rune
 func (l *Lexer) checkControlRune() bool {
-	return l.ControlRunes.checkForControl(*l.CurrentRune)
+	return l.ControlRunes.checkForControl(*l.CurrentRunePtr)
 }
 
 // nextChar move the pointer to the next rune
 func (l *Lexer) nextRune() bool {
 	l.CurrentRunePos++
 	if l.CurrentRunePos < len(l.EdiFactMessage) {
-		l.CurrentRune = &l.EdiFactMessage[l.CurrentRunePos]
+		l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		for l.checkForIgnoreRune() {
 			l.CurrentRunePos++
-			l.CurrentRune = &l.EdiFactMessage[l.CurrentRunePos]
+			l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		}
 		return true
 	}
@@ -88,7 +94,7 @@ func (l *Lexer) nextRune() bool {
 func (l *Lexer) checkForIgnoreRune() bool {
 	for _, tmpSlice := range ignoreSeq {
 		for _, e := range tmpSlice {
-			if *l.CurrentRune == e {
+			if *l.CurrentRunePtr == e {
 				return true
 			}
 		}

@@ -10,7 +10,7 @@ import (
 func main() {
 	dat, _ := ioutil.ReadFile("message")
 	p := parser.NewParser(string(dat))
-	p.ParseEidMessage()
+	p.ParseEdiFactMessage()
 	for i, t := range p.Tokens {
 		fmt.Println("index: ", i, " token: ", t)
 	}
