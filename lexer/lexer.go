@@ -6,11 +6,12 @@ import (
 
 // Lexer lexer object with functions
 type Lexer struct {
-	EdiFactMessage []rune
-	CurrentRunePtr *rune
-	CurrentRunePos int
-	CurrentSeq     []rune
-	ControlRunes   *control
+	EdiFactMessage         []rune
+	CurrentRunePtr         *rune
+	CurrentRunePos         int
+	CurrentSeq             []rune
+	ControlRunes           *control
+	releaseIndicatorActive bool
 }
 
 // NewLexer generate a new lexer object
@@ -38,6 +39,10 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 
 	for l.nextRune() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
+			if ctrlToken.TokenType == token.ReleaseIndicator {
+				l.releaseIndicatorActive = true
+				continue
+			}
 			if contentToken := l.findContentToken(); contentToken != nil {
 				addToken(&tokens, *contentToken)
 			}
@@ -49,8 +54,14 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	return tokens
 }
 
-// findControlToken generate a control type token from current rune
+// findControlToken generate a control type token from current rune.
+// If the lexer found a release indicator we will not generate a control token here.
+// The token will be added to the content  token
 func (l *Lexer) findControlToken() *token.Token {
+	if l.releaseIndicatorActive {
+		l.releaseIndicatorActive = false
+		return nil
+	}
 	switch *l.CurrentRunePtr {
 	case l.ControlRunes.CompontentDelimiter:
 		return &token.Token{TokenType: token.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr)}
@@ -78,7 +89,7 @@ func (l *Lexer) checkControlRune() bool {
 	return l.ControlRunes.checkForControl(*l.CurrentRunePtr)
 }
 
-// nextChar move the pointer to the next rune
+// nextChar move the pointer to the next valid rune
 func (l *Lexer) nextRune() bool {
 	l.CurrentRunePos++
 	if l.CurrentRunePos < len(l.EdiFactMessage) {
