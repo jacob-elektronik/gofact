@@ -1,15 +1,6 @@
 package token
 
-// Tokentypes
-const (
-	ControlChars = iota
-	Content
-	CompontentDelimiter
-	ElementDelimiter
-	SegmentTerminator
-	ReleaseIndicator
-	DecimalDelimiter
-)
+import "jacob.de/gofact/token/tokentype"
 
 // Token struct
 type Token struct {
@@ -20,20 +11,34 @@ type Token struct {
 func (t Token) printToken() string {
 	ret := "("
 	switch t.TokenType {
-	case ControlChars:
+	case tokentype.ControlChars:
 		ret += "Type: ControlChars / Value: "
-	case Content:
-		ret += "Type: Content / Value: "
-	case CompontentDelimiter:
+	case tokentype.UserDataSegments:
+		ret += "Type: UserDataSegments / Value: "
+	case tokentype.CompontentDelimiter:
 		ret += "Type: CompontentDelimiter / Value: "
-	case ElementDelimiter:
+	case tokentype.ElementDelimiter:
 		ret += "Type: ElementDelimiter / Value: "
-	case SegmentTerminator:
+	case tokentype.SegmentTerminator:
 		ret += "Type: SegmentTerminator / Value: "
-	case ReleaseIndicator:
+	case tokentype.ReleaseIndicator:
 		ret += "Type: ReleaseIndicator / Value: "
-	case DecimalDelimiter:
+	case tokentype.DecimalDelimiter:
 		ret += "Type: DecimalDelimiter / Value: "
+	case tokentype.ServiceStringAdvice:
+		ret += "Type: ServiceStringAdvice / Value: "
+	case tokentype.InterchangeHeader:
+		ret += "Type: InterchangeHeader / Value: "
+	case tokentype.InterchangeTrailer:
+		ret += "Type: InterchangeTrailer / Value: "
+	case tokentype.FunctionalGroupHeader:
+		ret += "Type: FunctionalGroupHeader / Value: "
+	case tokentype.FunctionalGroupTrailer:
+		ret += "Type: FunctionalGroupTrailer / Value: "
+	case tokentype.MessageHeader:
+		ret += "Type: MessageHeader / Value: "
+	case tokentype.MessageTrailer:
+		ret += "Type: MessageTrailer / Value: "
 	}
 	ret += string(t.TokenValue) + ")"
 	return ret

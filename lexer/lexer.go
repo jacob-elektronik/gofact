@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"jacob.de/gofact/token"
+	"jacob.de/gofact/token/tokentype"
 )
 
 // Lexer lexer object with functions
@@ -26,12 +27,12 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	var ctrlRunes []rune
 	if compareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
 		ctrlRunes = l.EdiFactMessage[3:9]
-		addToken(&tokens, token.Token{TokenType: token.Content, TokenValue: "UNA"})
-		addToken(&tokens, token.Token{TokenType: token.ControlChars, TokenValue: string(ctrlRunes)})
+		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA"})
+		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes)})
 		l.EdiFactMessage = l.EdiFactMessage[9:]
 	} else {
 		ctrlRunes = []rune(defaultCtrlString) // user standard values
-		addToken(&tokens, token.Token{TokenType: token.ControlChars, TokenValue: string(ctrlRunes)})
+		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes)})
 	}
 	l.ControlRunes = newControl(ctrlRunes)
 	l.CurrentRunePos = 0
@@ -39,7 +40,7 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 
 	for l.nextRune() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
-			if ctrlToken.TokenType == token.ReleaseIndicator {
+			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
 				l.releaseIndicatorActive = true
 				continue
 			}
@@ -64,20 +65,20 @@ func (l *Lexer) findControlToken() *token.Token {
 	}
 	switch *l.CurrentRunePtr {
 	case l.ControlRunes.CompontentDelimiter:
-		return &token.Token{TokenType: token.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr)}
+		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr)}
 	case l.ControlRunes.ElementDelimiter:
-		return &token.Token{TokenType: token.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr)}
+		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr)}
 	case l.ControlRunes.SegmentTerminator:
-		return &token.Token{TokenType: token.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr)}
+		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr)}
 	case l.ControlRunes.ReleaseIndicator:
-		return &token.Token{TokenType: token.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr)}
+		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr)}
 	}
 	return nil
 }
 
 func (l *Lexer) findContentToken() *token.Token {
 	if len(l.CurrentSeq) > 0 {
-		t := &token.Token{TokenType: token.Content, TokenValue: string(l.CurrentSeq)}
+		t := &token.Token{TokenType: tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq)}
 		l.CurrentSeq = []rune{}
 		return t
 	}
