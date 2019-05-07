@@ -4,7 +4,7 @@ type control struct {
 	CompontentDelimiter rune
 	ElementDelimiter    rune
 	SegmentTerminator   rune
-	releaseIndicator    rune
+	ReleaseIndicator    rune
 	DecimalDelimiter    rune
 }
 
