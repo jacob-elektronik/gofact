@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 
-	"jacob.de/gofact/lexer"
-	"jacob.de/gofact/token"
+	"jacob.de/gofact/parser"
 )
 
 func main() {
-	t := token.Token{TokenType: 1, TokenValue: "huhu"}
-	l := lexer.NewLexer("", "")
-	fmt.Println(t)
-	fmt.Println(l)
+	dat, _ := ioutil.ReadFile("message")
+	p := parser.NewParser(string(dat))
+	p.ParseEidMessage()
+	for i, t := range p.Tokens {
+		fmt.Println("index: ", i, " token: ", t)
+	}
 }
