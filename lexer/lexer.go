@@ -39,12 +39,12 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	for l.nextRune() {
 		cToken := l.findControlToken()
 		if cToken != nil {
-			addToken(&tokens, *cToken)
 			if len(l.CurrentSeq) > 0 {
 				// we found a control token and there were content before, so generate content token
 				addToken(&tokens, token.Token{TokenType: token.Content, TokenValue: string(l.CurrentSeq)})
 				l.CurrentSeq = []rune{}
 			}
+			addToken(&tokens, *cToken)
 		} else {
 			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRune)
 		}
