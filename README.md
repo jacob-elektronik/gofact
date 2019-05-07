@@ -1,3 +1,3 @@
 # gofact
 
-edicat golang parser
+edifat golang parser

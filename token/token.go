@@ -16,20 +16,20 @@ type Token struct {
 }
 
 func (t Token) printToken() string {
-	ret := ""
+	ret := "("
 	switch t.TokenType {
 	case ControlChars:
-		ret += "ControlChars: "
+		ret += "Type: ControlChars / Value: "
 	case Content:
-		ret += "Content: "
+		ret += "Type: Content / Value: "
 	case CompontentDelimiter:
-		ret += "CompontentDelimiter: "
+		ret += "Type: CompontentDelimiter / Value: "
 	case DataDelimiter:
-		ret += "DataDelimiter: "
+		ret += "Type: DataDelimiter / Value: "
 	case Terminator:
-		ret += "Terminator: "
+		ret += "Type: Terminator / Value: "
 	}
-	ret += string(t.TokenValue)
+	ret += string(t.TokenValue) + ")"
 	return ret
 }
 
