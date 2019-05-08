@@ -19,6 +19,9 @@ type Lexer struct {
 
 // NewLexer generate a new lexer object
 func NewLexer(message string) *Lexer {
+	if len(message) <= 0 {
+		return nil
+	}
 	l := &Lexer{EdiFactMessage: []rune(message), CurrentRunePtr: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, CtrlRunes: nil}
 	l.currentColumn = 0
 	l.currentLine = 1
@@ -28,19 +31,14 @@ func NewLexer(message string) *Lexer {
 // GetEdiTokens start reading the message and generate tokens
 func (l *Lexer) GetEdiTokens() []token.Token {
 	tokens := []token.Token{}
-	var ctrlRunes []rune
-	if compareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
-		ctrlRunes = l.EdiFactMessage[3:9]
+	ctrlRunes, defaultCtrl := l.getUNARunes()
+	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+	if !defaultCtrl {
 		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 0, Line: 1})
 		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
-		l.EdiFactMessage = l.EdiFactMessage[9:]
-	} else {
-		ctrlRunes = []rune(defaultCtrlString) // user standard values
 	}
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	l.CurrentRunePos = 0
 	l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
-
 	for l.nextRune() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
@@ -75,6 +73,8 @@ func (l *Lexer) findControlToken() *token.Token {
 		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.ReleaseIndicator:
 		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlRunes.DecimalDelimiter:
+		return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	}
 	return nil
 }
@@ -88,8 +88,22 @@ func (l *Lexer) findContentToken() *token.Token {
 	return nil
 }
 
+func (l *Lexer) getUNARunes() ([]rune, bool) {
+	var ctrlRunes []rune
+	var defaultCtrl bool
+	if compareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
+		ctrlRunes = l.EdiFactMessage[3:9]
+		l.EdiFactMessage = l.EdiFactMessage[9:]
+		defaultCtrl = false
+	} else {
+		ctrlRunes = []rune(defaultCtrlString) // user default values
+		defaultCtrl = true
+	}
+	return ctrlRunes, defaultCtrl
+}
+
 // checkControlChar checks if the current rune is a control rune
-func (l *Lexer) checkControlRune() bool {
+func (l *Lexer) isCurrentRuneControlRune() bool {
 	return l.CtrlRunes.checkForControl(*l.CurrentRunePtr)
 }
 

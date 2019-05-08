@@ -13,6 +13,8 @@ func newCtrlRunes(controlRunes []rune) *ctrlRunes {
 	return &ctrlRunes{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
 }
 
+
+
 func (c *ctrlRunes) checkForControl(r rune) bool {
 	if r == c.CompontentDelimiter {
 		return true
