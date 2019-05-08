@@ -9,7 +9,7 @@ const msg = `UNA:+.? '
 			UNH+1+ORDERS:D:96A:UN'
 			BGM+220+B10001'
 			DTM+4:20060620:102'
-			NAD+BY+++Bestellername+Strasse+Stadt++23436+xx'
+			NAD+BY+++Bestellername+Strasse+Stadt++23?+436+xx'
 			LIN+1++Produkt Schrauben:SA'
 			QTY+1:1000'
 			UNS+S'
@@ -29,7 +29,11 @@ func TestNewLexer(t *testing.T) {
 }
 
 func TestGetEdiTokens(t *testing.T) {
-
+	l := NewLexer(msg)
+	tokens := l.GetEdiTokens()
+	if len(tokens) == 0 {
+		t.Error("Expect tokens > 0")
+	}
 }
 
 func TestFindControlToken(t *testing.T) {
@@ -63,6 +67,13 @@ func TestFindControlToken(t *testing.T) {
 		t.Error("Expect control value")
 	}
 
+	r = rune('?')
+	l.CurrentRunePtr = &r
+	controlT = l.findControlToken()
+	if controlT == nil {
+		t.Error("Expect control value")
+	}
+
 	// test escape sign active
 	l.releaseIndicatorActive = true
 
@@ -73,11 +84,33 @@ func TestFindControlToken(t *testing.T) {
 		t.Error("Expect nil value")
 	}
 	// escape sign should be disabled now
-	r = rune('+')
+	r = rune('.')
 	l.CurrentRunePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
+	}
+
+	r = rune('a')
+	l.CurrentRunePtr = &r
+	controlT = l.findControlToken()
+	if controlT != nil {
+		t.Error("Expect nil value")
+	}
+}
+
+func TestFindContentToken(t *testing.T) {
+	l := NewLexer(msg)
+	ctrlRunes, _ := l.getUNARunes()
+	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+
+	l.CurrentSeq = []rune("ABCD")
+	if cToken := l.findContentToken(); cToken == nil {
+		t.Error("Expect none nil value")
+	}
+	l.CurrentSeq = []rune("")
+	if cToken := l.findContentToken(); cToken != nil {
+		t.Error("Expect nil value")
 	}
 }
 
@@ -131,6 +164,11 @@ func TestNextRune(t *testing.T) {
 	l.CurrentRunePos = len(l.EdiFactMessage)
 	if l.nextRune() {
 		t.Error("Expect false, we are at the end of the message")
+	}
+	l = NewLexer(msg)
+	l.CurrentRunePos = 8
+	if !l.nextRune() {
+		t.Error("Expect true")
 	}
 }
 
