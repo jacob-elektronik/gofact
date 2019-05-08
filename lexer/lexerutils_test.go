@@ -17,6 +17,10 @@ func TestCompareRuneSeq(t *testing.T) {
 	if compareRuneSeq(a, c) {
 		t.Error("Expect false")
 	}
+	d := []rune{10, 20, 40, 50}
+	if compareRuneSeq(a, d) {
+		t.Error("Expect false")
+	}
 }
 
 func TestAddToken(t *testing.T) {

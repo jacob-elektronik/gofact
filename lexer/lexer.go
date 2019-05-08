@@ -104,7 +104,7 @@ func (l *Lexer) getUNARunes() ([]rune, bool) {
 
 // checkControlChar checks if the current rune is a control rune
 func (l *Lexer) isCurrentRuneControlRune() bool {
-	return l.CtrlRunes.checkForControl(*l.CurrentRunePtr)
+	return l.CtrlRunes.isCtrlRune(*l.CurrentRunePtr)
 }
 
 // nextChar move the pointer to the next valid rune

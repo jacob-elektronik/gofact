@@ -10,12 +10,13 @@ type ctrlRunes struct {
 
 // newCtrlRunes generate a new control struct from the characters
 func newCtrlRunes(controlRunes []rune) *ctrlRunes {
-	return &ctrlRunes{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
+	if len(controlRunes) == 6 {
+		return &ctrlRunes{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
+	}
+	return nil
 }
 
-
-
-func (c *ctrlRunes) checkForControl(r rune) bool {
+func (c *ctrlRunes) isCtrlRune(r rune) bool {
 	if r == c.CompontentDelimiter {
 		return true
 	}
