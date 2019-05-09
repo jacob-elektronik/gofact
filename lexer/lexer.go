@@ -34,7 +34,7 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	ctrlRunes, defaultCtrl := l.getUNARunes()
 	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	if !defaultCtrl {
-		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 0, Line: 1})
+		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 1, Line: 1})
 		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
 	}
 	l.CurrentRunePos = 0
