@@ -166,7 +166,7 @@ func TestNextRune(t *testing.T) {
 		t.Error("Expect false, we are at the end of the message")
 	}
 	l = NewLexer(msg)
-	l.CurrentRunePos = 8
+	l.CurrentRunePos = 8 // 1 pos befor newline
 	if !l.nextRune() {
 		t.Error("Expect true")
 	}
