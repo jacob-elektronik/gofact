@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"jacob.de/gofact/token"
-	"jacob.de/gofact/token/tokentype"
+	"jacob.de/gofact/tokentype"
 )
 
 func TestCompareRuneSeq(t *testing.T) {

@@ -3,7 +3,7 @@ package token
 import (
 	"strconv"
 
-	"jacob.de/gofact/token/tokentype"
+	"jacob.de/gofact/tokentype"
 )
 
 // Token struct
@@ -14,7 +14,7 @@ type Token struct {
 	Line       int
 }
 
-func (t Token) printToken() string {
+func (t Token) PrintToken() string {
 	ret := ""
 	switch t.TokenType {
 	case tokentype.ControlChars:
@@ -51,5 +51,5 @@ func (t Token) printToken() string {
 }
 
 func (t Token) String() string {
-	return t.printToken()
+	return t.PrintToken()
 }

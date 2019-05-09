@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"jacob.de/gofact/token"
-	"jacob.de/gofact/token/tokentype"
+	"jacob.de/gofact/tokentype"
 )
 
 var ignoreSeq = [][]rune{[]rune("\n"), []rune("\r\n")}
