@@ -22,7 +22,7 @@ func (t Token) printToken() string {
 	case tokentype.UserDataSegments:
 		ret += "TokenType: UserDataSegments \t Value: "
 	case tokentype.CompontentDelimiter:
-		ret += "TokenType: CompDelimiter \t Value: "
+		ret += "TokenType: CompontentDelimiter \t Value: "
 	case tokentype.ElementDelimiter:
 		ret += "TokenType: ElementDelimiter \t Value: "
 	case tokentype.SegmentTerminator:
