@@ -15,38 +15,38 @@ type Token struct {
 }
 
 func (t Token) printToken() string {
-	ret := "("
+	ret := ""
 	switch t.TokenType {
 	case tokentype.ControlChars:
-		ret += "TokenType: ControlChars \t/ Value: "
+		ret += "TokenType: ControlChars \t Value: "
 	case tokentype.UserDataSegments:
-		ret += "TokenTypeType: UserDataSegments \t/ Value: "
+		ret += "TokenType: UserDataSegments \t Value: "
 	case tokentype.CompontentDelimiter:
-		ret += "TokenTypeType: CompDelimiter \t/ Value: "
+		ret += "TokenType: CompDelimiter \t Value: "
 	case tokentype.ElementDelimiter:
-		ret += "TokenTypeType: ElementDelimiter \t/ Value: "
+		ret += "TokenType: ElementDelimiter \t Value: "
 	case tokentype.SegmentTerminator:
-		ret += "TokenTypeType: SegmentTerminator \t/ Value: "
+		ret += "TokenType: SegmentTerminator \t Value: "
 	case tokentype.ReleaseIndicator:
-		ret += "TokenTypeType: ReleaseIndicator \t/ Value: "
+		ret += "TokenType: ReleaseIndicator \t Value: "
 	case tokentype.DecimalDelimiter:
-		ret += "TokenTypeType: DecimalDelimiter \t/ Value: "
+		ret += "TokenType: DecimalDelimiter \t Value: "
 	case tokentype.ServiceStringAdvice:
-		ret += "TokenTypeType: ServiceStringAdvice \t/ Value: "
+		ret += "TokenType: ServiceStringAdvice \t Value: "
 	case tokentype.InterchangeHeader:
-		ret += "TokenTypeType: InterchangeHeader \t/ Value: "
+		ret += "TokenType: InterchangeHeader \t Value: "
 	case tokentype.InterchangeTrailer:
-		ret += "TokenTypeType: InterchangeTrailer \t/ Value: "
+		ret += "TokenType: InterchangeTrailer \t Value: "
 	case tokentype.FunctionalGroupHeader:
-		ret += "TokenTypeType: FunctionalGroupHeader \t/ Value: "
+		ret += "TokenType: FunctionalGroupHeader \t Value: "
 	case tokentype.FunctionalGroupTrailer:
-		ret += "TokenTypeType: FunctionalGroupTrailer \t/ Value: "
+		ret += "TokenType: FunctionalGroupTrailer \t Value: "
 	case tokentype.MessageHeader:
-		ret += "TokenTypeType: MessageHeader \t/ Value: "
+		ret += "TokenType: MessageHeader \t Value: "
 	case tokentype.MessageTrailer:
-		ret += "TokenTypeType: MessageTrailer \t/ Value: "
+		ret += "TokenType: MessageTrailer \t Value: "
 	}
-	ret += string(t.TokenValue) + "\t/" + " Line: " + strconv.Itoa(t.Line) + " \t/" + " Column: " + strconv.Itoa(t.Column) + ")"
+	ret += string(t.TokenValue) + "\t" + " Line: " + strconv.Itoa(t.Line) + " \t" + " Column: " + strconv.Itoa(t.Column)
 	return ret
 }
 
