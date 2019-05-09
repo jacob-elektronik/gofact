@@ -23,7 +23,7 @@ func NewLexer(message string) *Lexer {
 		return nil
 	}
 	l := &Lexer{EdiFactMessage: []rune(message), CurrentRunePtr: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, CtrlRunes: nil}
-	l.currentColumn = 0
+	l.currentColumn = 1
 	l.currentLine = 1
 	return l
 }
@@ -115,6 +115,7 @@ func (l *Lexer) nextRune() bool {
 		l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		for l.checkForIgnoreRune() {
 			l.currentLine++
+			l.currentColumn = 1
 			l.CurrentRunePos++
 			l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		}
