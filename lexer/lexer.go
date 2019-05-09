@@ -56,6 +56,33 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	return tokens
 }
 
+// GetEdiTokensConcurrent write the tokens to a channel
+func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
+	ctrlRunes, defaultCtrl := l.getUNARunes()
+	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+	if !defaultCtrl {
+		ch <- token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 1, Line: 1}
+		ch <- token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
+	}
+	l.CurrentRunePos = 0
+	l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
+	for l.nextRune() {
+		if ctrlToken := l.findControlToken(); ctrlToken != nil {
+			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
+				l.releaseIndicatorActive = true
+				continue
+			}
+			if contentToken := l.findContentToken(); contentToken != nil {
+				ch <- *contentToken
+			}
+			ch <- *ctrlToken
+		} else {
+			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
+		}
+	}
+	close(ch)
+}
+
 // findControlToken generate a control type token from current rune.
 // If the lexer found a release indicator we will not generate a control token here.
 // The token will be added to the content  token

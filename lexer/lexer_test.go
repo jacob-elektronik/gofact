@@ -2,6 +2,8 @@ package lexer
 
 import (
 	"testing"
+
+	"jacob.de/gofact/token"
 )
 
 const msg = `UNA:+.? '
@@ -31,6 +33,19 @@ func TestNewLexer(t *testing.T) {
 func TestGetEdiTokens(t *testing.T) {
 	l := NewLexer(msg)
 	tokens := l.GetEdiTokens()
+	if len(tokens) == 0 {
+		t.Error("Expect tokens > 0")
+	}
+}
+
+func TestGetEdiTokensConcurrent(t *testing.T) {
+	l := NewLexer(msg)
+	tokenChan := make(chan token.Token)
+	go l.GetEdiTokensConcurrent(tokenChan)
+	tokens := []token.Token{}
+	for t := range tokenChan {
+		tokens = append(tokens, t)
+	}
 	if len(tokens) == 0 {
 		t.Error("Expect tokens > 0")
 	}
