@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"jacob.de/gofact/token"
-	"jacob.de/gofact/token/tokentype"
+	"jacob.de/gofact/tokentype"
 )
 
 // Lexer lexer object with functions
@@ -34,11 +34,12 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	ctrlRunes, defaultCtrl := l.getUNARunes()
 	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	if !defaultCtrl {
-		addToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 1, Line: 1})
+		addToken(&tokens, token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1})
 		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
+		l.currentLine++
+		l.currentColumn = 1
 	}
-	l.CurrentRunePos = 0
-	l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
+	l.CurrentRunePos = -1
 	for l.nextRune() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
@@ -61,11 +62,11 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 	ctrlRunes, defaultCtrl := l.getUNARunes()
 	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	if !defaultCtrl {
-		ch <- token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 1, Line: 1}
+		ch <- token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
 		ch <- token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
+		l.currentColumn = 1
 	}
-	l.CurrentRunePos = 0
-	l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
+	l.CurrentRunePos = -1
 	for l.nextRune() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
@@ -93,22 +94,22 @@ func (l *Lexer) findControlToken() *token.Token {
 	}
 	switch *l.CurrentRunePtr {
 	case l.CtrlRunes.CompontentDelimiter:
-		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
 	case l.CtrlRunes.ElementDelimiter:
-		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
 	case l.CtrlRunes.SegmentTerminator:
-		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
 	case l.CtrlRunes.ReleaseIndicator:
-		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
 	case l.CtrlRunes.DecimalDelimiter:
-		return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
 	}
 	return nil
 }
 
 func (l *Lexer) findContentToken() *token.Token {
 	if len(l.CurrentSeq) > 0 {
-		t := &token.Token{TokenType: tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: l.currentColumn, Line: l.currentLine}
+		t := &token.Token{TokenType: tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: l.currentColumn - len(string(l.CurrentSeq)), Line: l.currentLine}
 		l.CurrentSeq = []rune{}
 		return t
 	}
