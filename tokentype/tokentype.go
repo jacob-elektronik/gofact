@@ -7,6 +7,7 @@ const (
 	CompontentDelimiter
 	ElementDelimiter
 	SegmentTerminator
+	SegmentTag
 	ReleaseIndicator
 	DecimalDelimiter
 	ServiceStringAdvice

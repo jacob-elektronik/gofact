@@ -25,6 +25,8 @@ func (t Token) PrintToken() string {
 		ret += "TokenType: CompontentDelimiter \t Value: "
 	case tokentype.ElementDelimiter:
 		ret += "TokenType: ElementDelimiter \t Value: "
+	case tokentype.SegmentTag:
+		ret += "TokenType: SegmentTag \t Value: "
 	case tokentype.SegmentTerminator:
 		ret += "TokenType: SegmentTerminator \t Value: "
 	case tokentype.ReleaseIndicator:

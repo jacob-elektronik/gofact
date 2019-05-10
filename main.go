@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"jacob.de/gofact/parser"
@@ -13,7 +14,8 @@ func main() {
 	// tokenChan := make(chan token.Token)
 	// go l.GetEdiTokensConcurrent(tokenChan)
 	p := parser.NewParser(string(dat))
-	p.ParseEdiFactMessageConcurrent()
+	err := p.ParseEdiFactMessageConcurrent()
+	fmt.Println(err)
 	// const padding = 3
 	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
 	// for t := range tokenChan {

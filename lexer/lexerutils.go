@@ -38,10 +38,4 @@ func addToken(tokens *[]token.Token, t token.Token) {
 	*tokens = append(*tokens, t)
 }
 
-func tokenTypeForSeq(seq []rune) int {
-	tType := tokenTypeForRuneMap[string(seq)]
-	if tType == 0 {
-		return tokentype.UserDataSegments
-	}
-	return tType
-}
+

@@ -15,6 +15,7 @@ type Lexer struct {
 	releaseIndicatorActive bool
 	currentColumn          int
 	currentLine            int
+	lastTokenType          int
 }
 
 // NewLexer generate a new lexer object
@@ -64,6 +65,7 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 	if !defaultCtrl {
 		ch <- token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
 		ch <- token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
+		l.lastTokenType = tokentype.ControlChars
 		l.currentColumn = 1
 	}
 	l.CurrentRunePos = -1
@@ -74,8 +76,10 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 				continue
 			}
 			if contentToken := l.findContentToken(); contentToken != nil {
+				l.lastTokenType = contentToken.TokenType
 				ch <- *contentToken
 			}
+			l.lastTokenType = ctrlToken.TokenType
 			ch <- *ctrlToken
 		} else {
 			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
@@ -109,11 +113,22 @@ func (l *Lexer) findControlToken() *token.Token {
 
 func (l *Lexer) findContentToken() *token.Token {
 	if len(l.CurrentSeq) > 0 {
-		t := &token.Token{TokenType: tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: l.currentColumn - len(string(l.CurrentSeq)), Line: l.currentLine}
+		t := &token.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: l.currentColumn - len(string(l.CurrentSeq)), Line: l.currentLine}
 		l.CurrentSeq = []rune{}
 		return t
 	}
 	return nil
+}
+
+func (l *Lexer) tokenTypeForSeq(seq []rune) int {
+	tType := tokenTypeForRuneMap[string(seq)]
+	if tType == 0 {
+		if l.lastTokenType == tokentype.SegmentTerminator {
+			return tokentype.SegmentTag
+		}
+		return tokentype.UserDataSegments
+	}
+	return tType
 }
 
 func (l *Lexer) getUNARunes() ([]rune, bool) {
