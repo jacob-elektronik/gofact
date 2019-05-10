@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"jacob.de/gofact/token"
+	"jacob.de/gofact/tokentype"
 )
 
 const msg = `UNA:+.? '
@@ -200,5 +201,33 @@ func TestCheckForIgnoreRune(t *testing.T) {
 	l.CurrentRunePtr = &r
 	if !l.checkForIgnoreRune() {
 		t.Error("Expect true, newline is ignored")
+	}
+}
+
+func TestTokenTypeForSeq(t *testing.T) {
+	l := NewLexer(msg)
+	if tType := l.tokenTypeForSeq([]rune("UNA")); tType != tokentype.ServiceStringAdvice {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("UNB")); tType != tokentype.InterchangeHeader {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("UNG")); tType != tokentype.FunctionalGroupHeader {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("UNH")); tType != tokentype.MessageHeader {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("UNT")); tType != tokentype.MessageTrailer {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("UNE")); tType != tokentype.FunctionalGroupTrailer {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("UNZ")); tType != tokentype.InterchangeTrailer {
+		t.Error("Wrong token type")
+	}
+	if tType := l.tokenTypeForSeq([]rune("Test")); tType != tokentype.UserDataSegments {
+		t.Error("Wrong token type")
 	}
 }

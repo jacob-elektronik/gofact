@@ -30,30 +30,3 @@ func TestAddToken(t *testing.T) {
 		t.Error("Expect len > 0")
 	}
 }
-
-func TestTokenTypeForSeq(t *testing.T) {
-	if tType := tokenTypeForSeq([]rune("UNA")); tType != tokentype.ServiceStringAdvice {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("UNB")); tType != tokentype.InterchangeHeader {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("UNG")); tType != tokentype.FunctionalGroupHeader {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("UNH")); tType != tokentype.MessageHeader {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("UNT")); tType != tokentype.MessageTrailer {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("UNE")); tType != tokentype.FunctionalGroupTrailer {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("UNZ")); tType != tokentype.InterchangeTrailer {
-		t.Error("Wrong token type")
-	}
-	if tType := tokenTypeForSeq([]rune("Test")); tType != tokentype.UserDataSegments {
-		t.Error("Wrong token type")
-	}
-}
