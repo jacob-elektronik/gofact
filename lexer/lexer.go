@@ -3,6 +3,7 @@ package lexer
 import (
 	"jacob.de/gofact/token"
 	"jacob.de/gofact/tokentype"
+	"jacob.de/gofact/utils"
 )
 
 // Lexer lexer object with functions
@@ -16,6 +17,8 @@ type Lexer struct {
 	currentColumn          int
 	currentLine            int
 	lastTokenType          int
+	tmpSeqLine             int
+	tmpSeqColumn           int
 }
 
 // NewLexer generate a new lexer object
@@ -35,8 +38,8 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 	ctrlRunes, defaultCtrl := l.getUNARunes()
 	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	if !defaultCtrl {
-		addToken(&tokens, token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1})
-		addToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
+		utils.AddToken(&tokens, token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1})
+		utils.AddToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
 		l.currentLine++
 		l.currentColumn = 1
 	}
@@ -48,9 +51,9 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 				continue
 			}
 			if contentToken := l.findContentToken(); contentToken != nil {
-				addToken(&tokens, *contentToken)
+				utils.AddToken(&tokens, *contentToken)
 			}
-			addToken(&tokens, *ctrlToken)
+			utils.AddToken(&tokens, *ctrlToken)
 		} else {
 			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
 		}
@@ -75,13 +78,22 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 				l.releaseIndicatorActive = true
 				continue
 			}
-			if contentToken := l.findContentToken(); contentToken != nil {
-				l.lastTokenType = contentToken.TokenType
-				ch <- *contentToken
+			for {
+				if contentToken := l.findContentToken(); contentToken != nil {
+					l.lastTokenType = contentToken.TokenType
+					ch <- *contentToken
+				} else {
+					break
+				}
 			}
+
 			l.lastTokenType = ctrlToken.TokenType
 			ch <- *ctrlToken
 		} else {
+			if len(l.CurrentSeq) == 0 {
+				l.tmpSeqLine = l.currentLine
+				l.tmpSeqColumn = l.currentColumn
+			}
 			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
 		}
 	}
@@ -98,33 +110,68 @@ func (l *Lexer) findControlToken() *token.Token {
 	}
 	switch *l.CurrentRunePtr {
 	case l.CtrlRunes.CompontentDelimiter:
-		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.ElementDelimiter:
-		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.SegmentTerminator:
-		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.ReleaseIndicator:
-		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.DecimalDelimiter:
-		return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn - len(string(*l.CurrentRunePtr)), Line: l.currentLine}
+		return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	}
 	return nil
 }
 
 func (l *Lexer) findContentToken() *token.Token {
 	if len(l.CurrentSeq) > 0 {
-		t := &token.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: l.currentColumn - len(string(l.CurrentSeq)), Line: l.currentLine}
+		// if tmpSeq := l.findTaginSeq(l.CurrentSeq); tmpSeq != nil {
+		// 	t := &token.Token{TokenType: tokentype.Error, TokenValue: "Unknown Token: " + string(l.CurrentSeq), Column: l.tmpSeqColumn, Line: l.tmpSeqLine}
+		// }
+		// if tmpSeq := l.findTaginSeq(l.CurrentSeq); tmpSeq != nil {
+		// 	t := &token.Token{TokenType: tokentype.Error, TokenValue: "Unknown Token: " + string(l.CurrentSeq), Column: l.tmpSeqColumn, Line: l.tmpSeqLine}
+		// 	l.CurrentSeq = l.CurrentSeq[len(l.CurrentSeq)-3 : len(l.CurrentSeq)]
+		// 	l.tmpSeqColumn = l.tmpSeqColumn + len(tmpSeq)
+		// 	return t
+		// }
+		// if l.lastTokenType == tokentype.SegmentTerminator {
+		// 	if isSegment(string(tmpSeq)) {
+		// }
+		column := l.currentColumn - len(string(l.CurrentSeq))
+		if column < 0 {
+			column = 1
+		}
+		t := &token.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: column, Line: l.currentLine}
 		l.CurrentSeq = []rune{}
+		l.tmpSeqColumn = 0
+		l.tmpSeqLine = 0
 		return t
 	}
 	return nil
 }
 
+func (l *Lexer) findTaginSeq(seq []rune) []rune {
+	if len(seq) > 3 {
+		tmpSeq := seq[len(seq)-3 : len(seq)]
+		if utils.IsSegment(string(tmpSeq)) {
+			return seq[:len(seq)-3]
+		}
+
+		if utils.IsServiceTag(string(tmpSeq)) {
+			return seq[:len(seq)-3]
+		}
+	}
+	return nil
+}
+
 func (l *Lexer) tokenTypeForSeq(seq []rune) int {
-	tType := tokenTypeForRuneMap[string(seq)]
+	tType := utils.TokenTypeForRuneMap[string(seq)]
 	if tType == 0 {
-		if l.lastTokenType == tokentype.SegmentTerminator {
+		if utils.IsSegment(string(seq)) {
 			return tokentype.SegmentTag
+		}
+		if l.findTaginSeq(seq) != nil {
+			return tokentype.Error
 		}
 		return tokentype.UserDataSegments
 	}
@@ -134,12 +181,12 @@ func (l *Lexer) tokenTypeForSeq(seq []rune) int {
 func (l *Lexer) getUNARunes() ([]rune, bool) {
 	var ctrlRunes []rune
 	var defaultCtrl bool
-	if compareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
+	if utils.CompareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
 		ctrlRunes = l.EdiFactMessage[3:9]
 		l.EdiFactMessage = l.EdiFactMessage[9:]
 		defaultCtrl = false
 	} else {
-		ctrlRunes = []rune(defaultCtrlString) // user default values
+		ctrlRunes = []rune(utils.DefaultCtrlString) // user default values
 		defaultCtrl = true
 	}
 	return ctrlRunes, defaultCtrl
@@ -169,7 +216,7 @@ func (l *Lexer) nextRune() bool {
 
 // checkForIgnoreChar check if the current char is in the ignoreSequence array
 func (l *Lexer) checkForIgnoreRune() bool {
-	for _, tmpSlice := range ignoreSeq {
+	for _, tmpSlice := range utils.IgnoreSeq {
 		for _, e := range tmpSlice {
 			if *l.CurrentRunePtr == e {
 				return true

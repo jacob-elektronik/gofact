@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"text/tabwriter"
 
 	"jacob.de/gofact/lexer"
@@ -12,6 +13,7 @@ import (
 	"jacob.de/gofact/segmenttype"
 	"jacob.de/gofact/token"
 	"jacob.de/gofact/tokentype"
+	"jacob.de/gofact/utils"
 )
 
 // Parser struct
@@ -47,6 +49,9 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 	p.currenState = state.StartState
 	go lexer.GetEdiTokensConcurrent(tokenChan)
 	for t := range tokenChan {
+		if t.TokenType == tokentype.Error {
+			return errors.New("Parser error, " + t.TokenValue + " | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+		}
 		if err := p.parseToken(t); err != nil {
 			return err
 		}
@@ -63,60 +68,66 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 }
 
 func (p *Parser) parseToken(t token.Token) error {
+	seg := segment.Segment{}
 	switch t.TokenType {
 	case tokentype.ServiceStringAdvice:
 		if len(p.Segments) > 0 {
-			return errors.New("Parser error, ServiceStringAdvice(UNA) on wrong position | Line: " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, ServiceStringAdvice(UNA) on wrong position | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		seg := segment.Segment{}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
-		p.addSegment(seg)
 	case tokentype.ControlChars:
 		if p.lastToken.TokenType != tokentype.ServiceStringAdvice {
 			return errors.New("Parser error, ControlChars need a UNA Messag | Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
+		return nil
 	case tokentype.InterchangeHeader:
 		if p.lastToken == nil || p.lastToken.TokenType == tokentype.ControlChars {
-			seg := segment.Segment{}
 			seg.SType = segmenttype.ServiceSegment
 			seg.Tag = t.TokenValue
-			p.addSegment(seg)
 		} else {
 			return errors.New("Parser error, InterchangeHeader only after ControlChars ord at first line | Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
-
 	case tokentype.FunctionalGroupHeader, tokentype.MessageHeader:
-		seg := segment.Segment{}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
-		p.addSegment(seg)
 	case tokentype.ElementDelimiter, tokentype.UserDataSegments, tokentype.CompontentDelimiter, tokentype.SegmentTerminator:
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
+		return nil
 	case tokentype.SegmentTag:
 		if p.lastToken.TokenType != tokentype.SegmentTerminator {
 			return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
-		seg := segment.Segment{}
-		seg.SType = segmenttype.DataSegment
+		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
-		p.addSegment(seg)
 	case tokentype.FunctionalGroupTrailer, tokentype.InterchangeTrailer, tokentype.MessageTrailer:
 		if p.lastToken.TokenType != tokentype.SegmentTerminator {
 			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
-		seg := segment.Segment{}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
-		p.addSegment(seg)
 	}
+	if p.lastToken != nil && p.lastToken.TokenType != tokentype.ServiceStringAdvice &&
+		p.lastToken.TokenType != tokentype.ControlChars &&
+		p.lastToken.TokenType != tokentype.SegmentTerminator {
+		return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
+	}
+	p.addSegment(seg)
 	return nil
 }
 
 func (p *Parser) addSegment(s segment.Segment) {
 	p.Segments = append(p.Segments, s)
 	p.currentSegment = &p.Segments[len(p.Segments)-1]
+}
+
+func (p *Parser) segmentTypeForSeq(seq string) int {
+	sType := utils.SegmentTypeFoString[seq]
+	if sType == 0 {
+		return segmenttype.Unknown
+	}
+	return sType
 }
 
 // func (p *Parser) parseToken(t token.Token) {

@@ -1,0 +1,237 @@
+Ref: https://www.stylusstudio.com/edifact/D04B/segments.htm
+
+UN/CEFACT Revision 2004B Segment List
+
+AAI	Accommodation allocation information
+ADI	Health care claim adjudication information
+ADR	Address
+ADS	Address
+AGR	Agreement identification
+AJT	Adjustment details
+ALC	Allowance or charge
+ALI	Additional information
+ALS	Additional location information
+APD	Additional transport details
+APP	Applicability
+APR	Additional price information
+ARD	Monetary amount function
+ARR	Array information
+ASD	Service details
+ASI	Array structure identification
+ATI	Tour information
+ATR	Attribute
+ATT	Attribute
+AUT	Authentication result
+BAS	Basis
+BCD	Benefit and coverage detail
+BGM	Beginning of message
+BII	Structure identification
+BLI	Billable information
+BUS	Business function
+CAV	Characteristic value
+CCD	Credit cover details
+CCI	Characteristic/class id
+CDI	Physical or logical state
+CDS	Code set identification
+CDV	Code value definition
+CED	Computer environment details
+CIN	Clinical information
+CLA	Clause identification
+CLI	Clinical intervention
+CLT	Clear terminate information
+CMN	Commission information
+CMP	Composite data element identification
+CNI	Consignment information
+CNT	Control total
+CNX	Connection details
+CNY	Country information
+COD	Component details
+COM	Communication contact
+CON	Contact information
+COT	Contribution details
+CPI	Charge payment instructions
+CPS	Consignment packing sequence
+CPT	Account identification
+CRI	Consumer reference information
+CST	Customs status of goods
+CTA	Contact information
+CUR	Currencies
+CUX	Currencies
+DAM	Damage
+DAV	Daily availability
+DFN	Definition function
+DGS	Dangerous goods
+DII	Directory identification
+DIM	Dimensions
+DIS	Discount information
+DLI	Document line identification
+DLM	Delivery limitations
+DMS	Document/message summary
+DNT	Dental information
+DOC	Document/message details
+DRD	Data representation details
+DSG	Dosage administration
+DSI	Data set identification
+DTI	Date and time information
+DTM	Date/time/period
+EDT	Editing details
+EFI	External file link identification
+ELM	Simple data element details
+ELU	Data element usage details
+ELV	Element value definition
+EMP	Employment details
+EQA	Attached equipment
+EQD	Equipment details
+EQN	Number of units
+ERC	Application error information
+ERI	Application error information
+ERP	Error point details
+EVE	Event
+FCA	Financial charges allocation
+FII	Financial institution information
+FNS	Footnote set
+FNT	Footnote
+FOR	Formula
+	FRM	Follow-up action
+FRQ	Frequency
+FSQ	Formula sequence
+FTI	Frequent traveller information
+FTX	Free text
+GDS	Nature of cargo
+GEI	Processing information
+GID	Goods item details
+GIN	Goods identity number
+GIR	Related identification numbers
+GOR	Governmental requirements
+GPO	Geographical position
+GRU	Segment group usage details
+HAN	Handling instructions
+HDI	Hardware device information
+HDR	Header information
+HDS	Health diagnosis service and delivery
+HYN	Hierarchy information
+ICD	Insurance cover description
+ICI	Insurance cover information
+IDE	Identity
+IFD	Information detail
+IFT	Interactive free text
+IHC	Person characteristic
+IMD	Item description
+IND	Index details
+INP	Parties and instruction
+INV	Inventory management related details
+IRQ	Information required
+ITC	Institutional claim
+ITD	Information type data
+ITM	Item number
+LAN	Language
+LIN	Line item
+LKP	Level indication
+LNG	Language
+LOC	Place/location identification
+MAP	Message application product information
+MEA	Measurements
+MEM	Membership details
+MES	Measurements
+MKS	Market/sales channel information
+MOA	Monetary amount
+MOV	Car delivery instruction
+MSD	Message action details
+MSG	Message type identification
+MTD	Maintenance operation details
+NAA	Name and address
+NAD	Name and address
+NAT	Nationality
+NME	Name
+NUN	Number of units
+ODI	Origin and destination details
+ODS	Additional product details
+ORG	Originator of request details
+OTI	Other insurance
+PAC	Package
+PAI	Payment instructions
+PAS	Attendance
+PCC	Premium calculation component details
+PCD	Percentage details
+PCI	Package identification
+PDI	Person demographic information
+PDT	Product information
+PER	Period related details
+PGI	Product group information
+PIA	Additional product id
+PLI	Product location information
+PMT	Payment information
+PNA	Party identification
+POC	Purpose of conveyance call
+POP	Period of operation
+POR	Location and/or related time information
+POS	Point of sale information
+PRC	Process identification
+PRD	Product identification
+PRE	Price details
+PRI	Price details
+PRO	Promotions
+PRT	Party information
+PRV	Proviso details
+PSD	Physical sample description
+PSI	Service information
+PTY	Priority
+PYT	Payment terms
+QRS	Query and response
+QTI	Quantity
+QTY	Quantity
+QUA	Qualification
+QVR	Quantity variances
+RCI	Reservation control information
+RCS	Requirements and conditions
+REL	Relationship
+RFF	Reference
+RFR	Reference
+RJL	Accounting journal identification
+RLS	Relationship
+RNG	Range details
+ROD	Risk object type
+RPI	Quantity and action details
+RSL	Result
+RTC	Rate types
+RTE	Rate details
+RTI	Rate details
+RUL	Rule information
+SAL	Remuneration type identification
+SCC	Scheduling conditions
+SCD	Structure component definition
+SDT	Selection details
+SEG	Segment identification
+SEL	Seal number
+SEQ	Sequence details
+SER	Facility information
+SFI	Safety information
+SGP	Split goods placement
+SGU	Segment usage details
+SPR	Organisation classification details
+SPS	Sampling parameters for summary statistics
+SSR	Special requirement details
+STA	Statistics
+STC	Statistical concept
+STG	Stages
+STS	Status
+TAX	Duty/tax/fee details
+TCC	Charge/rate calculations
+TCE	Time and certainty
+TDI	Traveller document information
+TDT	Transport information
+TEM	Test method
+TFF	Tariff information
+TIF	Traveller information
+TIZ	Time zone information
+TMD	Transport movement details
+TMP	Temperature
+TOD	Terms of delivery or transport
+TPL	Transport placement
+TRF	Traffic restriction details
+TRU	Technical rules
+TSR	Transport service requirements
+TVL	Travel product information
+TXS	Taxes
+VEH	Vehicle
+VLI	Value list identification
