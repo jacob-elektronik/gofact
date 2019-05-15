@@ -5,7 +5,7 @@ import (
 	"jacob.de/gofact/tokentype"
 )
 
-var IgnoreSeq = [][]rune{[]rune("\n"), []rune("\r\n")}
+var IgnoreSeq = [][]rune{[]rune("\n"), []rune(" ")}
 
 var TokenTypeForRuneMap = map[string]int{
 	"UNA": tokentype.ServiceStringAdvice,

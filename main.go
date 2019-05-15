@@ -17,13 +17,17 @@ var message = flag.String("message", "", "edifact message file")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
 func main() {
-	// argsWithoutProg := os.Args[1:]
-	// dat, _ := ioutil.ReadFile("huge_file2.edi")
-	// dat, _ := ioutil.ReadFile(argsWithoutProg[0])
+	// dat, _ := ioutil.ReadFile("siemens")
 	// l := lexer.NewLexer(string(dat))
 	// tokenChan := make(chan token.Token)
 	// go l.GetEdiTokensConcurrent(tokenChan)
-	// start := time.Now()
+	// const padding = 3
+	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	// for t := range tokenChan {
+	// 	fmt.Fprintln(w, t)
+	// }
+	// w.Flush()
+
 	flag.Parse()
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -49,6 +53,21 @@ func main() {
 		}
 	}
 
+	// dat, _ := ioutil.ReadFile("siemens")
+	// p := parser.NewParser(string(dat))
+	// err := p.ParseEdiFactMessageConcurrent()
+	// fmt.Println(err)
+
+	// dat, _ := ioutil.ReadFile("siemens")
+	// l := lexer.NewLexer(string(dat))
+	// tokenChan := make(chan token.Token)
+	// go l.GetEdiTokensConcurrent(tokenChan)
+	// const padding = 3
+	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	// for t := range tokenChan {
+	// 	fmt.Fprintln(w, t)
+	// }
+	// w.Flush()
 	if *message != "" {
 		dat, _ := ioutil.ReadFile(*message)
 		p := parser.NewParser(string(dat))

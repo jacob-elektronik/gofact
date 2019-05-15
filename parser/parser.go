@@ -2,7 +2,10 @@ package parser
 
 import (
 	"errors"
+	"fmt"
+	"os"
 	"strconv"
+	"text/tabwriter"
 
 	"jacob.de/gofact/lexer"
 	"jacob.de/gofact/parser/state"
@@ -18,18 +21,18 @@ type Parser struct {
 	EdiFactMessage string
 	// Tokens                       []token.Token
 	// lastToken                    *token.Token
-	currenState                  int
-	root                         *ediTree
-	currentNode                  *ediTree
-	Segments                     []segment.Segment
-	currentSegment               *segment.Segment
-	interChangeHeaderOpen        bool
-	functionalGroupHeaderOpen    bool
-	messageHeaderOpen            bool
-	messageTrailer               bool
-	functionalGroupHeaderTrailer bool
-	interChangeTrailer           bool
-	lastTokenType                int
+	currenState               int
+	root                      *ediTree
+	currentNode               *ediTree
+	Segments                  []segment.Segment
+	currentSegment            *segment.Segment
+	interChangeHeaderOpen     bool
+	functionalGroupHeaderOpen bool
+	messageHeaderOpen         bool
+	// messageTrailer               bool
+	// functionalGroupHeaderTrailer bool
+	// interChangeTrailer           bool
+	lastTokenType int
 }
 
 // NewParser generate a new Parser object
@@ -64,12 +67,12 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 		// p.lastToken = &p.Tokens[len(p.Tokens)-1]
 
 	}
-	// const padding = 3
-	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-	// for _, s := range p.Segments {
-	// 	fmt.Fprintln(w, s)
-	// }
-	// w.Flush()
+	const padding = 3
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	for _, s := range p.Segments {
+		fmt.Fprintln(w, s)
+	}
+	w.Flush()
 	return nil
 }
 
@@ -84,20 +87,24 @@ func (p *Parser) parseToken(t token.Token) error {
 		seg.Tag = t.TokenValue
 	case tokentype.ControlChars:
 		if p.lastTokenType != tokentype.ServiceStringAdvice {
-			return errors.New("Parser error, ControlChars need a UNA Messag | Line: " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, ControlChars need a UNA Messag | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
 	case tokentype.InterchangeHeader:
-		p.checkServiceSegmentSyntax(&t)
+		if err := p.checkServiceSegmentSyntax(&t); err != nil {
+			return err
+		}
 		if p.lastTokenType == -1 || p.lastTokenType == tokentype.ControlChars {
 			seg.SType = segmenttype.ServiceSegment
 			seg.Tag = t.TokenValue
 		} else {
-			return errors.New("Parser error, InterchangeHeader only after ControlChars ord at first line | Line: " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, InterchangeHeader only after ControlChars ord at first line | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 	case tokentype.FunctionalGroupHeader, tokentype.MessageHeader:
-		p.checkServiceSegmentSyntax(&t)
+		if err := p.checkServiceSegmentSyntax(&t); err != nil {
+			return err
+		}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
 	case tokentype.ElementDelimiter, tokentype.UserDataSegments, tokentype.CompontentDelimiter, tokentype.SegmentTerminator:
@@ -105,26 +112,30 @@ func (p *Parser) parseToken(t token.Token) error {
 		return nil
 	case tokentype.SegmentTag:
 		if p.lastTokenType != tokentype.SegmentTerminator {
-			return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	case tokentype.FunctionalGroupTrailer, tokentype.InterchangeTrailer, tokentype.MessageTrailer:
-		p.checkServiceSegmentSyntax(&t)
+		if err := p.checkServiceSegmentSyntax(&t); err != nil {
+			return err
+		}
 		if p.lastTokenType != tokentype.SegmentTerminator {
-			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator| Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
 	default:
-		p.checkServiceSegmentSyntax(&t)
+		if err := p.checkServiceSegmentSyntax(&t); err != nil {
+			return err
+		}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
 	}
 	if p.lastTokenType != -1 && p.lastTokenType != tokentype.ServiceStringAdvice &&
 		p.lastTokenType != tokentype.ControlChars &&
 		p.lastTokenType != tokentype.SegmentTerminator {
-		return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
+		return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 	}
 	p.addSegment(seg)
 	return nil
@@ -136,41 +147,44 @@ func (p *Parser) checkServiceSegmentSyntax(t *token.Token) error {
 		p.interChangeHeaderOpen = true
 	case tokentype.FunctionalGroupHeader:
 		if !p.interChangeHeaderOpen {
-			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, no Interchange Header found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+		}
+		if p.messageHeaderOpen {
+			return errors.New("Parser error, no Functional Group Header in Message allowed:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		p.functionalGroupHeaderOpen = true
 	case tokentype.MessageHeader:
 		if !p.interChangeHeaderOpen {
-			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, missing interchange header:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		p.messageHeaderOpen = true
 	case tokentype.MessageTrailer:
 		if !p.interChangeHeaderOpen {
-			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, no Interchange Header found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		if !p.messageHeaderOpen {
-			return errors.New("Parser error, no open Message Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, no open Message Header for Trailer found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		p.messageTrailer = true
+		p.messageHeaderOpen = false
 	case tokentype.FunctionalGroupTrailer:
 		if !p.interChangeHeaderOpen {
-			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, no Interchange Header found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		if !p.functionalGroupHeaderOpen {
-			return errors.New("Parser error, no open Functional Group Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, no Functional Group Header for Trailer found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		p.functionalGroupHeaderTrailer = true
+		p.functionalGroupHeaderOpen = false
 	case tokentype.InterchangeTrailer:
 		if !p.interChangeHeaderOpen {
-			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+			return errors.New("Parser error, no open Interchange Header found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		if !p.messageHeaderOpen {
-			return errors.New("Parser error, no Message Trailer found:  " + string(t.Line) + " Column: " + string(t.Column))
+		if p.messageHeaderOpen {
+			return errors.New("Parser error, no Message Trailer found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		if !p.functionalGroupHeaderOpen {
-			return errors.New("Parser error, no open Functional Group Trailer found:  " + string(t.Line) + " Column: " + string(t.Column))
+		if p.functionalGroupHeaderOpen {
+			return errors.New("Parser error, no close Functional Group Trailer found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		p.interChangeTrailer = true
+		p.interChangeHeaderOpen = false
 	}
 	return nil
 }

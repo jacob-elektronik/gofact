@@ -19,6 +19,7 @@ type Lexer struct {
 	lastTokenType          int
 	tmpSeqLine             int
 	tmpSeqColumn           int
+	segmentTagOpen         bool
 }
 
 // NewLexer generate a new lexer object
@@ -80,7 +81,7 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 		ch <- token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
 		ch <- token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
 		l.lastTokenType = tokentype.ControlChars
-		l.currentColumn = 1
+		l.currentColumn = 3 + len(ctrlRunes)
 	}
 	l.CurrentRunePos = -1
 	for l.nextRune() {
@@ -124,11 +125,13 @@ func (l *Lexer) findControlToken() *token.Token {
 	case l.CtrlRunes.ElementDelimiter:
 		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.SegmentTerminator:
+		l.segmentTagOpen = false
 		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.ReleaseIndicator:
 		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.DecimalDelimiter:
-		return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return nil
+		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	}
 	return nil
 }
@@ -165,12 +168,17 @@ func (l *Lexer) findTaginSeq(seq []rune) []rune {
 func (l *Lexer) tokenTypeForSeq(seq []rune) int {
 	tType := utils.TokenTypeForRuneMap[string(seq)]
 	if tType == 0 {
-		if utils.IsSegment(string(seq)) {
-			return tokentype.SegmentTag
-		}
-		if l.findTaginSeq(seq) != nil {
+		// after segment termination there must be a valid tag
+		if l.lastTokenType == tokentype.SegmentTerminator && !utils.IsSegment(string(seq)) {
 			return tokentype.Error
 		}
+
+		// if ther eis no segment open and we find a new tag, set segmentTagOpen to true
+		if utils.IsSegment(string(seq)) && !l.segmentTagOpen {
+			l.segmentTagOpen = true
+			return tokentype.SegmentTag
+		}
+		// if there is no other option return data segment
 		return tokentype.UserDataSegments
 	}
 	return tType
@@ -202,8 +210,17 @@ func (l *Lexer) nextRune() bool {
 	if l.CurrentRunePos < len(l.EdiFactMessage) {
 		l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		for l.checkForIgnoreRune() {
-			l.currentLine++
-			l.currentColumn = 1
+			if *l.CurrentRunePtr == '\n' {
+				l.currentLine++
+				l.currentColumn = 1
+			}
+			if *l.CurrentRunePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
+				return true
+			}
+			// if *l.CurrentRunePtr != ' ' {
+			// 	l.currentColumn++
+			// }
+			l.currentColumn++
 			l.CurrentRunePos++
 			l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
 		}
