@@ -92,7 +92,7 @@ FII	Financial institution information
 FNS	Footnote set
 FNT	Footnote
 FOR	Formula
-	FRM	Follow-up action
+FRM	Follow-up action
 FRQ	Frequency
 FSQ	Formula sequence
 FTI	Frequent traveller information
