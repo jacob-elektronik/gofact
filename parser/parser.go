@@ -2,10 +2,7 @@ package parser
 
 import (
 	"errors"
-	"fmt"
-	"os"
 	"strconv"
-	"text/tabwriter"
 
 	"jacob.de/gofact/lexer"
 	"jacob.de/gofact/parser/state"
@@ -19,18 +16,25 @@ import (
 // Parser struct
 type Parser struct {
 	EdiFactMessage string
-	Tokens         []token.Token
-	lastToken      *token.Token
-	currenState    int
-	root           *ediTree
-	currentNode    *ediTree
-	Segments       []segment.Segment
-	currentSegment *segment.Segment
+	// Tokens                       []token.Token
+	// lastToken                    *token.Token
+	currenState                  int
+	root                         *ediTree
+	currentNode                  *ediTree
+	Segments                     []segment.Segment
+	currentSegment               *segment.Segment
+	interChangeHeaderOpen        bool
+	functionalGroupHeaderOpen    bool
+	messageHeaderOpen            bool
+	messageTrailer               bool
+	functionalGroupHeaderTrailer bool
+	interChangeTrailer           bool
+	lastTokenType                int
 }
 
 // NewParser generate a new Parser object
 func NewParser(message string) *Parser {
-	return &Parser{EdiFactMessage: message, Tokens: nil}
+	return &Parser{EdiFactMessage: message, lastTokenType: -1}
 }
 
 // ParseEdiFactMessage start parsing edi message
@@ -55,15 +59,17 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 		if err := p.parseToken(t); err != nil {
 			return err
 		}
-		p.Tokens = append(p.Tokens, t)
-		p.lastToken = &p.Tokens[len(p.Tokens)-1]
+		p.lastTokenType = t.TokenType
+		// p.Tokens = append(p.Tokens, t)
+		// p.lastToken = &p.Tokens[len(p.Tokens)-1]
+
 	}
-	const padding = 3
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-	for _, s := range p.Segments {
-		fmt.Fprintln(w, s)
-	}
-	w.Flush()
+	// const padding = 3
+	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	// for _, s := range p.Segments {
+	// 	fmt.Fprintln(w, s)
+	// }
+	// w.Flush()
 	return nil
 }
 
@@ -77,43 +83,95 @@ func (p *Parser) parseToken(t token.Token) error {
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
 	case tokentype.ControlChars:
-		if p.lastToken.TokenType != tokentype.ServiceStringAdvice {
+		if p.lastTokenType != tokentype.ServiceStringAdvice {
 			return errors.New("Parser error, ControlChars need a UNA Messag | Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
 	case tokentype.InterchangeHeader:
-		if p.lastToken == nil || p.lastToken.TokenType == tokentype.ControlChars {
+		p.checkServiceSegmentSyntax(&t)
+		if p.lastTokenType == -1 || p.lastTokenType == tokentype.ControlChars {
 			seg.SType = segmenttype.ServiceSegment
 			seg.Tag = t.TokenValue
 		} else {
 			return errors.New("Parser error, InterchangeHeader only after ControlChars ord at first line | Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
 	case tokentype.FunctionalGroupHeader, tokentype.MessageHeader:
+		p.checkServiceSegmentSyntax(&t)
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
 	case tokentype.ElementDelimiter, tokentype.UserDataSegments, tokentype.CompontentDelimiter, tokentype.SegmentTerminator:
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
 	case tokentype.SegmentTag:
-		if p.lastToken.TokenType != tokentype.SegmentTerminator {
+		if p.lastTokenType != tokentype.SegmentTerminator {
 			return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	case tokentype.FunctionalGroupTrailer, tokentype.InterchangeTrailer, tokentype.MessageTrailer:
-		if p.lastToken.TokenType != tokentype.SegmentTerminator {
+		p.checkServiceSegmentSyntax(&t)
+		if p.lastTokenType != tokentype.SegmentTerminator {
 			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
 		}
 		seg.SType = segmenttype.ServiceSegment
 		seg.Tag = t.TokenValue
+	default:
+		p.checkServiceSegmentSyntax(&t)
+		seg.SType = segmenttype.ServiceSegment
+		seg.Tag = t.TokenValue
 	}
-	if p.lastToken != nil && p.lastToken.TokenType != tokentype.ServiceStringAdvice &&
-		p.lastToken.TokenType != tokentype.ControlChars &&
-		p.lastToken.TokenType != tokentype.SegmentTerminator {
+	if p.lastTokenType != -1 && p.lastTokenType != tokentype.ServiceStringAdvice &&
+		p.lastTokenType != tokentype.ControlChars &&
+		p.lastTokenType != tokentype.SegmentTerminator {
 		return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + string(t.Line) + " Column: " + string(t.Column))
 	}
 	p.addSegment(seg)
+	return nil
+}
+
+func (p *Parser) checkServiceSegmentSyntax(t *token.Token) error {
+	switch t.TokenType {
+	case tokentype.InterchangeHeader:
+		p.interChangeHeaderOpen = true
+	case tokentype.FunctionalGroupHeader:
+		if !p.interChangeHeaderOpen {
+			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		p.functionalGroupHeaderOpen = true
+	case tokentype.MessageHeader:
+		if !p.interChangeHeaderOpen {
+			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		p.messageHeaderOpen = true
+	case tokentype.MessageTrailer:
+		if !p.interChangeHeaderOpen {
+			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		if !p.messageHeaderOpen {
+			return errors.New("Parser error, no open Message Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		p.messageTrailer = true
+	case tokentype.FunctionalGroupTrailer:
+		if !p.interChangeHeaderOpen {
+			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		if !p.functionalGroupHeaderOpen {
+			return errors.New("Parser error, no open Functional Group Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		p.functionalGroupHeaderTrailer = true
+	case tokentype.InterchangeTrailer:
+		if !p.interChangeHeaderOpen {
+			return errors.New("Parser error, no Interchange Header found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		if !p.messageHeaderOpen {
+			return errors.New("Parser error, no Message Trailer found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		if !p.functionalGroupHeaderOpen {
+			return errors.New("Parser error, no open Functional Group Trailer found:  " + string(t.Line) + " Column: " + string(t.Column))
+		}
+		p.interChangeTrailer = true
+	}
 	return nil
 }
 
@@ -128,52 +186,4 @@ func (p *Parser) segmentTypeForSeq(seq string) int {
 		return segmenttype.Unknown
 	}
 	return sType
-}
-
-// func (p *Parser) parseToken(t token.Token) {
-// 	switch t.TokenType {
-// 	case tokentype.ServiceStringAdvice:
-// 		p.root = newTree(t)
-// 		p.currentNode = p.root
-// 	case tokentype.ControlChars:
-// 		p.currentNode.Left = newTree(t)
-// 		p.currentNode = p.root
-// 	case tokentype.InterchangeHeader:
-// 		if p.root == nil {
-// 			p.root = newTree(t)
-// 			p.currentNode = p.root
-// 		} else {
-// 			p.currentNode.Right = newTree(t)
-// 			p.currentNode = p.currentNode.Right
-// 		}
-// 	case tokentype.ElementDelimiter, tokentype.UserDataSegments, tokentype.CompontentDelimiter:
-// 		if p.currentNode.EDIToken.TokenType == tokentype.InterchangeHeader || p.currentNode.EDIToken.TokenType == tokentype.FunctionalGroupHeader || p.currentNode.EDIToken.TokenType == tokentype.MessageHeader {
-// 			p.currentNode.Left = newTree(t)
-// 			p.currentNode = p.currentNode.Left
-// 		} else {
-// 			p.currentNode.Right = newTree(t)
-// 			p.currentNode = p.currentNode.Right
-// 		}
-// 	case tokentype.SegmentTerminator:
-// 		p.currentNode.Left = newTree(t)
-// 		// walk back
-// 		p.currentNode = p.root
-// 		for p.currentNode.Right != nil {
-// 			p.currentNode = p.currentNode.Right
-// 		}
-// 		fmt.Println("debug")
-// 	case tokentype.FunctionalGroupHeader:
-// 		p.currentNode.Right = newTree(t)
-// 		p.currentNode = p.currentNode.Right
-// 	case tokentype.MessageHeader:
-// 		p.currentNode.Right = newTree(t)
-// 		p.currentNode = p.currentNode.Right
-// 	case tokentype.MessageTrailer, tokentype.FunctionalGroupTrailer, tokentype.InterchangeTrailer:
-// 		p.currentNode.Right = newTree(t)
-// 		p.currentNode = p.currentNode.Right
-// 	}
-// }
-
-func (p *Parser) printTree() {
-
 }

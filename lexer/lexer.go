@@ -50,11 +50,22 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 				l.releaseIndicatorActive = true
 				continue
 			}
-			if contentToken := l.findContentToken(); contentToken != nil {
-				utils.AddToken(&tokens, *contentToken)
+			for {
+				if contentToken := l.findContentToken(); contentToken != nil {
+					l.lastTokenType = contentToken.TokenType
+					utils.AddToken(&tokens, *contentToken)
+				} else {
+					break
+				}
+				l.lastTokenType = ctrlToken.TokenType
+				utils.AddToken(&tokens, *ctrlToken)
 			}
-			utils.AddToken(&tokens, *ctrlToken)
+
 		} else {
+			if len(l.CurrentSeq) == 0 {
+				l.tmpSeqLine = l.currentLine
+				l.tmpSeqColumn = l.currentColumn
+			}
 			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
 		}
 	}
@@ -102,7 +113,6 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 
 // findControlToken generate a control type token from current rune.
 // If the lexer found a release indicator we will not generate a control token here.
-// The token will be added to the content  token
 func (l *Lexer) findControlToken() *token.Token {
 	if l.releaseIndicatorActive {
 		l.releaseIndicatorActive = false
@@ -125,18 +135,6 @@ func (l *Lexer) findControlToken() *token.Token {
 
 func (l *Lexer) findContentToken() *token.Token {
 	if len(l.CurrentSeq) > 0 {
-		// if tmpSeq := l.findTaginSeq(l.CurrentSeq); tmpSeq != nil {
-		// 	t := &token.Token{TokenType: tokentype.Error, TokenValue: "Unknown Token: " + string(l.CurrentSeq), Column: l.tmpSeqColumn, Line: l.tmpSeqLine}
-		// }
-		// if tmpSeq := l.findTaginSeq(l.CurrentSeq); tmpSeq != nil {
-		// 	t := &token.Token{TokenType: tokentype.Error, TokenValue: "Unknown Token: " + string(l.CurrentSeq), Column: l.tmpSeqColumn, Line: l.tmpSeqLine}
-		// 	l.CurrentSeq = l.CurrentSeq[len(l.CurrentSeq)-3 : len(l.CurrentSeq)]
-		// 	l.tmpSeqColumn = l.tmpSeqColumn + len(tmpSeq)
-		// 	return t
-		// }
-		// if l.lastTokenType == tokentype.SegmentTerminator {
-		// 	if isSegment(string(tmpSeq)) {
-		// }
 		column := l.currentColumn - len(string(l.CurrentSeq))
 		if column < 0 {
 			column = 1
