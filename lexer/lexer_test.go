@@ -227,7 +227,23 @@ func TestTokenTypeForSeq(t *testing.T) {
 	if tType := l.tokenTypeForSeq([]rune("UNZ")); tType != tokentype.InterchangeTrailer {
 		t.Error("Wrong token type")
 	}
+	if tType := l.tokenTypeForSeq([]rune("QTY")); tType != tokentype.SegmentTag {
+		t.Error("Wrong token type")
+	}
 	if tType := l.tokenTypeForSeq([]rune("Test")); tType != tokentype.UserDataSegments {
 		t.Error("Wrong token type")
+	}
+}
+
+func TestFindTagInSeq(t *testing.T) {
+	l := NewLexer(msg)
+	if l.findTaginSeq([]rune{0, 1}) != nil {
+		t.Error("Expect nil, rune len < 3")
+	}
+	if l.findTaginSeq([]rune{104, 117, 104, 117, 81, 84, 89}) == nil {
+		t.Error("Expect none nil, rune contains QTY")
+	}
+	if l.findTaginSeq([]rune{104, 117, 104, 117}) != nil {
+		t.Error("Expect nil, no tag in rune")
 	}
 }

@@ -1,9 +1,13 @@
 package lexer
 
-import "testing"
+import (
+	"testing"
+
+	"jacob.de/gofact/utils"
+)
 
 func TestNewCtrlRunes(t *testing.T) {
-	c := newCtrlRunes([]rune(defaultCtrlString))
+	c := newCtrlRunes([]rune(utils.DefaultCtrlString))
 	if c == nil {
 		t.Error("Expect none nil value")
 	}
@@ -19,7 +23,7 @@ func TestNewCtrlRunes(t *testing.T) {
 	}
 }
 func TestIsCtrlRune(t *testing.T) {
-	c := newCtrlRunes([]rune(defaultCtrlString))
+	c := newCtrlRunes([]rune(utils.DefaultCtrlString))
 	if !c.isCtrlRune(':') {
 		t.Error("Expect true")
 	}
