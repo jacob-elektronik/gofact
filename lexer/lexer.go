@@ -213,13 +213,13 @@ func (l *Lexer) nextRune() bool {
 			if *l.CurrentRunePtr == '\n' {
 				l.currentLine++
 				l.currentColumn = 1
+				l.CurrentRunePos++
+				l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
+				return true
 			}
 			if *l.CurrentRunePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
 				return true
 			}
-			// if *l.CurrentRunePtr != ' ' {
-			// 	l.currentColumn++
-			// }
 			l.currentColumn++
 			l.CurrentRunePos++
 			l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
