@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"jacob.de/gofact/token"
+	"jacob.de/gofact/editoken"
 	"jacob.de/gofact/tokentype"
 )
 
@@ -41,9 +41,9 @@ func TestGetEdiTokens(t *testing.T) {
 
 func TestGetEdiTokensConcurrent(t *testing.T) {
 	l := NewLexer(msg)
-	tokenChan := make(chan token.Token)
+	tokenChan := make(chan editoken.Token)
 	go l.GetEdiTokensConcurrent(tokenChan)
-	tokens := []token.Token{}
+	var tokens []editoken.Token
 	for t := range tokenChan {
 		tokens = append(tokens, t)
 	}
@@ -65,12 +65,6 @@ func TestFindControlToken(t *testing.T) {
 		t.Error("Expect control token")
 	}
 	r = rune('+')
-	l.CurrentRunePtr = &r
-	controlT = l.findControlToken()
-	if controlT == nil {
-		t.Error("Expect control token")
-	}
-	r = rune('.')
 	l.CurrentRunePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
@@ -100,7 +94,7 @@ func TestFindControlToken(t *testing.T) {
 		t.Error("Expect nil value")
 	}
 	// escape sign should be disabled now
-	r = rune('.')
+	r = rune('+')
 	l.CurrentRunePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"jacob.de/gofact/token"
+	"jacob.de/gofact/editoken"
 	"jacob.de/gofact/tokentype"
 )
 
@@ -62,7 +62,7 @@ func CompareRuneSeq(a, b []rune) bool {
 }
 
 // addToken add a token to a token slice
-func AddToken(tokens *[]token.Token, t token.Token) {
+func AddToken(tokens *[]editoken.Token, t editoken.Token) {
 	*tokens = append(*tokens, t)
 }
 

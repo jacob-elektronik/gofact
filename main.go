@@ -4,12 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"jacob.de/gofact/parser"
 	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
-
-	"jacob.de/gofact/parser"
 )
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
@@ -53,21 +52,21 @@ func main() {
 		}
 	}
 
-	// dat, _ := ioutil.ReadFile("siemens")
-	// p := parser.NewParser(string(dat))
-	// err := p.ParseEdiFactMessageConcurrent()
-	// fmt.Println(err)
+	//dat, _ := ioutil.ReadFile("siemens")
+	//p := parser.NewParser(string(dat))
+	//err := p.ParseEdiFactMessageConcurrent()
+	//fmt.Println(err)
 
-	// dat, _ := ioutil.ReadFile("siemens")
-	// l := lexer.NewLexer(string(dat))
-	// tokenChan := make(chan token.Token)
-	// go l.GetEdiTokensConcurrent(tokenChan)
-	// const padding = 3
-	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-	// for t := range tokenChan {
-	// 	fmt.Fprintln(w, t)
-	// }
-	// w.Flush()
+	//dat, _ := ioutil.ReadFile("edi_messages/siemens")
+	//l := lexer.NewLexer(string(dat))
+	//tokenChan := make(chan editoken.Token)
+	//go l.GetEdiTokensConcurrent(tokenChan)
+	//const padding = 3
+	//w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+	//for t := range tokenChan {
+	//	_, _ = fmt.Fprintln(w, t)
+	//}
+	//_ = w.Flush()
 	if *message != "" {
 		dat, _ := ioutil.ReadFile(*message)
 		p := parser.NewParser(string(dat))

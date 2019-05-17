@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"jacob.de/gofact/token"
+	"jacob.de/gofact/editoken"
 	"jacob.de/gofact/tokentype"
 	"jacob.de/gofact/utils"
 )
@@ -34,13 +34,13 @@ func NewLexer(message string) *Lexer {
 }
 
 // GetEdiTokens start reading the message and generate tokens
-func (l *Lexer) GetEdiTokens() []token.Token {
-	tokens := []token.Token{}
+func (l *Lexer) GetEdiTokens() []editoken.Token {
+	var tokens []editoken.Token
 	ctrlRunes, defaultCtrl := l.getUNARunes()
 	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	if !defaultCtrl {
-		utils.AddToken(&tokens, token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1})
-		utils.AddToken(&tokens, token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
+		utils.AddToken(&tokens, editoken.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1})
+		utils.AddToken(&tokens, editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
 		l.currentLine++
 		l.currentColumn = 1
 	}
@@ -74,12 +74,12 @@ func (l *Lexer) GetEdiTokens() []token.Token {
 }
 
 // GetEdiTokensConcurrent write the tokens to a channel
-func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
+func (l *Lexer) GetEdiTokensConcurrent(ch chan<- editoken.Token) {
 	ctrlRunes, defaultCtrl := l.getUNARunes()
 	l.CtrlRunes = newCtrlRunes(ctrlRunes)
 	if !defaultCtrl {
-		ch <- token.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
-		ch <- token.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
+		ch <- editoken.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
+		ch <- editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
 		l.lastTokenType = tokentype.ControlChars
 		l.currentColumn = 3 + len(ctrlRunes)
 	}
@@ -114,21 +114,21 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- token.Token) {
 
 // findControlToken generate a control type token from current rune.
 // If the lexer found a release indicator we will not generate a control token here.
-func (l *Lexer) findControlToken() *token.Token {
+func (l *Lexer) findControlToken() *editoken.Token {
 	if l.releaseIndicatorActive {
 		l.releaseIndicatorActive = false
 		return nil
 	}
 	switch *l.CurrentRunePtr {
 	case l.CtrlRunes.CompontentDelimiter:
-		return &token.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.ElementDelimiter:
-		return &token.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.SegmentTerminator:
 		l.segmentTagOpen = false
-		return &token.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.ReleaseIndicator:
-		return &token.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
 	case l.CtrlRunes.DecimalDelimiter:
 		return nil
 		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
@@ -136,13 +136,13 @@ func (l *Lexer) findControlToken() *token.Token {
 	return nil
 }
 
-func (l *Lexer) findContentToken() *token.Token {
+func (l *Lexer) findContentToken() *editoken.Token {
 	if len(l.CurrentSeq) > 0 {
 		column := l.currentColumn - len(string(l.CurrentSeq))
 		if column < 0 {
 			column = 1
 		}
-		t := &token.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: column, Line: l.currentLine}
+		t := &editoken.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: column, Line: l.currentLine}
 		l.CurrentSeq = []rune{}
 		l.tmpSeqColumn = 0
 		l.tmpSeqLine = 0
@@ -153,7 +153,7 @@ func (l *Lexer) findContentToken() *token.Token {
 
 func (l *Lexer) findTaginSeq(seq []rune) []rune {
 	if len(seq) > 3 {
-		tmpSeq := seq[len(seq)-3 : len(seq)]
+		tmpSeq := seq[len(seq)-3 :]
 		if utils.IsSegment(string(tmpSeq)) {
 			return seq[:len(seq)-3]
 		}
@@ -173,7 +173,7 @@ func (l *Lexer) tokenTypeForSeq(seq []rune) int {
 			return tokentype.Error
 		}
 
-		// if ther eis no segment open and we find a new tag, set segmentTagOpen to true
+		// if there is no segment open and we find a new tag, set segmentTagOpen to true
 		if utils.IsSegment(string(seq)) && !l.segmentTagOpen {
 			l.segmentTagOpen = true
 			return tokentype.SegmentTag

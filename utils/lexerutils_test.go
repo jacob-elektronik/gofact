@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	"jacob.de/gofact/token"
+	"jacob.de/gofact/editoken"
 	"jacob.de/gofact/tokentype"
 )
 
@@ -24,8 +24,8 @@ func TestCompareRuneSeq(t *testing.T) {
 }
 
 func TestAddToken(t *testing.T) {
-	tokens := []token.Token{}
-	AddToken(&tokens, token.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 0, Line: 1})
+	var tokens []editoken.Token
+	AddToken(&tokens, editoken.Token{TokenType: tokentype.UserDataSegments, TokenValue: "UNA", Column: 0, Line: 1})
 	if len(tokens) == 0 {
 		t.Error("Expect len > 0")
 	}
