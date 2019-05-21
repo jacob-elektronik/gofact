@@ -11,5 +11,8 @@ test:
 test_html:
 	go tool cover -html=testcover.out
 
+profile:
+	./gofact -message edi_messages/huge_file2.edi  -cpuprofile cpu.prof
+
 clean: 
 	if [ -a ./gofact ]; then rm ./gofact; fi;

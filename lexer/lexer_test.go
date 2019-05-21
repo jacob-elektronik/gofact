@@ -31,18 +31,11 @@ func TestNewLexer(t *testing.T) {
 	}
 }
 
+
 func TestGetEdiTokens(t *testing.T) {
 	l := NewLexer(msg)
-	tokens := l.GetEdiTokens()
-	if len(tokens) == 0 {
-		t.Error("Expect tokens > 0")
-	}
-}
-
-func TestGetEdiTokensConcurrent(t *testing.T) {
-	l := NewLexer(msg)
 	tokenChan := make(chan editoken.Token)
-	go l.GetEdiTokensConcurrent(tokenChan)
+	go l.GetEdiTokens(tokenChan)
 	var tokens []editoken.Token
 	for t := range tokenChan {
 		tokens = append(tokens, t)
@@ -54,31 +47,31 @@ func TestGetEdiTokensConcurrent(t *testing.T) {
 
 func TestFindControlToken(t *testing.T) {
 	l := NewLexer(msg)
-	ctrlRunes, _ := l.getUNARunes()
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+	ctrlRunes, _ := l.getUNABytes()
+	l.CtrlBytes = newCtrlBytes(ctrlRunes)
 
 	// test all control runes from msg string
-	r := rune(':')
-	l.CurrentRunePtr = &r
+	r := byte(':')
+	l.CurrentBytePtr = &r
 	controlT := l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control token")
 	}
-	r = rune('+')
-	l.CurrentRunePtr = &r
+	r = byte('+')
+	l.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control token")
 	}
-	r = rune('\'')
-	l.CurrentRunePtr = &r
+	r = byte('\'')
+	l.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
 	}
 
-	r = rune('?')
-	l.CurrentRunePtr = &r
+	r = byte('?')
+	l.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
@@ -87,22 +80,22 @@ func TestFindControlToken(t *testing.T) {
 	// test escape sign active
 	l.releaseIndicatorActive = true
 
-	r = rune('+')
-	l.CurrentRunePtr = &r
+	r = byte('+')
+	l.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT != nil {
 		t.Error("Expect nil value")
 	}
 	// escape sign should be disabled now
-	r = rune('+')
-	l.CurrentRunePtr = &r
+	r = byte('+')
+	l.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
 	}
 
-	r = rune('a')
-	l.CurrentRunePtr = &r
+	r = byte('a')
+	l.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT != nil {
 		t.Error("Expect nil value")
@@ -111,14 +104,14 @@ func TestFindControlToken(t *testing.T) {
 
 func TestFindContentToken(t *testing.T) {
 	l := NewLexer(msg)
-	ctrlRunes, _ := l.getUNARunes()
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+	ctrlRunes, _ := l.getUNABytes()
+	l.CtrlBytes = newCtrlBytes(ctrlRunes)
 
-	l.CurrentSeq = []rune("ABCD")
+	l.CurrentSeq = []byte("ABCD")
 	if cToken := l.findContentToken(); cToken == nil {
 		t.Error("Expect none nil value")
 	}
-	l.CurrentSeq = []rune("")
+	l.CurrentSeq = []byte("")
 	if cToken := l.findContentToken(); cToken != nil {
 		t.Error("Expect nil value")
 	}
@@ -126,118 +119,105 @@ func TestFindContentToken(t *testing.T) {
 
 func TestGetUNARunes(t *testing.T) {
 	l := NewLexer(msg)
-	ctrlRunes, defaultCtrl := l.getUNARunes()
+	ctrlRunes, defaultCtrl := l.getUNABytes()
 	if defaultCtrl == true {
-		t.Error("Expect none default ctrlRunes")
+		t.Error("Expect none default ctrlBytes")
 	}
-	var ctrlArr [6]rune
+	var ctrlArr [6]byte
 	copy(ctrlArr[:], ctrlRunes)
-	if ctrlArr != [6]rune{58, 43, 46, 63, 32, 39} {
+	if ctrlArr != [6]byte{58, 43, 46, 63, 32, 39} {
 		t.Error("wrong crtlRunes returned")
 	}
 	// remove UNA string from msg and test again
 	l.EdiFactMessage = l.EdiFactMessage[9:]
-	ctrlRunes, defaultCtrl = l.getUNARunes()
+	ctrlRunes, defaultCtrl = l.getUNABytes()
 	if defaultCtrl == false {
-		t.Error("Expect default ctrlRunes")
+		t.Error("Expect default ctrlBytes")
 	}
 }
 
 func TestIsCurrentRuneControlRune(t *testing.T) {
 	l := NewLexer(msg)
-	ctrlRunes, _ := l.getUNARunes()
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+	ctrlRunes, _ := l.getUNABytes()
+	l.CtrlBytes = newCtrlBytes(ctrlRunes)
 
-	r := rune('+')
-	l.CurrentRunePtr = &r
-	if !l.isCurrentRuneControlRune() {
+	r := byte('+')
+	l.CurrentBytePtr = &r
+	if !l.isCurrentByteControlByte() {
 		t.Error("Expect true")
 	}
 
-	r = rune('^')
-	l.CurrentRunePtr = &r
-	if l.isCurrentRuneControlRune() {
+	r = byte('^')
+	l.CurrentBytePtr = &r
+	if l.isCurrentByteControlByte() {
 		t.Error("Expect false")
 	}
 }
 
 func TestNextRune(t *testing.T) {
 	l := NewLexer(msg)
-	ctrlRunes, _ := l.getUNARunes()
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+	ctrlRunes, _ := l.getUNABytes()
+	l.CtrlBytes = newCtrlBytes(ctrlRunes)
 
-	l.CurrentRunePos = 40
-	if !l.nextRune() {
+	l.CurrentBytePos = 40
+	if !l.nextByte() {
 		t.Error("Expect true")
 	}
 
-	l.CurrentRunePos = len(l.EdiFactMessage)
-	if l.nextRune() {
+	l.CurrentBytePos = len(l.EdiFactMessage)
+	if l.nextByte() {
 		t.Error("Expect false, we are at the end of the message")
 	}
 	l = NewLexer(msg)
-	l.CurrentRunePos = 8 // 1 pos befor newline
-	if !l.nextRune() {
+	l.CurrentBytePos = 8 // 1 pos befor newline
+	if !l.nextByte() {
 		t.Error("Expect true")
 	}
 }
 
 func TestCheckForIgnoreRune(t *testing.T) {
 	l := NewLexer(msg)
-	r := rune('+')
-	l.CurrentRunePtr = &r
+	r := byte('+')
+	l.CurrentBytePtr = &r
 
-	if l.checkForIgnoreRune() {
+	if l.checkForIgnoreByte() {
 		t.Error("Expect false, + is not ignored")
 	}
 
-	r = rune('\n')
-	l.CurrentRunePtr = &r
-	if !l.checkForIgnoreRune() {
+	r = byte('\n')
+	l.CurrentBytePtr = &r
+	if !l.checkForIgnoreByte() {
 		t.Error("Expect true, newline is ignored")
 	}
 }
 
 func TestTokenTypeForSeq(t *testing.T) {
 	l := NewLexer(msg)
-	if tType := l.tokenTypeForSeq([]rune("UNA")); tType != tokentype.ServiceStringAdvice {
+	if tType := l.tokenTypeForSeq([]byte("UNA")); tType != tokentype.ServiceStringAdvice {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("UNB")); tType != tokentype.InterchangeHeader {
+	if tType := l.tokenTypeForSeq([]byte("UNB")); tType != tokentype.InterchangeHeader {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("UNG")); tType != tokentype.FunctionalGroupHeader {
+	if tType := l.tokenTypeForSeq([]byte("UNG")); tType != tokentype.FunctionalGroupHeader {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("UNH")); tType != tokentype.MessageHeader {
+	if tType := l.tokenTypeForSeq([]byte("UNH")); tType != tokentype.MessageHeader {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("UNT")); tType != tokentype.MessageTrailer {
+	if tType := l.tokenTypeForSeq([]byte("UNT")); tType != tokentype.MessageTrailer {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("UNE")); tType != tokentype.FunctionalGroupTrailer {
+	if tType := l.tokenTypeForSeq([]byte("UNE")); tType != tokentype.FunctionalGroupTrailer {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("UNZ")); tType != tokentype.InterchangeTrailer {
+	if tType := l.tokenTypeForSeq([]byte("UNZ")); tType != tokentype.InterchangeTrailer {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("QTY")); tType != tokentype.SegmentTag {
+	if tType := l.tokenTypeForSeq([]byte("QTY")); tType != tokentype.SegmentTag {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]rune("Test")); tType != tokentype.UserDataSegments {
+	if tType := l.tokenTypeForSeq([]byte("Test")); tType != tokentype.UserDataSegments {
 		t.Error("Wrong token type")
-	}
-}
-
-func TestFindTagInSeq(t *testing.T) {
-	l := NewLexer(msg)
-	if l.findTaginSeq([]rune{0, 1}) != nil {
-		t.Error("Expect nil, rune len < 3")
-	}
-	if l.findTaginSeq([]rune{104, 117, 104, 117, 81, 84, 89}) == nil {
-		t.Error("Expect none nil, rune contains QTY")
-	}
-	if l.findTaginSeq([]rune{104, 117, 104, 117}) != nil {
-		t.Error("Expect nil, no tag in rune")
 	}
 }

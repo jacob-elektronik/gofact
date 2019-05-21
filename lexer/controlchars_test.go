@@ -7,37 +7,37 @@ import (
 )
 
 func TestNewCtrlRunes(t *testing.T) {
-	c := newCtrlRunes([]rune(utils.DefaultCtrlString))
+	c := newCtrlBytes([]byte(utils.DefaultCtrlString))
 	if c == nil {
 		t.Error("Expect none nil value")
 	}
 	errorStr := ":+.'"
-	c = newCtrlRunes([]rune(errorStr))
+	c = newCtrlBytes([]byte(errorStr))
 	if c != nil {
 		t.Error("Expect nil value")
 	}
 	errorStr = ":+.'!@#$%"
-	c = newCtrlRunes([]rune(errorStr))
+	c = newCtrlBytes([]byte(errorStr))
 	if c != nil {
 		t.Error("Expect nil value")
 	}
 }
 func TestIsCtrlRune(t *testing.T) {
-	c := newCtrlRunes([]rune(utils.DefaultCtrlString))
-	if !c.isCtrlRune(':') {
+	c := newCtrlBytes([]byte(utils.DefaultCtrlString))
+	if !c.isCtrlByte(':') {
 		t.Error("Expect true")
 	}
-	if !c.isCtrlRune('+') {
+	if !c.isCtrlByte('+') {
 		t.Error("Expect true")
 	}
-	if !c.isCtrlRune('.') {
+	if !c.isCtrlByte('.') {
 		t.Error("Expect true")
 	}
-	if !c.isCtrlRune('\'') {
+	if !c.isCtrlByte('\'') {
 		t.Error("Expect true")
 	}
 
-	if c.isCtrlRune('#') {
+	if c.isCtrlByte('#') {
 		t.Error("Expect false")
 	}
 }

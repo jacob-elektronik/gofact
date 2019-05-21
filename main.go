@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"jacob.de/gofact/parser"
 	"log"
 	"os"
@@ -12,20 +11,12 @@ import (
 )
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var message = flag.String("message", "", "edifact message file")
+var message = flag.String("message", "", "edifact message fiel path")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var printTokens = flag.Bool("ptokens", false, "print tokens generatet by the lexer")
+var printSegments = flag.Bool("psegments", false, "print segments generatet by the parser")
 
 func main() {
-	// dat, _ := ioutil.ReadFile("siemens")
-	// l := lexer.NewLexer(string(dat))
-	// tokenChan := make(chan token.Token)
-	// go l.GetEdiTokensConcurrent(tokenChan)
-	// const padding = 3
-	// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-	// for t := range tokenChan {
-	// 	fmt.Fprintln(w, t)
-	// }
-	// w.Flush()
 
 	flag.Parse()
 	if *cpuprofile != "" {
@@ -51,38 +42,12 @@ func main() {
 			log.Fatal("could not write memory profile: ", err)
 		}
 	}
-
-	//dat, _ := ioutil.ReadFile("siemens")
-	//p := parser.NewParser(string(dat))
-	//err := p.ParseEdiFactMessageConcurrent()
-	//fmt.Println(err)
-
-	//dat, _ := ioutil.ReadFile("edi_messages/siemens")
-	//l := lexer.NewLexer(string(dat))
-	//tokenChan := make(chan editoken.Token)
-	//go l.GetEdiTokensConcurrent(tokenChan)
-	//const padding = 3
-	//w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-	//for t := range tokenChan {
-	//	_, _ = fmt.Fprintln(w, t)
-	//}
-	//_ = w.Flush()
 	if *message != "" {
-		dat, _ := ioutil.ReadFile(*message)
-		p := parser.NewParser(string(dat))
+		p := parser.NewParser(*message, *printSegments, *printTokens)
 		err := p.ParseEdiFactMessageConcurrent()
 		fmt.Println(err)
-		// l := lexer.NewLexer(string(dat))
-		// l.GetEdiTokens()
-		// const padding = 3
-		// w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-
-		// w.Flush()
 	} else {
 		fmt.Println("no message to parse")
 	}
-
-	// elapsed := time.Since(start)
-	// log.Printf("Parser took %s", elapsed)
 
 }

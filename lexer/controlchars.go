@@ -1,22 +1,22 @@
 package lexer
 
-type ctrlRunes struct {
-	CompontentDelimiter rune
-	ElementDelimiter    rune
-	SegmentTerminator   rune
-	ReleaseIndicator    rune
-	DecimalDelimiter    rune
+type ctrlBytes struct {
+	CompontentDelimiter byte
+	ElementDelimiter    byte
+	SegmentTerminator   byte
+	ReleaseIndicator    byte
+	DecimalDelimiter    byte
 }
 
-// newCtrlRunes generate a new control struct from the characters
-func newCtrlRunes(controlRunes []rune) *ctrlRunes {
-	if len(controlRunes) == 6 {
-		return &ctrlRunes{CompontentDelimiter: controlRunes[0], ElementDelimiter: controlRunes[1], DecimalDelimiter: controlRunes[2], ReleaseIndicator: controlRunes[3], SegmentTerminator: controlRunes[5]}
+// newCtrlBytes generate a new control struct from the characters
+func newCtrlBytes(controlBytes []byte) *ctrlBytes {
+	if len(controlBytes) == 6 {
+		return &ctrlBytes{CompontentDelimiter: controlBytes[0], ElementDelimiter: controlBytes[1], DecimalDelimiter: controlBytes[2], ReleaseIndicator: controlBytes[3], SegmentTerminator: controlBytes[5]}
 	}
 	return nil
 }
 
-func (c *ctrlRunes) isCtrlRune(r rune) bool {
+func (c *ctrlBytes) isCtrlByte(r byte) bool {
 	if r == c.CompontentDelimiter {
 		return true
 	}

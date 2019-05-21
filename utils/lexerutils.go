@@ -5,9 +5,9 @@ import (
 	"jacob.de/gofact/tokentype"
 )
 
-var IgnoreSeq = [][]rune{[]rune("\n"), []rune(" ")}
+var IgnoreSeq = []byte{byte('\n'), byte(' ')}
 
-var TokenTypeForRuneMap = map[string]int{
+var TokenTypeForStr = map[string]int{
 	"UNA": tokentype.ServiceStringAdvice,
 	"UNB": tokentype.InterchangeHeader,
 	"UNG": tokentype.FunctionalGroupHeader,
@@ -48,8 +48,8 @@ var TokenTypeForRuneMap = map[string]int{
 
 const DefaultCtrlString string = ":+.? '"
 
-// compareRuneSeq compare two arrays of runes
-func CompareRuneSeq(a, b []rune) bool {
+// CompareByteSeq compare two arrays of bytes
+func CompareByteSeq(a, b []byte) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -74,7 +74,7 @@ func IsSegment(seq string) bool {
 }
 
 func IsServiceTag(seq string) bool {
-	if TokenTypeForRuneMap[seq] == 0 {
+	if TokenTypeForStr[seq] == 0 {
 		return false
 	}
 	return true

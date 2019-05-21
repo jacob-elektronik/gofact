@@ -2,48 +2,49 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"jacob.de/gofact/editoken"
 	"jacob.de/gofact/lexer"
 	"jacob.de/gofact/segment"
 	"jacob.de/gofact/segmenttype"
 	"jacob.de/gofact/tokentype"
 	"jacob.de/gofact/utils"
+	"os"
 	"strconv"
+	"text/tabwriter"
 )
 
 // Parser struct
 type Parser struct {
-	EdiFactMessage string
-	// Tokens                       []token.Token
-	// lastToken                    *token.Token
+	EdiFactMessage            string
 	Segments                  []segment.Segment
 	currentSegment            *segment.Segment
 	interChangeHeaderOpen     bool
 	functionalGroupHeaderOpen bool
 	messageHeaderOpen         bool
-	lastTokenType int
+	lastTokenType             int
+	printSegments             bool
+	printTokens               bool
 }
 
 // NewParser generate a new Parser object
-func NewParser(message string) *Parser {
-	return &Parser{EdiFactMessage: message, lastTokenType: -1}
-}
-
-// ParseEdiFactMessage start parsing edi message
-func (p *Parser) ParseEdiFactMessage() {
-	ediLexer := lexer.NewLexer(p.EdiFactMessage)
-	tokens := ediLexer.GetEdiTokens()
-	for _, t := range tokens {
-		p.parseToken(t)
-	}
+func NewParser(message string, printSegments bool, printTokens bool) *Parser {
+	return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens}
 }
 
 // ParseEdiFactMessageConcurrent start parsing edi message concurrent
 func (p *Parser) ParseEdiFactMessageConcurrent() error {
+	tokenChan := make(chan editoken.Token, 100)
 	ediLexer := lexer.NewLexer(p.EdiFactMessage)
-	tokenChan := make(chan editoken.Token)
-	go ediLexer.GetEdiTokensConcurrent(tokenChan)
+	go ediLexer.EdiReader.ReadFile(ediLexer.MessageChan)
+	go ediLexer.GetEdiTokens(tokenChan)
 	for t := range tokenChan {
+		if p.printTokens {
+			const padding = 3
+			w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+			_, _ = fmt.Fprintln(w, t)
+			_ = w.Flush()
+		}
 		if t.TokenType == tokentype.Error {
 			return errors.New("Parser error, " + t.TokenValue + " | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
@@ -51,16 +52,17 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 			return err
 		}
 		p.lastTokenType = t.TokenType
-		// p.Tokens = append(p.Tokens, t)
-		// p.lastToken = &p.Tokens[len(p.Tokens)-1]
 
 	}
-	//const padding = 3
-	//w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-	//for _, s := range p.Segments {
-	//	fmt.Fprintln(w, s)
-	//}
-	//w.Flush()
+	if p.printSegments {
+		const padding = 3
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+		for _, s := range p.Segments {
+			_, _ = fmt.Fprintln(w, s)
+		}
+		_ = w.Flush()
+	}
+
 	return nil
 }
 

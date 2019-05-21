@@ -2,17 +2,19 @@ package lexer
 
 import (
 	"jacob.de/gofact/editoken"
+	"jacob.de/gofact/reader"
 	"jacob.de/gofact/tokentype"
 	"jacob.de/gofact/utils"
 )
 
 // Lexer lexer object with functions
 type Lexer struct {
-	EdiFactMessage         []rune
-	CurrentRunePtr         *rune
-	CurrentRunePos         int
-	CurrentSeq             []rune
-	CtrlRunes              *ctrlRunes
+	EdiFactMessage         []byte
+	EdiReader              *reader.EdiReader
+	CurrentBytePtr         *byte
+	CurrentBytePos         int
+	CurrentSeq             []byte
+	CtrlBytes              *ctrlBytes
 	releaseIndicatorActive bool
 	currentColumn          int
 	currentLine            int
@@ -20,71 +22,32 @@ type Lexer struct {
 	tmpSeqLine             int
 	tmpSeqColumn           int
 	segmentTagOpen         bool
+	MessageChan            chan []byte
 }
 
-// NewLexer generate a new lexer object
-func NewLexer(message string) *Lexer {
-	if len(message) <= 0 {
+func NewLexer(filePath string) *Lexer {
+	if len(filePath) <= 0 {
 		return nil
 	}
-	l := &Lexer{EdiFactMessage: []rune(message), CurrentRunePtr: nil, CurrentRunePos: 0, CurrentSeq: []rune{}, CtrlRunes: nil}
+	l := &Lexer{EdiFactMessage: []byte{}, CurrentBytePtr: nil, CurrentBytePos: 0, CurrentSeq: []byte{}, CtrlBytes: nil}
+	l.EdiReader = reader.NewEdiReader(filePath)
 	l.currentColumn = 1
 	l.currentLine = 1
+	l.MessageChan = make(chan []byte, 100)
 	return l
 }
 
-// GetEdiTokens start reading the message and generate tokens
-func (l *Lexer) GetEdiTokens() []editoken.Token {
-	var tokens []editoken.Token
-	ctrlRunes, defaultCtrl := l.getUNARunes()
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
-	if !defaultCtrl {
-		utils.AddToken(&tokens, editoken.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1})
-		utils.AddToken(&tokens, editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1})
-		l.currentLine++
-		l.currentColumn = 1
-	}
-	l.CurrentRunePos = -1
-	for l.nextRune() {
-		if ctrlToken := l.findControlToken(); ctrlToken != nil {
-			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
-				l.releaseIndicatorActive = true
-				continue
-			}
-			for {
-				if contentToken := l.findContentToken(); contentToken != nil {
-					l.lastTokenType = contentToken.TokenType
-					utils.AddToken(&tokens, *contentToken)
-				} else {
-					break
-				}
-				l.lastTokenType = ctrlToken.TokenType
-				utils.AddToken(&tokens, *ctrlToken)
-			}
-
-		} else {
-			if len(l.CurrentSeq) == 0 {
-				l.tmpSeqLine = l.currentLine
-				l.tmpSeqColumn = l.currentColumn
-			}
-			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
-		}
-	}
-	return tokens
-}
-
-// GetEdiTokensConcurrent write the tokens to a channel
-func (l *Lexer) GetEdiTokensConcurrent(ch chan<- editoken.Token) {
-	ctrlRunes, defaultCtrl := l.getUNARunes()
-	l.CtrlRunes = newCtrlRunes(ctrlRunes)
+func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
+	ctrlBytes, defaultCtrl := l.getUNABytes()
+	l.CtrlBytes = newCtrlBytes(ctrlBytes)
 	if !defaultCtrl {
 		ch <- editoken.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
-		ch <- editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlRunes), Column: 3, Line: 1}
+		ch <- editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
 		l.lastTokenType = tokentype.ControlChars
-		l.currentColumn = 3 + len(ctrlRunes)
+		l.currentColumn = 3 + len(ctrlBytes)
 	}
-	l.CurrentRunePos = -1
-	for l.nextRune() {
+	l.CurrentBytePos = -1
+	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
 				l.releaseIndicatorActive = true
@@ -106,32 +69,32 @@ func (l *Lexer) GetEdiTokensConcurrent(ch chan<- editoken.Token) {
 				l.tmpSeqLine = l.currentLine
 				l.tmpSeqColumn = l.currentColumn
 			}
-			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentRunePtr)
+			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentBytePtr)
 		}
 	}
 	close(ch)
 }
 
-// findControlToken generate a control type token from current rune.
+// findControlToken generate a control type token from current byte.
 // If the lexer found a release indicator we will not generate a control token here.
 func (l *Lexer) findControlToken() *editoken.Token {
 	if l.releaseIndicatorActive {
 		l.releaseIndicatorActive = false
 		return nil
 	}
-	switch *l.CurrentRunePtr {
-	case l.CtrlRunes.CompontentDelimiter:
-		return &editoken.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
-	case l.CtrlRunes.ElementDelimiter:
-		return &editoken.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
-	case l.CtrlRunes.SegmentTerminator:
+	switch *l.CurrentBytePtr {
+	case l.CtrlBytes.CompontentDelimiter:
+		return &editoken.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlBytes.ElementDelimiter:
+		return &editoken.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlBytes.SegmentTerminator:
 		l.segmentTagOpen = false
-		return &editoken.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
-	case l.CtrlRunes.ReleaseIndicator:
-		return &editoken.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
-	case l.CtrlRunes.DecimalDelimiter:
+		return &editoken.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlBytes.ReleaseIndicator:
+		return &editoken.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+	case l.CtrlBytes.DecimalDelimiter:
 		return nil
-		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentRunePtr), Column: l.currentColumn, Line: l.currentLine}
+		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
 	}
 	return nil
 }
@@ -143,7 +106,7 @@ func (l *Lexer) findContentToken() *editoken.Token {
 			column = 1
 		}
 		t := &editoken.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: column, Line: l.currentLine}
-		l.CurrentSeq = []rune{}
+		l.CurrentSeq = []byte{}
 		l.tmpSeqColumn = 0
 		l.tmpSeqLine = 0
 		return t
@@ -151,22 +114,8 @@ func (l *Lexer) findContentToken() *editoken.Token {
 	return nil
 }
 
-func (l *Lexer) findTaginSeq(seq []rune) []rune {
-	if len(seq) > 3 {
-		tmpSeq := seq[len(seq)-3 :]
-		if utils.IsSegment(string(tmpSeq)) {
-			return seq[:len(seq)-3]
-		}
-
-		if utils.IsServiceTag(string(tmpSeq)) {
-			return seq[:len(seq)-3]
-		}
-	}
-	return nil
-}
-
-func (l *Lexer) tokenTypeForSeq(seq []rune) int {
-	tType := utils.TokenTypeForRuneMap[string(seq)]
+func (l *Lexer) tokenTypeForSeq(seq []byte) int {
+	tType := utils.TokenTypeForStr[string(seq)]
 	if tType == 0 {
 		// after segment termination there must be a valid tag
 		if l.lastTokenType == tokentype.SegmentTerminator && !utils.IsSegment(string(seq)) {
@@ -184,45 +133,63 @@ func (l *Lexer) tokenTypeForSeq(seq []rune) int {
 	return tType
 }
 
-func (l *Lexer) getUNARunes() ([]rune, bool) {
-	var ctrlRunes []rune
+func (l *Lexer) getUNABytes() ([]byte, bool) {
+	for len(l.EdiFactMessage) < 10 {
+		l.nextByte()
+	}
+	var ctrlBytes []byte
 	var defaultCtrl bool
-	if utils.CompareRuneSeq(l.EdiFactMessage[0:3], []rune("UNA")) {
-		ctrlRunes = l.EdiFactMessage[3:9]
+	if utils.CompareByteSeq(l.EdiFactMessage[0:3], []byte("UNA")) {
+		ctrlBytes = l.EdiFactMessage[3:9]
 		l.EdiFactMessage = l.EdiFactMessage[9:]
 		defaultCtrl = false
 	} else {
-		ctrlRunes = []rune(utils.DefaultCtrlString) // user default values
+		ctrlBytes = []byte(utils.DefaultCtrlString) // user default values
 		defaultCtrl = true
 	}
-	return ctrlRunes, defaultCtrl
+	return ctrlBytes, defaultCtrl
 }
 
-// checkControlChar checks if the current rune is a control rune
-func (l *Lexer) isCurrentRuneControlRune() bool {
-	return l.CtrlRunes.isCtrlRune(*l.CurrentRunePtr)
+// checkControlChar checks if the current byte is a control byte
+func (l *Lexer) isCurrentByteControlByte() bool {
+	return l.CtrlBytes.isCtrlByte(*l.CurrentBytePtr)
 }
 
-// nextChar move the pointer to the next valid rune
-func (l *Lexer) nextRune() bool {
-	l.CurrentRunePos++
+
+func (l *Lexer) nextByte() bool {
+	nextByte :=  <- l.MessageChan
+	//fmt.Println("lexer: ", string(nextByte))
+	l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
+	l.CurrentBytePos++
 	l.currentColumn++
-	if l.CurrentRunePos < len(l.EdiFactMessage) {
-		l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
-		for l.checkForIgnoreRune() {
-			if *l.CurrentRunePtr == '\n' {
+	if l.CurrentBytePos < len(l.EdiFactMessage) {
+		l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
+		for l.checkForIgnoreByte() {
+			if *l.CurrentBytePtr == '\n' {
 				l.currentLine++
 				l.currentColumn = 1
-				l.CurrentRunePos++
-				l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
+				l.CurrentBytePos++
+				nextByte =  <- l.MessageChan
+				l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
+				if l.CurrentBytePos < len(l.EdiFactMessage) {
+					l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
+				} else {
+					return false
+				}
 				return true
 			}
-			if *l.CurrentRunePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
+			if *l.CurrentBytePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
 				return true
 			}
 			l.currentColumn++
-			l.CurrentRunePos++
-			l.CurrentRunePtr = &l.EdiFactMessage[l.CurrentRunePos]
+			l.CurrentBytePos++
+			nextByte =  <- l.MessageChan
+			l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
+			if l.CurrentBytePos < len(l.EdiFactMessage) {
+				l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
+			} else {
+				return false
+			}
 		}
 		return true
 	}
@@ -230,13 +197,11 @@ func (l *Lexer) nextRune() bool {
 }
 
 // checkForIgnoreChar check if the current char is in the ignoreSequence array
-func (l *Lexer) checkForIgnoreRune() bool {
-	for _, tmpSlice := range utils.IgnoreSeq {
-		for _, e := range tmpSlice {
-			if *l.CurrentRunePtr == e {
+func (l *Lexer) checkForIgnoreByte() bool {
+	for _, e := range utils.IgnoreSeq {
+			if *l.CurrentBytePtr == e {
 				return true
 			}
-		}
 	}
 	return false
 }

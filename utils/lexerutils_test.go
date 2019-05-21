@@ -8,17 +8,17 @@ import (
 )
 
 func TestCompareRuneSeq(t *testing.T) {
-	a := []rune{10, 20, 30}
-	b := []rune{10, 20, 30}
-	if !CompareRuneSeq(a, b) {
+	a := []byte{10, 20, 30}
+	b := []byte{10, 20, 30}
+	if !CompareByteSeq(a, b) {
 		t.Error("Expect true")
 	}
-	c := []rune{10, 20, 40}
-	if CompareRuneSeq(a, c) {
+	c := []byte{10, 20, 40}
+	if CompareByteSeq(a, c) {
 		t.Error("Expect false")
 	}
-	d := []rune{10, 20, 40, 50}
-	if CompareRuneSeq(a, d) {
+	d := []byte{10, 20, 40, 50}
+	if CompareByteSeq(a, d) {
 		t.Error("Expect false")
 	}
 }
