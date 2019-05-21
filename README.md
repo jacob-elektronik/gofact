@@ -1,7 +1,7 @@
 # Gofact
 
 ## Edifact golang parser
-####Table of contents
+Table of contents
 1. [Usage](#Usage)
     1. [Appclication](#appclication)
     2. [Library](#library)
