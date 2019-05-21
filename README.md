@@ -31,12 +31,12 @@
 
 1. import library
     ```
-        import "jacob.de/gofact/parser"
+   import "jacob.de/gofact/parser"
     ```
 2. initialize parser
     ```
-        p := parser.NewParser(*message, *printSegments, *printTokens)
-        err := p.ParseEdiFactMessageConcurrent()
+   p := parser.NewParser(*message, *printSegments, *printTokens)
+   err := p.ParseEdiFactMessageConcurrent()
     ```
     
  #### testing
