@@ -1,15 +1,14 @@
 # Gofact
 
-## Edifact golang parser
-Table of contents
+## Table of contents
 1. [Usage](#Usage)
     1. [Appclication](#appclication)
     2. [Library](#library)
     2. [Testing](#testing)
 
-### Usage
+## Usage
 
-#### appclication
+### appclication
 
 - make build
 - ./gofact -help
@@ -32,7 +31,7 @@ Table of contents
     ./gofact -message edi_messages/message -psegments
     ~~~~
  
-#### library
+### library
 
 1. import library
     ~~~~go
@@ -44,7 +43,7 @@ Table of contents
     err := p.ParseEdiFactMessageConcurrent()
     ~~~~
     
- #### testing
+### testing
  
 - run test
     ~~~~bash
