@@ -6,7 +6,7 @@ import (
 	"jacob.de/gofact/utils"
 )
 
-func TestNewCtrlRunes(t *testing.T) {
+func TestNewCtrlBytes(t *testing.T) {
 	c := newCtrlBytes([]byte(utils.DefaultCtrlString))
 	if c == nil {
 		t.Error("Expect none nil value")
@@ -22,7 +22,7 @@ func TestNewCtrlRunes(t *testing.T) {
 		t.Error("Expect nil value")
 	}
 }
-func TestIsCtrlRune(t *testing.T) {
+func TestIsCtrlByte(t *testing.T) {
 	c := newCtrlBytes([]byte(utils.DefaultCtrlString))
 	if !c.isCtrlByte(':') {
 		t.Error("Expect true")
