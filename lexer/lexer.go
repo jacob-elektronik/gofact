@@ -155,9 +155,8 @@ func (l *Lexer) isCurrentByteControlByte() bool {
 	return l.CtrlBytes.isCtrlByte(*l.CurrentBytePtr)
 }
 
-
 func (l *Lexer) nextByte() bool {
-	nextByte :=  <- l.MessageChan
+	nextByte := <-l.MessageChan
 	//fmt.Println("lexer: ", string(nextByte))
 	l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
 	l.CurrentBytePos++
@@ -169,7 +168,7 @@ func (l *Lexer) nextByte() bool {
 				l.currentLine++
 				l.currentColumn = 1
 				l.CurrentBytePos++
-				nextByte =  <- l.MessageChan
+				nextByte = <-l.MessageChan
 				l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
 				if l.CurrentBytePos < len(l.EdiFactMessage) {
 					l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
@@ -183,7 +182,7 @@ func (l *Lexer) nextByte() bool {
 			}
 			l.currentColumn++
 			l.CurrentBytePos++
-			nextByte =  <- l.MessageChan
+			nextByte = <-l.MessageChan
 			l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
 			if l.CurrentBytePos < len(l.EdiFactMessage) {
 				l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
@@ -199,9 +198,9 @@ func (l *Lexer) nextByte() bool {
 // checkForIgnoreChar check if the current char is in the ignoreSequence array
 func (l *Lexer) checkForIgnoreByte() bool {
 	for _, e := range utils.IgnoreSeq {
-			if *l.CurrentBytePtr == e {
-				return true
-			}
+		if *l.CurrentBytePtr == e {
+			return true
+		}
 	}
 	return false
 }

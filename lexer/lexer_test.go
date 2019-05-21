@@ -31,7 +31,6 @@ func TestNewLexer(t *testing.T) {
 	}
 }
 
-
 func TestGetEdiTokens(t *testing.T) {
 	l := NewLexer(msg)
 	tokenChan := make(chan editoken.Token)

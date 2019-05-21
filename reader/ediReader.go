@@ -8,13 +8,13 @@ import (
 )
 
 type EdiReader struct {
-	file *os.File
-	buf []byte
+	file      *os.File
+	buf       []byte
 	BufReader *bufio.Reader
 }
 
 // NewEdiReader buffered reader
-func NewEdiReader(fileStr string)  *EdiReader{
+func NewEdiReader(fileStr string) *EdiReader {
 	r := EdiReader{}
 	r.file, _ = os.Open(fileStr)
 	r.BufReader = bufio.NewReader(r.file)
