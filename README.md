@@ -1,6 +1,11 @@
 # Gofact
 
 ## Edifact golang parser
+####Table of contents
+1. [Usage](#Usage)
+    1. [Appclication](#appclication)
+    2. [Library](#library)
+    2. [Testing](#testing)
 
 ### Usage
 
@@ -9,7 +14,7 @@
 - make build
 - ./gofact -help
 
-    ```
+    ~~~~bash
     Usage of ./gofact:
       -cpuprofile file
             write cpu profile to file
@@ -21,32 +26,32 @@
             print segments generatet by the parser
       -ptokens
             print tokens generatet by the lexer
-    ```
+    ~~~~
  - example
-    ```
+    ~~~~bash
     ./gofact -message edi_messages/message -psegments
-     ```
+    ~~~~
  
 #### library
 
 1. import library
-    ```
-   import "jacob.de/gofact/parser"
-    ```
+    ~~~~go
+    import "jacob.de/gofact/parser"
+    ~~~~
 2. initialize parser
-    ```
-   p := parser.NewParser(*message, *printSegments, *printTokens)
-   err := p.ParseEdiFactMessageConcurrent()
-    ```
+    ~~~~go
+    p := parser.NewParser(*message, *printSegments, *printTokens)
+    err := p.ParseEdiFactMessageConcurrent()
+    ~~~~
     
  #### testing
  
 - run test
-  ```
-  make test
-  ```
+    ~~~~bash
+    make test
+    ~~~~
 - show test coverage
-  ```
-  make test_html
-  ```
+    ~~~~bash
+    make test_html
+    ~~~~
    
