@@ -10,7 +10,7 @@ type LexerPosition struct {
 func NewLexerPosition() *LexerPosition {
 	return &LexerPosition{
 		CurrentBytePtr: nil,
-		CurrentBytePos: 0,
+		CurrentBytePos: -1,
 		currentColumn:  1,
 		currentLine:    1,
 	}
