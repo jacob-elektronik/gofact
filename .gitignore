@@ -1,0 +1,6 @@
+.DS_Store
+.idea/
+cpu.prof
+edi_messages/siemens
+gofact
+testcover.out
