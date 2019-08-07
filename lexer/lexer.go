@@ -11,28 +11,21 @@ import (
 type Lexer struct {
 	EdiFactMessage         []byte
 	EdiReader              *reader.EdiReader
-	CurrentBytePtr         *byte
-	CurrentBytePos         int
 	CurrentSeq             []byte
 	CtrlBytes              *ctrlBytes
 	releaseIndicatorActive bool
-	currentColumn          int
-	currentLine            int
 	lastTokenType          int
-	tmpSeqLine             int
-	tmpSeqColumn           int
-	segmentTagOpen         bool
-	MessageChan            chan []byte
+	segmentTagOpen bool
+	MessageChan    chan []byte
+	lexerPosition  *LexerPosition
 }
 
 func NewLexer(filePath string) *Lexer {
 	if len(filePath) <= 0 {
 		return nil
 	}
-	l := &Lexer{EdiFactMessage: []byte{}, CurrentBytePtr: nil, CurrentBytePos: 0, CurrentSeq: []byte{}, CtrlBytes: nil}
+	l := &Lexer{EdiFactMessage: []byte{}, lexerPosition:NewLexerPosition(), CurrentSeq: []byte{}, CtrlBytes: nil}
 	l.EdiReader = reader.NewEdiReader(filePath)
-	l.currentColumn = 1
-	l.currentLine = 1
 	l.MessageChan = make(chan []byte, 100)
 	return l
 }
@@ -44,9 +37,8 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 		ch <- editoken.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
 		ch <- editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
 		l.lastTokenType = tokentype.ControlChars
-		l.currentColumn = 3 + len(ctrlBytes)
+		l.lexerPosition.SetColum(3 + len(ctrlBytes))
 	}
-	l.CurrentBytePos = -1
 	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
@@ -65,11 +57,7 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 			l.lastTokenType = ctrlToken.TokenType
 			ch <- *ctrlToken
 		} else {
-			if len(l.CurrentSeq) == 0 {
-				l.tmpSeqLine = l.currentLine
-				l.tmpSeqColumn = l.currentColumn
-			}
-			l.CurrentSeq = append(l.CurrentSeq, *l.CurrentBytePtr)
+			l.CurrentSeq = append(l.CurrentSeq, *l.lexerPosition.CurrentBytePtr)
 		}
 	}
 	close(ch)
@@ -82,16 +70,16 @@ func (l *Lexer) findControlToken() *editoken.Token {
 		l.releaseIndicatorActive = false
 		return nil
 	}
-	switch *l.CurrentBytePtr {
+	switch *l.lexerPosition.CurrentBytePtr {
 	case l.CtrlBytes.CompontentDelimiter:
-		return &editoken.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.ElementDelimiter:
-		return &editoken.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.SegmentTerminator:
 		l.segmentTagOpen = false
-		return &editoken.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.ReleaseIndicator:
-		return &editoken.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
+		return &editoken.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.DecimalDelimiter:
 		return nil
 		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
@@ -101,14 +89,12 @@ func (l *Lexer) findControlToken() *editoken.Token {
 
 func (l *Lexer) findContentToken() *editoken.Token {
 	if len(l.CurrentSeq) > 0 {
-		column := l.currentColumn - len(string(l.CurrentSeq))
+		column := l.lexerPosition.currentColumn - len(string(l.CurrentSeq))
 		if column < 0 {
 			column = 1
 		}
-		t := &editoken.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: column, Line: l.currentLine}
+		t := &editoken.Token{TokenType: l.tokenTypeForSeq(l.CurrentSeq), TokenValue: string(l.CurrentSeq), Column: column, Line: l.lexerPosition.currentLine}
 		l.CurrentSeq = []byte{}
-		l.tmpSeqColumn = 0
-		l.tmpSeqLine = 0
 		return t
 	}
 	return nil
@@ -152,37 +138,22 @@ func (l *Lexer) getUNABytes() ([]byte, bool) {
 
 // checkControlChar checks if the current byte is a control byte
 func (l *Lexer) isCurrentByteControlByte() bool {
-	return l.CtrlBytes.isCtrlByte(*l.CurrentBytePtr)
+	return l.CtrlBytes.isCtrlByte(*l.lexerPosition.CurrentBytePtr)
 }
 
 func (l *Lexer) nextByte() bool {
 	l.EdiFactMessage = l.apendNextByte()
-	l.CurrentBytePos++
-	l.currentColumn++
-	if l.CurrentBytePos < len(l.EdiFactMessage) {
-		l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
+	if l.lexerPosition.MoveToNext(l.EdiFactMessage) {
 		for l.checkForIgnoreByte() {
-			if *l.CurrentBytePtr == '\n' {
-				l.currentLine++
-				l.currentColumn = 1
-				l.CurrentBytePos++
+			if *l.lexerPosition.CurrentBytePtr == '\n' {
 				l.EdiFactMessage = l.apendNextByte()
-				if l.CurrentBytePos < len(l.EdiFactMessage) {
-					l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
-				} else {
-					return false
-				}
+				return l.lexerPosition.NextLine(l.EdiFactMessage)
+			}
+			if *l.lexerPosition.CurrentBytePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
 				return true
 			}
-			if *l.CurrentBytePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
-				return true
-			}
-			l.currentColumn++
-			l.CurrentBytePos++
 			l.EdiFactMessage = l.apendNextByte()
-			if l.CurrentBytePos < len(l.EdiFactMessage) {
-				l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
-			} else {
+			if !l.lexerPosition.MoveToNext(l.EdiFactMessage) {
 				return false
 			}
 		}
@@ -198,7 +169,7 @@ func (l *Lexer) apendNextByte() []byte {
 // checkForIgnoreChar check if the current char is in the ignoreSequence array
 func (l *Lexer) checkForIgnoreByte() bool {
 	for _, e := range utils.IgnoreSeq {
-		if *l.CurrentBytePtr == e {
+		if *l.lexerPosition.CurrentBytePtr == e {
 			return true
 		}
 	}
