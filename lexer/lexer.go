@@ -145,7 +145,7 @@ func (l *Lexer) nextByte() bool {
 	l.EdiFactMessage = l.apendNextByte()
 	if l.lexerPosition.MoveToNext(l.EdiFactMessage) {
 		for l.checkForIgnoreByte() {
-			if *l.lexerPosition.CurrentBytePtr == '\n' {
+			if l.isNewLine() {
 				l.EdiFactMessage = l.apendNextByte()
 				return l.lexerPosition.NextLine(l.EdiFactMessage)
 			}
@@ -160,6 +160,10 @@ func (l *Lexer) nextByte() bool {
 		return true
 	}
 	return false
+}
+
+func (l *Lexer)isNewLine() bool {
+	return *l.lexerPosition.CurrentBytePtr == '\n'
 }
 
 func (l *Lexer) apendNextByte() []byte {
