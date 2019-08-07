@@ -3,8 +3,8 @@ package lexer
 import (
 	"testing"
 
-	"jacob.de/gofact/editoken"
-	"jacob.de/gofact/tokentype"
+	"gofact/editoken"
+	"gofact/tokentype"
 )
 
 const msg = `UNA:+.? '

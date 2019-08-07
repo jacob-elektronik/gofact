@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"jacob.de/gofact/utils"
+	"gofact/utils"
 )
 
 func TestNewCtrlBytes(t *testing.T) {

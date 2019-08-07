@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"jacob.de/gofact/parser"
+	"gofact/parser"
 	"log"
 	"os"
 	"runtime"

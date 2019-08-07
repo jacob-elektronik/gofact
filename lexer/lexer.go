@@ -1,10 +1,10 @@
 package lexer
 
 import (
-	"jacob.de/gofact/editoken"
-	"jacob.de/gofact/reader"
-	"jacob.de/gofact/tokentype"
-	"jacob.de/gofact/utils"
+	"gofact/editoken"
+	"gofact/reader"
+	"gofact/tokentype"
+	"gofact/utils"
 )
 
 // Lexer lexer object with functions
@@ -156,9 +156,7 @@ func (l *Lexer) isCurrentByteControlByte() bool {
 }
 
 func (l *Lexer) nextByte() bool {
-	nextByte := <-l.MessageChan
-	//fmt.Println("lexer: ", string(nextByte))
-	l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
+	l.EdiFactMessage = l.apendNextByte()
 	l.CurrentBytePos++
 	l.currentColumn++
 	if l.CurrentBytePos < len(l.EdiFactMessage) {
@@ -168,8 +166,7 @@ func (l *Lexer) nextByte() bool {
 				l.currentLine++
 				l.currentColumn = 1
 				l.CurrentBytePos++
-				nextByte = <-l.MessageChan
-				l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
+				l.EdiFactMessage = l.apendNextByte()
 				if l.CurrentBytePos < len(l.EdiFactMessage) {
 					l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
 				} else {
@@ -182,8 +179,7 @@ func (l *Lexer) nextByte() bool {
 			}
 			l.currentColumn++
 			l.CurrentBytePos++
-			nextByte = <-l.MessageChan
-			l.EdiFactMessage = append(l.EdiFactMessage, nextByte...)
+			l.EdiFactMessage = l.apendNextByte()
 			if l.CurrentBytePos < len(l.EdiFactMessage) {
 				l.CurrentBytePtr = &l.EdiFactMessage[l.CurrentBytePos]
 			} else {
@@ -193,6 +189,10 @@ func (l *Lexer) nextByte() bool {
 		return true
 	}
 	return false
+}
+
+func (l *Lexer) apendNextByte() []byte {
+	return append(l.EdiFactMessage, <-l.MessageChan...)
 }
 
 // checkForIgnoreChar check if the current char is in the ignoreSequence array

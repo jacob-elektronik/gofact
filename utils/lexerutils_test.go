@@ -3,8 +3,8 @@ package utils
 import (
 	"testing"
 
-	"jacob.de/gofact/editoken"
-	"jacob.de/gofact/tokentype"
+	"gofact/editoken"
+	"gofact/tokentype"
 )
 
 func TestCompareRuneSeq(t *testing.T) {

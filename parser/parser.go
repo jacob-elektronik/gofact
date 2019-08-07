@@ -3,12 +3,12 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"jacob.de/gofact/editoken"
-	"jacob.de/gofact/lexer"
-	"jacob.de/gofact/segment"
-	"jacob.de/gofact/segmenttype"
-	"jacob.de/gofact/tokentype"
-	"jacob.de/gofact/utils"
+	"gofact/editoken"
+	"gofact/lexer"
+	"gofact/segment"
+	"gofact/segmenttype"
+	"gofact/tokentype"
+	"gofact/utils"
 	"os"
 	"strconv"
 	"text/tabwriter"
@@ -42,8 +42,14 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 		if p.printTokens {
 			const padding = 3
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-			_, _ = fmt.Fprintln(w, t)
-			_ = w.Flush()
+			_, err := fmt.Fprintln(w, t)
+			if err != nil {
+				return err
+			}
+			err = w.Flush()
+			if err != nil {
+				return err
+			}
 		}
 		if t.TokenType == tokentype.Error {
 			return errors.New("Parser error, " + t.TokenValue + " | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
@@ -58,9 +64,15 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 		const padding = 3
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
 		for _, s := range p.Segments {
-			_, _ = fmt.Fprintln(w, s)
+			_, err := fmt.Fprintln(w, s)
+			if err != nil {
+				return err
+			}
 		}
-		_ = w.Flush()
+		err := w.Flush()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

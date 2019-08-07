@@ -1,6 +1,6 @@
 package utils
 
-import "jacob.de/gofact/segmenttype"
+import "gofact/segmenttype"
 
 var SegmentTypeFoString = map[string]int{
 	"AAI": segmenttype.AAI,

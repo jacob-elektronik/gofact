@@ -3,7 +3,7 @@ package editoken
 import (
 	"strconv"
 
-	"jacob.de/gofact/tokentype"
+	"gofact/tokentype"
 )
 
 // Token struct

@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"jacob.de/gofact/editoken"
-	"jacob.de/gofact/tokentype"
+	"gofact/editoken"
+	"gofact/tokentype"
 )
 
 var IgnoreSeq = []byte{byte('\n'), byte(' ')}
