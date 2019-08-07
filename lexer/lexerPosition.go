@@ -47,6 +47,14 @@ func (lp *LexerPosition)IncrLine() {
 	lp.currentLine++
 }
 
+func (lp *LexerPosition)SetColum(val int) {
+	lp.currentColumn = val
+}
+
+func (lp *LexerPosition)SetLine(val int) {
+	lp.currentLine = val
+}
+
 func (lp *LexerPosition)ResetColumn() {
 	lp.currentColumn = 1
 }
