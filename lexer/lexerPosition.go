@@ -40,7 +40,7 @@ func (lp *LexerPosition)IncrPos() {
 }
 
 func (lp *LexerPosition)IncrCol() {
-	lp.CurrentBytePos++
+	lp.currentColumn++
 }
 
 func (lp *LexerPosition)IncrLine() {
@@ -57,6 +57,10 @@ func (lp *LexerPosition)SetLine(val int) {
 
 func (lp *LexerPosition)ResetColumn() {
 	lp.currentColumn = 1
+}
+
+func (lp *LexerPosition)ResetBytePos() {
+	lp.CurrentBytePos = -1
 }
 
 func (lp *LexerPosition)SetPointer(msgBuffer []byte) bool {

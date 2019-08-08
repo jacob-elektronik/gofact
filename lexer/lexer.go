@@ -15,16 +15,16 @@ type Lexer struct {
 	CtrlBytes              *ctrlBytes
 	releaseIndicatorActive bool
 	lastTokenType          int
-	segmentTagOpen bool
-	MessageChan    chan []byte
-	lexerPosition  *LexerPosition
+	segmentTagOpen         bool
+	MessageChan            chan []byte
+	lexerPosition          *LexerPosition
 }
 
 func NewLexer(filePath string) *Lexer {
 	if len(filePath) <= 0 {
 		return nil
 	}
-	l := &Lexer{EdiFactMessage: []byte{}, lexerPosition:NewLexerPosition(), CurrentSeq: []byte{}, CtrlBytes: nil}
+	l := &Lexer{EdiFactMessage: []byte{}, lexerPosition: NewLexerPosition(), CurrentSeq: []byte{}, CtrlBytes: nil}
 	l.EdiReader = reader.NewEdiReader(filePath)
 	l.MessageChan = make(chan []byte, 100)
 	return l
@@ -39,6 +39,7 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 		l.lastTokenType = tokentype.ControlChars
 		l.lexerPosition.SetColum(3 + len(ctrlBytes))
 	}
+	l.lexerPosition.ResetBytePos()
 	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
@@ -162,7 +163,7 @@ func (l *Lexer) nextByte() bool {
 	return false
 }
 
-func (l *Lexer)isNewLine() bool {
+func (l *Lexer) isNewLine() bool {
 	return *l.lexerPosition.CurrentBytePtr == '\n'
 }
 
