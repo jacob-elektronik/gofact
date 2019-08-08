@@ -1,4 +1,4 @@
-package segmenttype
+package types
 
 // segmentstype segment type
 const (

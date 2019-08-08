@@ -1,4 +1,4 @@
-package tokentype
+package types
 
 // Tokentypes
 const (

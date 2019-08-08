@@ -1,7 +1,7 @@
 package segment
 
 import (
-	"gofact/segmenttype"
+	"gofact/segment/types"
 )
 
 // Segment edi segments
@@ -14,473 +14,473 @@ type Segment struct {
 func (s Segment) PrintSegment() string {
 	ret := ""
 	switch s.SType {
-	case segmenttype.ServiceSegment:
+	case types.ServiceSegment:
 		ret += "Segmenttype: ServiceSegment"
-	case segmenttype.AAI:
+	case types.AAI:
 		ret += "Segmenttype: Accommodation allocation information"
-	case segmenttype.ADI:
+	case types.ADI:
 		ret += "Segmenttype: Health care claim adjudication information"
-	case segmenttype.ADR:
+	case types.ADR:
 		ret += "Segmenttype: Address"
-	case segmenttype.ADS:
+	case types.ADS:
 		ret += "Segmenttype: Address"
-	case segmenttype.AGR:
+	case types.AGR:
 		ret += "Segmenttype: Agreement identification"
-	case segmenttype.AJT:
+	case types.AJT:
 		ret += "Segmenttype: Adjustment details"
-	case segmenttype.ALC:
+	case types.ALC:
 		ret += "Segmenttype: Allowance or charge"
-	case segmenttype.ALI:
+	case types.ALI:
 		ret += "Segmenttype: Additional information"
-	case segmenttype.ALS:
+	case types.ALS:
 		ret += "Segmenttype: Additional location information"
-	case segmenttype.APD:
+	case types.APD:
 		ret += "Segmenttype: Additional transport details"
-	case segmenttype.APP:
+	case types.APP:
 		ret += "Segmenttype: Applicability"
-	case segmenttype.APR:
+	case types.APR:
 		ret += "Segmenttype: Additional price information"
-	case segmenttype.ARD:
+	case types.ARD:
 		ret += "Segmenttype: Monetary amount function"
-	case segmenttype.ARR:
+	case types.ARR:
 		ret += "Segmenttype: Array information"
-	case segmenttype.ASD:
+	case types.ASD:
 		ret += "Segmenttype: Service details"
-	case segmenttype.ASI:
+	case types.ASI:
 		ret += "Segmenttype: Array structure identification"
-	case segmenttype.ATI:
+	case types.ATI:
 		ret += "Segmenttype: Tour information"
-	case segmenttype.ATR:
+	case types.ATR:
 		ret += "Segmenttype: Attribute"
-	case segmenttype.ATT:
+	case types.ATT:
 		ret += "Segmenttype: Attribute"
-	case segmenttype.AUT:
+	case types.AUT:
 		ret += "Segmenttype: Authentication result"
-	case segmenttype.BAS:
+	case types.BAS:
 		ret += "Segmenttype: Basis"
-	case segmenttype.BCD:
+	case types.BCD:
 		ret += "Segmenttype: Benefit and coverage detail"
-	case segmenttype.BGM:
+	case types.BGM:
 		ret += "Segmenttype: Beginning of message"
-	case segmenttype.BII:
+	case types.BII:
 		ret += "Segmenttype: Structure identification"
-	case segmenttype.BLI:
+	case types.BLI:
 		ret += "Segmenttype: Billable information"
-	case segmenttype.BUS:
+	case types.BUS:
 		ret += "Segmenttype: Business function"
-	case segmenttype.CAV:
+	case types.CAV:
 		ret += "Segmenttype: Characteristic value"
-	case segmenttype.CCD:
+	case types.CCD:
 		ret += "Segmenttype: Credit cover details"
-	case segmenttype.CCI:
+	case types.CCI:
 		ret += "Segmenttype: Characteristic/class id"
-	case segmenttype.CDI:
+	case types.CDI:
 		ret += "Segmenttype: Physical or logical state"
-	case segmenttype.CDS:
+	case types.CDS:
 		ret += "Segmenttype: Code set identification"
-	case segmenttype.CDV:
+	case types.CDV:
 		ret += "Segmenttype: Code value definition"
-	case segmenttype.CED:
+	case types.CED:
 		ret += "Segmenttype: Computer environment details"
-	case segmenttype.CIN:
+	case types.CIN:
 		ret += "Segmenttype: Clinical information"
-	case segmenttype.CLA:
+	case types.CLA:
 		ret += "Segmenttype: Clause identification"
-	case segmenttype.CLI:
+	case types.CLI:
 		ret += "Segmenttype: Clinical intervention"
-	case segmenttype.CLT:
+	case types.CLT:
 		ret += "Segmenttype: Clear terminate information"
-	case segmenttype.CMN:
+	case types.CMN:
 		ret += "Segmenttype: Commission information"
-	case segmenttype.CMP:
+	case types.CMP:
 		ret += "Segmenttype: Composite data element identification"
-	case segmenttype.CNI:
+	case types.CNI:
 		ret += "Segmenttype: Consignment information"
-	case segmenttype.CNT:
+	case types.CNT:
 		ret += "Segmenttype: Control total"
-	case segmenttype.CNX:
+	case types.CNX:
 		ret += "Segmenttype: Connection details"
-	case segmenttype.CNY:
+	case types.CNY:
 		ret += "Segmenttype: Country information"
-	case segmenttype.COD:
+	case types.COD:
 		ret += "Segmenttype: Component details"
-	case segmenttype.COM:
+	case types.COM:
 		ret += "Segmenttype: Communication contact"
-	case segmenttype.CON:
+	case types.CON:
 		ret += "Segmenttype: Contact information"
-	case segmenttype.COT:
+	case types.COT:
 		ret += "Segmenttype: Contribution details"
-	case segmenttype.CPI:
+	case types.CPI:
 		ret += "Segmenttype: Charge payment instructions"
-	case segmenttype.CPS:
+	case types.CPS:
 		ret += "Segmenttype: Consignment packing sequence"
-	case segmenttype.CPT:
+	case types.CPT:
 		ret += "Segmenttype: Account identification"
-	case segmenttype.CRI:
+	case types.CRI:
 		ret += "Segmenttype: Consumer reference information"
-	case segmenttype.CST:
+	case types.CST:
 		ret += "Segmenttype: Customs status of goods"
-	case segmenttype.CTA:
+	case types.CTA:
 		ret += "Segmenttype: Contact information"
-	case segmenttype.CUR:
+	case types.CUR:
 		ret += "Segmenttype: Currencies"
-	case segmenttype.CUX:
+	case types.CUX:
 		ret += "Segmenttype: Currencies"
-	case segmenttype.DAM:
+	case types.DAM:
 		ret += "Segmenttype: Damage"
-	case segmenttype.DAV:
+	case types.DAV:
 		ret += "Segmenttype: Daily availability"
-	case segmenttype.DFN:
+	case types.DFN:
 		ret += "Segmenttype: Definition function"
-	case segmenttype.DGS:
+	case types.DGS:
 		ret += "Segmenttype: Dangerous goods"
-	case segmenttype.DII:
+	case types.DII:
 		ret += "Segmenttype: Directory identification"
-	case segmenttype.DIM:
+	case types.DIM:
 		ret += "Segmenttype: Dimensions"
-	case segmenttype.DIS:
+	case types.DIS:
 		ret += "Segmenttype: Discount information"
-	case segmenttype.DLI:
+	case types.DLI:
 		ret += "Segmenttype: Document line identification"
-	case segmenttype.DLM:
+	case types.DLM:
 		ret += "Segmenttype: Delivery limitations"
-	case segmenttype.DMS:
+	case types.DMS:
 		ret += "Segmenttype: Document/message summary"
-	case segmenttype.DNT:
+	case types.DNT:
 		ret += "Segmenttype: Dental information"
-	case segmenttype.DOC:
+	case types.DOC:
 		ret += "Segmenttype: Document/message details"
-	case segmenttype.DRD:
+	case types.DRD:
 		ret += "Segmenttype: Data representation details"
-	case segmenttype.DSG:
+	case types.DSG:
 		ret += "Segmenttype: Dosage administration"
-	case segmenttype.DSI:
+	case types.DSI:
 		ret += "Segmenttype: Data set identification"
-	case segmenttype.DTI:
+	case types.DTI:
 		ret += "Segmenttype: Date and time information"
-	case segmenttype.DTM:
+	case types.DTM:
 		ret += "Segmenttype: Date/time/period"
-	case segmenttype.EDT:
+	case types.EDT:
 		ret += "Segmenttype: Editing details"
-	case segmenttype.EFI:
+	case types.EFI:
 		ret += "Segmenttype: External file link identification"
-	case segmenttype.ELM:
+	case types.ELM:
 		ret += "Segmenttype: Simple data element details"
-	case segmenttype.ELU:
+	case types.ELU:
 		ret += "Segmenttype: Data element usage details"
-	case segmenttype.ELV:
+	case types.ELV:
 		ret += "Segmenttype: Element value definition"
-	case segmenttype.EMP:
+	case types.EMP:
 		ret += "Segmenttype: Employment details"
-	case segmenttype.EQA:
+	case types.EQA:
 		ret += "Segmenttype: Attached equipment"
-	case segmenttype.EQD:
+	case types.EQD:
 		ret += "Segmenttype: Equipment details"
-	case segmenttype.EQN:
+	case types.EQN:
 		ret += "Segmenttype: Number of units"
-	case segmenttype.ERC:
+	case types.ERC:
 		ret += "Segmenttype: Application error information"
-	case segmenttype.ERI:
+	case types.ERI:
 		ret += "Segmenttype: Application error information"
-	case segmenttype.ERP:
+	case types.ERP:
 		ret += "Segmenttype: Error point details"
-	case segmenttype.EVE:
+	case types.EVE:
 		ret += "Segmenttype: Event"
-	case segmenttype.FCA:
+	case types.FCA:
 		ret += "Segmenttype: Financial charges allocation"
-	case segmenttype.FII:
+	case types.FII:
 		ret += "Segmenttype: Financial institution information"
-	case segmenttype.FNS:
+	case types.FNS:
 		ret += "Segmenttype: Footnote set"
-	case segmenttype.FNT:
+	case types.FNT:
 		ret += "Segmenttype: Footnote"
-	case segmenttype.FOR:
+	case types.FOR:
 		ret += "Segmenttype: Formula"
-	case segmenttype.FRM:
+	case types.FRM:
 		ret += "Segmenttype: Follow-up action"
-	case segmenttype.FRQ:
+	case types.FRQ:
 		ret += "Segmenttype: Frequency"
-	case segmenttype.FSQ:
+	case types.FSQ:
 		ret += "Segmenttype: Formula sequence"
-	case segmenttype.FTI:
+	case types.FTI:
 		ret += "Segmenttype: Frequent traveller information"
-	case segmenttype.FTX:
+	case types.FTX:
 		ret += "Segmenttype: Free text"
-	case segmenttype.GDS:
+	case types.GDS:
 		ret += "Segmenttype: Nature of cargo"
-	case segmenttype.GEI:
+	case types.GEI:
 		ret += "Segmenttype: Processing information"
-	case segmenttype.GID:
+	case types.GID:
 		ret += "Segmenttype: Goods item details"
-	case segmenttype.GIN:
+	case types.GIN:
 		ret += "Segmenttype: Goods identity number"
-	case segmenttype.GIR:
+	case types.GIR:
 		ret += "Segmenttype: Related identification numbers"
-	case segmenttype.GOR:
+	case types.GOR:
 		ret += "Segmenttype: Governmental requirements"
-	case segmenttype.GPO:
+	case types.GPO:
 		ret += "Segmenttype: Geographical position"
-	case segmenttype.GRU:
+	case types.GRU:
 		ret += "Segmenttype: Segment group usage details"
-	case segmenttype.HAN:
+	case types.HAN:
 		ret += "Segmenttype: Handling instructions"
-	case segmenttype.HDI:
+	case types.HDI:
 		ret += "Segmenttype: Hardware device information"
-	case segmenttype.HDR:
+	case types.HDR:
 		ret += "Segmenttype: Header information"
-	case segmenttype.HDS:
+	case types.HDS:
 		ret += "Segmenttype: Health diagnosis service and delivery"
-	case segmenttype.HYN:
+	case types.HYN:
 		ret += "Segmenttype: Hierarchy information"
-	case segmenttype.ICD:
+	case types.ICD:
 		ret += "Segmenttype: Insurance cover description"
-	case segmenttype.ICI:
+	case types.ICI:
 		ret += "Segmenttype: Insurance cover information"
-	case segmenttype.IDE:
+	case types.IDE:
 		ret += "Segmenttype: Identity"
-	case segmenttype.IFD:
+	case types.IFD:
 		ret += "Segmenttype: Information detail"
-	case segmenttype.IFT:
+	case types.IFT:
 		ret += "Segmenttype: Interactive free text"
-	case segmenttype.IHC:
+	case types.IHC:
 		ret += "Segmenttype: Person characteristic"
-	case segmenttype.IMD:
+	case types.IMD:
 		ret += "Segmenttype: Item description"
-	case segmenttype.IND:
+	case types.IND:
 		ret += "Segmenttype: Index details"
-	case segmenttype.INP:
+	case types.INP:
 		ret += "Segmenttype: Parties and instruction"
-	case segmenttype.INV:
+	case types.INV:
 		ret += "Segmenttype: Inventory management related details"
-	case segmenttype.IRQ:
+	case types.IRQ:
 		ret += "Segmenttype: Information required"
-	case segmenttype.ITC:
+	case types.ITC:
 		ret += "Segmenttype: Institutional claim"
-	case segmenttype.ITD:
+	case types.ITD:
 		ret += "Segmenttype: Information type data"
-	case segmenttype.ITM:
+	case types.ITM:
 		ret += "Segmenttype: Item number"
-	case segmenttype.LAN:
+	case types.LAN:
 		ret += "Segmenttype: Language"
-	case segmenttype.LIN:
+	case types.LIN:
 		ret += "Segmenttype: Line item"
-	case segmenttype.LKP:
+	case types.LKP:
 		ret += "Segmenttype: Level indication"
-	case segmenttype.LNG:
+	case types.LNG:
 		ret += "Segmenttype: Language"
-	case segmenttype.LOC:
+	case types.LOC:
 		ret += "Segmenttype: Place/location identification"
-	case segmenttype.MAP:
+	case types.MAP:
 		ret += "Segmenttype: Message application product information"
-	case segmenttype.MEA:
+	case types.MEA:
 		ret += "Segmenttype: Measurements"
-	case segmenttype.MEM:
+	case types.MEM:
 		ret += "Segmenttype: Membership details"
-	case segmenttype.MES:
+	case types.MES:
 		ret += "Segmenttype: Measurements"
-	case segmenttype.MKS:
+	case types.MKS:
 		ret += "Segmenttype: Market/sales channel information"
-	case segmenttype.MOA:
+	case types.MOA:
 		ret += "Segmenttype: Monetary amount"
-	case segmenttype.MOV:
+	case types.MOV:
 		ret += "Segmenttype: Car delivery instruction"
-	case segmenttype.MSD:
+	case types.MSD:
 		ret += "Segmenttype: Message action details"
-	case segmenttype.MSG:
+	case types.MSG:
 		ret += "Segmenttype: Message type identification"
-	case segmenttype.MTD:
+	case types.MTD:
 		ret += "Segmenttype: Maintenance operation details"
-	case segmenttype.NAA:
+	case types.NAA:
 		ret += "Segmenttype: Name and address"
-	case segmenttype.NAD:
+	case types.NAD:
 		ret += "Segmenttype: Name and address"
-	case segmenttype.NAT:
+	case types.NAT:
 		ret += "Segmenttype: Nationality"
-	case segmenttype.NME:
+	case types.NME:
 		ret += "Segmenttype: Name"
-	case segmenttype.NUN:
+	case types.NUN:
 		ret += "Segmenttype: Number of units"
-	case segmenttype.ODI:
+	case types.ODI:
 		ret += "Segmenttype: Origin and destination details"
-	case segmenttype.ODS:
+	case types.ODS:
 		ret += "Segmenttype: Additional product details"
-	case segmenttype.ORG:
+	case types.ORG:
 		ret += "Segmenttype: Originator of request details"
-	case segmenttype.OTI:
+	case types.OTI:
 		ret += "Segmenttype: Other insurance"
-	case segmenttype.PAC:
+	case types.PAC:
 		ret += "Segmenttype: Package"
-	case segmenttype.PAI:
+	case types.PAI:
 		ret += "Segmenttype: Payment instructions"
-	case segmenttype.PAS:
+	case types.PAS:
 		ret += "Segmenttype: Attendance"
-	case segmenttype.PCC:
+	case types.PCC:
 		ret += "Segmenttype: Premium calculation component details"
-	case segmenttype.PCD:
+	case types.PCD:
 		ret += "Segmenttype: Percentage details"
-	case segmenttype.PCI:
+	case types.PCI:
 		ret += "Segmenttype: Package identification"
-	case segmenttype.PDI:
+	case types.PDI:
 		ret += "Segmenttype: Person demographic information"
-	case segmenttype.PDT:
+	case types.PDT:
 		ret += "Segmenttype: Product information"
-	case segmenttype.PER:
+	case types.PER:
 		ret += "Segmenttype: Period related details"
-	case segmenttype.PGI:
+	case types.PGI:
 		ret += "Segmenttype: Product group information"
-	case segmenttype.PIA:
+	case types.PIA:
 		ret += "Segmenttype: Additional product id"
-	case segmenttype.PLI:
+	case types.PLI:
 		ret += "Segmenttype: Product location information"
-	case segmenttype.PMT:
+	case types.PMT:
 		ret += "Segmenttype: Payment information"
-	case segmenttype.PNA:
+	case types.PNA:
 		ret += "Segmenttype: Party identification"
-	case segmenttype.POC:
+	case types.POC:
 		ret += "Segmenttype: Purpose of conveyance call"
-	case segmenttype.POP:
+	case types.POP:
 		ret += "Segmenttype: Period of operation"
-	case segmenttype.POR:
+	case types.POR:
 		ret += "Segmenttype: Location and/or related time information"
-	case segmenttype.POS:
+	case types.POS:
 		ret += "Segmenttype: Point of sale information"
-	case segmenttype.PRC:
+	case types.PRC:
 		ret += "Segmenttype: Process identification"
-	case segmenttype.PRD:
+	case types.PRD:
 		ret += "Segmenttype: Product identification"
-	case segmenttype.PRE:
+	case types.PRE:
 		ret += "Segmenttype: Price details"
-	case segmenttype.PRI:
+	case types.PRI:
 		ret += "Segmenttype: Price details"
-	case segmenttype.PRO:
+	case types.PRO:
 		ret += "Segmenttype: Promotions"
-	case segmenttype.PRT:
+	case types.PRT:
 		ret += "Segmenttype: Party information"
-	case segmenttype.PRV:
+	case types.PRV:
 		ret += "Segmenttype: Proviso details"
-	case segmenttype.PSD:
+	case types.PSD:
 		ret += "Segmenttype: Physical sample description"
-	case segmenttype.PSI:
+	case types.PSI:
 		ret += "Segmenttype: Service information"
-	case segmenttype.PTY:
+	case types.PTY:
 		ret += "Segmenttype: Priority"
-	case segmenttype.PYT:
+	case types.PYT:
 		ret += "Segmenttype: Payment terms"
-	case segmenttype.QRS:
+	case types.QRS:
 		ret += "Segmenttype: Query and response"
-	case segmenttype.QTI:
+	case types.QTI:
 		ret += "Segmenttype: Quantity"
-	case segmenttype.QTY:
+	case types.QTY:
 		ret += "Segmenttype: Quantity"
-	case segmenttype.QUA:
+	case types.QUA:
 		ret += "Segmenttype: Qualification"
-	case segmenttype.QVR:
+	case types.QVR:
 		ret += "Segmenttype: Quantity variances"
-	case segmenttype.RCI:
+	case types.RCI:
 		ret += "Segmenttype: Reservation control information"
-	case segmenttype.RCS:
+	case types.RCS:
 		ret += "Segmenttype: Requirements and conditions"
-	case segmenttype.REL:
+	case types.REL:
 		ret += "Segmenttype: Relationship"
-	case segmenttype.RFF:
+	case types.RFF:
 		ret += "Segmenttype: Reference"
-	case segmenttype.RFR:
+	case types.RFR:
 		ret += "Segmenttype: Reference"
-	case segmenttype.RJL:
+	case types.RJL:
 		ret += "Segmenttype: Accounting journal identification"
-	case segmenttype.RLS:
+	case types.RLS:
 		ret += "Segmenttype: Relationship"
-	case segmenttype.RNG:
+	case types.RNG:
 		ret += "Segmenttype: Range details"
-	case segmenttype.ROD:
+	case types.ROD:
 		ret += "Segmenttype: Risk object type"
-	case segmenttype.RPI:
+	case types.RPI:
 		ret += "Segmenttype: Quantity and action details"
-	case segmenttype.RSL:
+	case types.RSL:
 		ret += "Segmenttype: Result"
-	case segmenttype.RTC:
+	case types.RTC:
 		ret += "Segmenttype: Rate types"
-	case segmenttype.RTE:
+	case types.RTE:
 		ret += "Segmenttype: Rate details"
-	case segmenttype.RTI:
+	case types.RTI:
 		ret += "Segmenttype: Rate details"
-	case segmenttype.RUL:
+	case types.RUL:
 		ret += "Segmenttype: Rule information"
-	case segmenttype.SAL:
+	case types.SAL:
 		ret += "Segmenttype: Remuneration type identification"
-	case segmenttype.SCC:
+	case types.SCC:
 		ret += "Segmenttype: Scheduling conditions"
-	case segmenttype.SCD:
+	case types.SCD:
 		ret += "Segmenttype: Structure component definition"
-	case segmenttype.SDT:
+	case types.SDT:
 		ret += "Segmenttype: Selection details"
-	case segmenttype.SEG:
+	case types.SEG:
 		ret += "Segmenttype: Segment identification"
-	case segmenttype.SEL:
+	case types.SEL:
 		ret += "Segmenttype: Seal number"
-	case segmenttype.SEQ:
+	case types.SEQ:
 		ret += "Segmenttype: Sequence details"
-	case segmenttype.SER:
+	case types.SER:
 		ret += "Segmenttype: Facility information"
-	case segmenttype.SFI:
+	case types.SFI:
 		ret += "Segmenttype: Safety information"
-	case segmenttype.SGP:
+	case types.SGP:
 		ret += "Segmenttype: Split goods placement"
-	case segmenttype.SGU:
+	case types.SGU:
 		ret += "Segmenttype: Segment usage details"
-	case segmenttype.SPR:
+	case types.SPR:
 		ret += "Segmenttype: Organisation classification details"
-	case segmenttype.SPS:
+	case types.SPS:
 		ret += "Segmenttype: Sampling parameters for summary statistics"
-	case segmenttype.SSR:
+	case types.SSR:
 		ret += "Segmenttype: Special requirement details"
-	case segmenttype.STA:
+	case types.STA:
 		ret += "Segmenttype: Statistics"
-	case segmenttype.STC:
+	case types.STC:
 		ret += "Segmenttype: Statistical concept"
-	case segmenttype.STG:
+	case types.STG:
 		ret += "Segmenttype: Stages"
-	case segmenttype.STS:
+	case types.STS:
 		ret += "Segmenttype: Status"
-	case segmenttype.TAX:
+	case types.TAX:
 		ret += "Segmenttype: Duty/tax/fee details"
-	case segmenttype.TCC:
+	case types.TCC:
 		ret += "Segmenttype: Charge/rate calculations"
-	case segmenttype.TCE:
+	case types.TCE:
 		ret += "Segmenttype: Time and certainty"
-	case segmenttype.TDI:
+	case types.TDI:
 		ret += "Segmenttype: Traveller document information"
-	case segmenttype.TDT:
+	case types.TDT:
 		ret += "Segmenttype: Transport information"
-	case segmenttype.TEM:
+	case types.TEM:
 		ret += "Segmenttype: Test method"
-	case segmenttype.TFF:
+	case types.TFF:
 		ret += "Segmenttype: Tariff information"
-	case segmenttype.TIF:
+	case types.TIF:
 		ret += "Segmenttype: Traveller information"
-	case segmenttype.TIZ:
+	case types.TIZ:
 		ret += "Segmenttype: Time zone information"
-	case segmenttype.TMD:
+	case types.TMD:
 		ret += "Segmenttype: Transport movement details"
-	case segmenttype.TMP:
+	case types.TMP:
 		ret += "Segmenttype: Temperature"
-	case segmenttype.TOD:
+	case types.TOD:
 		ret += "Segmenttype: Terms of delivery or transport"
-	case segmenttype.TPL:
+	case types.TPL:
 		ret += "Segmenttype: Transport placement"
-	case segmenttype.TRF:
+	case types.TRF:
 		ret += "Segmenttype: Traffic restriction details"
-	case segmenttype.TRU:
+	case types.TRU:
 		ret += "Segmenttype: Technical rules"
-	case segmenttype.TSR:
+	case types.TSR:
 		ret += "Segmenttype: Transport service requirements"
-	case segmenttype.TVL:
+	case types.TVL:
 		ret += "Segmenttype: Travel product information"
-	case segmenttype.TXS:
+	case types.TXS:
 		ret += "Segmenttype: Taxes"
-	case segmenttype.VEH:
+	case types.VEH:
 		ret += "Segmenttype: Vehicle"
-	case segmenttype.VLI:
+	case types.VLI:
 		ret += "Segmenttype: Value list identification"
 	}
 	ret += " \tTag :" + s.Tag + "\tData: " + string(s.Data)

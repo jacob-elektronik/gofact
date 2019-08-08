@@ -1,10 +1,10 @@
 package lexer
 
 import (
+	"gofact/editoken/types"
 	"testing"
 
 	"gofact/editoken"
-	"gofact/tokentype"
 )
 
 const msg = `UNA:+.? '
@@ -201,31 +201,31 @@ func TestCheckForIgnoreByte(t *testing.T) {
 func TestTokenTypeForSeq(t *testing.T) {
 	l := NewLexer("../edi_messages/message")
 	go l.EdiReader.ReadFile(l.MessageChan)
-	if tType := l.tokenTypeForSeq([]byte("UNA")); tType != tokentype.ServiceStringAdvice {
+	if tType := l.tokenTypeForSeq([]byte("UNA")); tType != types.ServiceStringAdvice {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("UNB")); tType != tokentype.InterchangeHeader {
+	if tType := l.tokenTypeForSeq([]byte("UNB")); tType != types.InterchangeHeader {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("UNG")); tType != tokentype.FunctionalGroupHeader {
+	if tType := l.tokenTypeForSeq([]byte("UNG")); tType != types.FunctionalGroupHeader {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("UNH")); tType != tokentype.MessageHeader {
+	if tType := l.tokenTypeForSeq([]byte("UNH")); tType != types.MessageHeader {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("UNT")); tType != tokentype.MessageTrailer {
+	if tType := l.tokenTypeForSeq([]byte("UNT")); tType != types.MessageTrailer {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("UNE")); tType != tokentype.FunctionalGroupTrailer {
+	if tType := l.tokenTypeForSeq([]byte("UNE")); tType != types.FunctionalGroupTrailer {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("UNZ")); tType != tokentype.InterchangeTrailer {
+	if tType := l.tokenTypeForSeq([]byte("UNZ")); tType != types.InterchangeTrailer {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("QTY")); tType != tokentype.SegmentTag {
+	if tType := l.tokenTypeForSeq([]byte("QTY")); tType != types.SegmentTag {
 		t.Error("Wrong token type")
 	}
-	if tType := l.tokenTypeForSeq([]byte("Test")); tType != tokentype.UserDataSegments {
+	if tType := l.tokenTypeForSeq([]byte("Test")); tType != types.UserDataSegments {
 		t.Error("Wrong token type")
 	}
 }

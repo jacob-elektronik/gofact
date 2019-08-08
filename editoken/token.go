@@ -1,9 +1,8 @@
 package editoken
 
 import (
+	"gofact/editoken/types"
 	"strconv"
-
-	"gofact/tokentype"
 )
 
 // Token struct
@@ -17,95 +16,95 @@ type Token struct {
 func (t Token) PrintToken() string {
 	ret := ""
 	switch t.TokenType {
-	case tokentype.ControlChars:
+	case types.ControlChars:
 		ret += "TokenType: ControlChars \t Value: "
-	case tokentype.UserDataSegments:
+	case types.UserDataSegments:
 		ret += "TokenType: UserDataSegments \t Value: "
-	case tokentype.CompontentDelimiter:
+	case types.CompontentDelimiter:
 		ret += "TokenType: CompontentDelimiter \t Value: "
-	case tokentype.ElementDelimiter:
+	case types.ElementDelimiter:
 		ret += "TokenType: ElementDelimiter \t Value: "
-	case tokentype.SegmentTag:
+	case types.SegmentTag:
 		ret += "TokenType: SegmentTag \t Value: "
-	case tokentype.SegmentTerminator:
+	case types.SegmentTerminator:
 		ret += "TokenType: SegmentTerminator \t Value: "
-	case tokentype.ReleaseIndicator:
+	case types.ReleaseIndicator:
 		ret += "TokenType: ReleaseIndicator \t Value: "
-	case tokentype.DecimalDelimiter:
+	case types.DecimalDelimiter:
 		ret += "TokenType: DecimalDelimiter \t Value: "
-	case tokentype.ServiceStringAdvice:
+	case types.ServiceStringAdvice:
 		ret += "TokenType: ServiceStringAdvice \t Value: "
-	case tokentype.InterchangeHeader:
+	case types.InterchangeHeader:
 		ret += "TokenType: InterchangeHeader \t Value: "
-	case tokentype.InterchangeTrailer:
+	case types.InterchangeTrailer:
 		ret += "TokenType: InterchangeTrailer \t Value: "
-	case tokentype.FunctionalGroupHeader:
+	case types.FunctionalGroupHeader:
 		ret += "TokenType: FunctionalGroupHeader \t Value: "
-	case tokentype.FunctionalGroupTrailer:
+	case types.FunctionalGroupTrailer:
 		ret += "TokenType: FunctionalGroupTrailer \t Value: "
-	case tokentype.MessageHeader:
+	case types.MessageHeader:
 		ret += "TokenType: MessageHeader \t Value: "
-	case tokentype.MessageTrailer:
+	case types.MessageTrailer:
 		ret += "TokenType: MessageTrailer \t Value: "
 
-	case tokentype.DataElementErrorIndication:
+	case types.DataElementErrorIndication:
 		ret += "TokenType: DataElementErrorIndication \t Value: "
-	case tokentype.GroupResponse:
+	case types.GroupResponse:
 		ret += "TokenType: GroupResponse \t Value: "
-	case tokentype.InterchangeResponse:
+	case types.InterchangeResponse:
 		ret += "TokenType: InterchangeResponse \t Value: "
-	case tokentype.MessagePackageResponse:
+	case types.MessagePackageResponse:
 		ret += "TokenType: MessagePackageResponse \t Value: "
-	case tokentype.SegmentElementErrorIndication:
+	case types.SegmentElementErrorIndication:
 		ret += "TokenType: SegmentElementErrorIndication \t Value: "
-	case tokentype.AntiCollisionSegmentGroupHeader:
+	case types.AntiCollisionSegmentGroupHeader:
 		ret += "TokenType: AntiCollisionSegmentGroupHeader \t Value: "
-	case tokentype.AntiCollisionSegmentGroupTrailer:
+	case types.AntiCollisionSegmentGroupTrailer:
 		ret += "TokenType: AntiCollisionSegmentGroupTrailer \t Value: "
-	case tokentype.InteractiveInterchangeHeader:
+	case types.InteractiveInterchangeHeader:
 		ret += "TokenType: InteractiveInterchangeHeader \t Value: "
-	case tokentype.InteractiveMessageHeader:
+	case types.InteractiveMessageHeader:
 		ret += "TokenType: InteractiveMessageHeader \t Value: "
-	case tokentype.InteractiveStatus:
+	case types.InteractiveStatus:
 		ret += "TokenType: InteractiveStatus \t Value: "
-	case tokentype.InteractiveMessageTrailer:
+	case types.InteractiveMessageTrailer:
 		ret += "TokenType: InteractiveMessageTrailer \t Value: "
-	case tokentype.InteractiveInterchangeTrailer:
+	case types.InteractiveInterchangeTrailer:
 		ret += "TokenType: InteractiveInterchangeTrailer \t Value: "
-	case tokentype.ObjectHeader:
+	case types.ObjectHeader:
 		ret += "TokenType: ObjectHeader \t Value: "
-	case tokentype.ObjectTrailer:
+	case types.ObjectTrailer:
 		ret += "TokenType: MessageHObjectTrailereader \t Value: "
-	case tokentype.SectionControl:
+	case types.SectionControl:
 		ret += "TokenType: SectionControl \t Value: "
 
-	case tokentype.SecurityAlgorithm:
+	case types.SecurityAlgorithm:
 		ret += "TokenType: SecurityAlgorithm \t Value: "
-	case tokentype.SecuredDataIdentification:
+	case types.SecuredDataIdentification:
 		ret += "TokenType: SecuredDataIdentification \t Value: "
-	case tokentype.Certificate:
+	case types.Certificate:
 		ret += "TokenType: Certificate \t Value: "
-	case tokentype.DataEncryptionHeader:
+	case types.DataEncryptionHeader:
 		ret += "TokenType: DataEncryptionHeader \t Value: "
-	case tokentype.SecurityMessageRelation:
+	case types.SecurityMessageRelation:
 		ret += "TokenType: SecurityMessageRelation \t Value: "
-	case tokentype.KeyManagementFunction:
+	case types.KeyManagementFunction:
 		ret += "TokenType: KeyManagementFunction \t Value: "
-	case tokentype.SecurityHeader:
+	case types.SecurityHeader:
 		ret += "TokenType: SecurityHeader \t Value: "
-	case tokentype.SecurityListStatus:
+	case types.SecurityListStatus:
 		ret += "TokenType: SecurityListStatus \t Value: "
-	case tokentype.SecurityResult:
+	case types.SecurityResult:
 		ret += "TokenType: SecurityResult \t Value: "
-	case tokentype.SecurityTrailer:
+	case types.SecurityTrailer:
 		ret += "TokenType: SecurityTrailer \t Value: "
-	case tokentype.DataEncryptionTrailer:
+	case types.DataEncryptionTrailer:
 		ret += "TokenType: DataEncryptionTrailer \t Value: "
-	case tokentype.SecurityReferences:
+	case types.SecurityReferences:
 		ret += "TokenType: SecurityReferences \t Value: "
-	case tokentype.SecurityOnReferences:
+	case types.SecurityOnReferences:
 		ret += "TokenType: SecurityOnReferences \t Value: "
-	case tokentype.Error:
+	case types.Error:
 		ret += "TokenType: Error \t Value: "
 	}
 	ret += string(t.TokenValue) + "\t" + " Line: " + strconv.Itoa(t.Line) + " \t" + " Column: " + strconv.Itoa(t.Column)

@@ -2,8 +2,8 @@ package lexer
 
 import (
 	"gofact/editoken"
+	"gofact/editoken/types"
 	"gofact/reader"
-	"gofact/tokentype"
 	"gofact/utils"
 )
 
@@ -34,15 +34,15 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 	ctrlBytes, defaultCtrl := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlBytes)
 	if !defaultCtrl {
-		ch <- editoken.Token{TokenType: tokentype.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
-		ch <- editoken.Token{TokenType: tokentype.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
-		l.lastTokenType = tokentype.ControlChars
+		ch <- editoken.Token{TokenType: types.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
+		ch <- editoken.Token{TokenType: types.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
+		l.lastTokenType = types.ControlChars
 		l.lexerPosition.SetColum(3 + len(ctrlBytes))
 	}
 	l.lexerPosition.ResetBytePos()
 	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
-			if ctrlToken.TokenType == tokentype.ReleaseIndicator {
+			if ctrlToken.TokenType == types.ReleaseIndicator {
 				l.releaseIndicatorActive = true
 				continue
 			}
@@ -73,14 +73,14 @@ func (l *Lexer) findControlToken() *editoken.Token {
 	}
 	switch *l.lexerPosition.CurrentBytePtr {
 	case l.CtrlBytes.CompontentDelimiter:
-		return &editoken.Token{TokenType: tokentype.CompontentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
+		return &editoken.Token{TokenType: types.CompontentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.ElementDelimiter:
-		return &editoken.Token{TokenType: tokentype.ElementDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
+		return &editoken.Token{TokenType: types.ElementDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.SegmentTerminator:
 		l.segmentTagOpen = false
-		return &editoken.Token{TokenType: tokentype.SegmentTerminator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
+		return &editoken.Token{TokenType: types.SegmentTerminator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.ReleaseIndicator:
-		return &editoken.Token{TokenType: tokentype.ReleaseIndicator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
+		return &editoken.Token{TokenType: types.ReleaseIndicator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.DecimalDelimiter:
 		return nil
 		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
@@ -105,17 +105,17 @@ func (l *Lexer) tokenTypeForSeq(seq []byte) int {
 	tType := utils.TokenTypeForStr[string(seq)]
 	if tType == 0 {
 		// after segment termination there must be a valid tag
-		if l.lastTokenType == tokentype.SegmentTerminator && !utils.IsSegment(string(seq)) {
-			return tokentype.Error
+		if l.lastTokenType == types.SegmentTerminator && !utils.IsSegment(string(seq)) {
+			return types.Error
 		}
 
 		// if there is no segment open and we find a new tag, set segmentTagOpen to true
 		if utils.IsSegment(string(seq)) && !l.segmentTagOpen {
 			l.segmentTagOpen = true
-			return tokentype.SegmentTag
+			return types.SegmentTag
 		}
 		// if there is no other option return data segment
-		return tokentype.UserDataSegments
+		return types.UserDataSegments
 	}
 	return tType
 }
@@ -150,7 +150,7 @@ func (l *Lexer) nextByte() bool {
 				l.EdiFactMessage = l.apendNextByte()
 				return l.lexerPosition.NextLine(l.EdiFactMessage)
 			}
-			if *l.lexerPosition.CurrentBytePtr == ' ' && l.lastTokenType != tokentype.SegmentTerminator && l.lastTokenType != tokentype.ControlChars {
+			if *l.lexerPosition.CurrentBytePtr == ' ' && l.lastTokenType != types.SegmentTerminator && l.lastTokenType != types.ControlChars {
 				return true
 			}
 			l.EdiFactMessage = l.apendNextByte()
