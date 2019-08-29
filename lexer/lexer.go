@@ -52,6 +52,12 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 			l.CurrentSeq = append(l.CurrentSeq, *l.lexerPosition.CurrentBytePtr)
 		}
 	}
+	ch <- editoken.Token{
+		TokenType:  types.EOF,
+		TokenValue: "EOF",
+		Column:     l.lexerPosition.currentColumn,
+		Line:       l.lexerPosition.currentLine,
+	}
 	close(ch)
 }
 

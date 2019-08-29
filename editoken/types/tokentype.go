@@ -46,4 +46,5 @@ const (
 	SecurityReferences
 	SecurityOnReferences
 	Error
+	EOF
 )

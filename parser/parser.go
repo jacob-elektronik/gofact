@@ -35,8 +35,10 @@ func NewParser(message string, printSegments bool, printTokens bool, subSet stri
 		return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens, subSet: utils.SubSetDefault}
 	case utils.SubSetEancom:
 		return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens, subSet: utils.SubSetEancom}
-	default:
+	case "":
 		return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens, subSet: utils.SubSetDefault}
+	default:
+		return nil
 	}
 }
 
@@ -124,7 +126,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		return nil
 	case tokenTypes.SegmentTag:
 		if p.lastTokenType != tokenTypes.SegmentTerminator {
-			return errors.New("Parser error, new tag only after SegmentTerminator| Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+			return errors.New("Parser error, new tag only after SegmentTerminator | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
@@ -133,10 +135,20 @@ func (p *Parser) parseToken(t editoken.Token) error {
 			return err
 		}
 		if p.lastTokenType != tokenTypes.SegmentTerminator {
-			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator| Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		seg.SType = segmentTypes.ServiceSegment
 		seg.Tag = t.TokenValue
+	case tokenTypes.EOF:
+		if p.messageHeaderOpen {
+			return errors.New("Parser error, Message Head not closed | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+		}
+		if p.functionalGroupHeaderOpen {
+			return errors.New("Parser error, Functional Group Head not closed | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+		}
+		if p.interChangeHeaderOpen {
+			return errors.New("Parser error, Interchange Header Head not closed | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+		}
 	default:
 		if err := p.checkServiceSegmentSyntax(&t); err != nil {
 			return err

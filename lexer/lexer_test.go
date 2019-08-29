@@ -32,7 +32,7 @@ func TestNewLexer(t *testing.T) {
 }
 
 func TestGetEdiTokens(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	tokenChan := make(chan editoken.Token)
 	go l.GetEdiTokens(tokenChan)
@@ -46,7 +46,7 @@ func TestGetEdiTokens(t *testing.T) {
 }
 
 func TestFindControlToken(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlRunes)
@@ -104,7 +104,7 @@ func TestFindControlToken(t *testing.T) {
 }
 
 func TestFindContentToken(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlRunes)
@@ -120,7 +120,7 @@ func TestFindContentToken(t *testing.T) {
 }
 
 func TestGetUNABytes(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, defaultCtrl := l.getUNABytes()
 	if defaultCtrl == true {
@@ -140,7 +140,7 @@ func TestGetUNABytes(t *testing.T) {
 }
 
 func TestIsCurrentByteControlByte(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlRunes)
@@ -159,7 +159,7 @@ func TestIsCurrentByteControlByte(t *testing.T) {
 }
 
 func TestNextByte(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlRunes)
@@ -171,9 +171,9 @@ func TestNextByte(t *testing.T) {
 
 	l.lexerPosition.CurrentBytePos = len(l.EdiFactMessage)
 	if l.nextByte() {
-		t.Error("Expect false, we are at the end of the message")
+		t.Error("Expect false, we are at the end of the message.edi")
 	}
-	l = NewLexer("../edi_messages/message")
+	l = NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	l.lexerPosition.CurrentBytePos = 8 // 1 pos befor newline
 	if !l.nextByte() {
@@ -182,7 +182,7 @@ func TestNextByte(t *testing.T) {
 }
 
 func TestCheckForIgnoreByte(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	r := byte('+')
 	l.lexerPosition.CurrentBytePtr = &r
@@ -199,7 +199,7 @@ func TestCheckForIgnoreByte(t *testing.T) {
 }
 
 func TestTokenTypeForSeq(t *testing.T) {
-	l := NewLexer("../edi_messages/message")
+	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	if tType := l.tokenTypeForSeq([]byte("UNA")); tType != types.ServiceStringAdvice {
 		t.Error("Wrong token type")
