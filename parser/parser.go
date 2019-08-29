@@ -2,16 +2,13 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	"gofact/editoken"
 	tokenTypes "gofact/editoken/types"
 	"gofact/lexer"
 	"gofact/segment"
 	segmentTypes "gofact/segment/types"
 	"gofact/utils"
-	"os"
 	"strconv"
-	"text/tabwriter"
 )
 
 // Parser struct
@@ -23,20 +20,19 @@ type Parser struct {
 	functionalGroupHeaderOpen bool
 	messageHeaderOpen         bool
 	lastTokenType             int
-	printSegments             bool
-	printTokens               bool
 	subSet                    string
+	Tokens                    []editoken.Token
 }
 
 // NewParser generate a new Parser object
-func NewParser(message string, printSegments bool, printTokens bool, subSet string) *Parser {
+func NewParser(message string, subSet string) *Parser {
 	switch subSet {
 	case utils.SubSetDefault:
-		return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens, subSet: utils.SubSetDefault}
+		return &Parser{EdiFactMessage: message, lastTokenType: -1, subSet: utils.SubSetDefault}
 	case utils.SubSetEancom:
-		return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens, subSet: utils.SubSetEancom}
+		return &Parser{EdiFactMessage: message, lastTokenType: -1, subSet: utils.SubSetEancom}
 	case "":
-		return &Parser{EdiFactMessage: message, lastTokenType: -1, printSegments: printSegments, printTokens: printTokens, subSet: utils.SubSetDefault}
+		return &Parser{EdiFactMessage: message, lastTokenType: -1, subSet: utils.SubSetDefault}
 	default:
 		return nil
 	}
@@ -49,18 +45,7 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 	go ediLexer.EdiReader.ReadFile(ediLexer.MessageChan)
 	go ediLexer.GetEdiTokens(tokenChan)
 	for t := range tokenChan {
-		if p.printTokens {
-			const padding = 3
-			w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-			_, err := fmt.Fprintln(w, t)
-			if err != nil {
-				return err
-			}
-			err = w.Flush()
-			if err != nil {
-				return err
-			}
-		}
+		p.Tokens = append(p.Tokens, t)
 		if t.TokenType == tokenTypes.Error {
 			return errors.New("Parser error, " + t.TokenValue + " | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
@@ -69,20 +54,6 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 		}
 		p.lastTokenType = t.TokenType
 
-	}
-	if p.printSegments {
-		const padding = 3
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
-		for _, s := range p.Segments {
-			_, err := fmt.Fprintln(w, s)
-			if err != nil {
-				return err
-			}
-		}
-		err := w.Flush()
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -183,7 +154,7 @@ func (p *Parser) checkServiceSegmentSyntax(t *editoken.Token) error {
 		}
 		p.messageHeaderOpen = true
 	case tokenTypes.MessageTrailer:
-		if !p.interChangeHeaderOpen && p.subSet == utils.SubSetDefault  {
+		if !p.interChangeHeaderOpen && p.subSet == utils.SubSetDefault {
 			return errors.New("Parser error, no Interchange Header found:  " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		if !p.messageHeaderOpen {
