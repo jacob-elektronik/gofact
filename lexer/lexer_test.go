@@ -53,26 +53,26 @@ func TestFindControlToken(t *testing.T) {
 
 	// test all control runes from msg string
 	r := byte(':')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT := l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control token")
 	}
 	r = byte('+')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control token")
 	}
 	r = byte('\'')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
 	}
 
 	r = byte('?')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
@@ -82,21 +82,21 @@ func TestFindControlToken(t *testing.T) {
 	l.releaseIndicatorActive = true
 
 	r = byte('+')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT != nil {
 		t.Error("Expect nil value")
 	}
 	// escape sign should be disabled now
 	r = byte('+')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT == nil {
 		t.Error("Expect control value")
 	}
 
 	r = byte('a')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	controlT = l.findControlToken()
 	if controlT != nil {
 		t.Error("Expect nil value")
@@ -146,13 +146,13 @@ func TestIsCurrentByteControlByte(t *testing.T) {
 	l.CtrlBytes = newCtrlBytes(ctrlRunes)
 
 	r := byte('+')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	if !l.isCurrentByteControlByte() {
 		t.Error("Expect true")
 	}
 
 	r = byte('^')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	if l.isCurrentByteControlByte() {
 		t.Error("Expect false")
 	}
@@ -164,18 +164,18 @@ func TestNextByte(t *testing.T) {
 	ctrlRunes, _ := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlRunes)
 
-	l.CurrentBytePos = 40
+	l.lexerPosition.CurrentBytePos = 40
 	if !l.nextByte() {
 		t.Error("Expect true")
 	}
 
-	l.CurrentBytePos = len(l.EdiFactMessage)
+	l.lexerPosition.CurrentBytePos = len(l.EdiFactMessage)
 	if l.nextByte() {
 		t.Error("Expect false, we are at the end of the message")
 	}
 	l = NewLexer("../edi_messages/message")
 	go l.EdiReader.ReadFile(l.MessageChan)
-	l.CurrentBytePos = 8 // 1 pos befor newline
+	l.lexerPosition.CurrentBytePos = 8 // 1 pos befor newline
 	if !l.nextByte() {
 		t.Error("Expect true")
 	}
@@ -185,14 +185,14 @@ func TestCheckForIgnoreByte(t *testing.T) {
 	l := NewLexer("../edi_messages/message")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	r := byte('+')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 
 	if l.checkForIgnoreByte() {
 		t.Error("Expect false, + is not ignored")
 	}
 
 	r = byte('\n')
-	l.CurrentBytePtr = &r
+	l.lexerPosition.CurrentBytePtr = &r
 	if !l.checkForIgnoreByte() {
 		t.Error("Expect true, newline is ignored")
 	}
