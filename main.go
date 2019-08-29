@@ -8,10 +8,11 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"text/tabwriter"
 )
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var message = flag.String("message.edi", "", "edifact message.edi fiel path")
+var message = flag.String("message", "", "edifact message.edi fiel path")
 var subset = flag.String("subset", "edifact", "supportet subset : eancom")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 var printTokens = flag.Bool("ptokens", false, "print tokens generatet by the lexer")
@@ -44,10 +45,40 @@ func main() {
 		}
 	}
 	if *message != "" {
-		fmt.Println(*subset)
-		p := parser.NewParser(*message, *printSegments, *printTokens, *subset)
+		p := parser.NewParser(*message, *subset)
 		err := p.ParseEdiFactMessageConcurrent()
 		fmt.Println(err)
+
+		if *printTokens {
+			for t :=range p.Tokens {
+				const padding = 3
+				w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+				_, err := fmt.Fprintln(w, t)
+				if err != nil {
+					fmt.Println(err)
+				}
+				err = w.Flush()
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+
+		}
+
+		if *printSegments {
+			const padding = 3
+			w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.TabIndent|tabwriter.Debug)
+			for _, s := range p.Segments {
+				_, err := fmt.Fprintln(w, s)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+			err := w.Flush()
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
 	} else {
 		fmt.Println("no message.edi to parse")
 	}
