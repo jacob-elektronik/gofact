@@ -25,6 +25,8 @@
             print segments generatet by the parser
       -ptokens
             print tokens generatet by the lexer
+      -subset
+            supportet subset : eancom, edifact (default)
     ~~~~
  - example
     ~~~~bash

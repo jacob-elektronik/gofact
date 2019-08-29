@@ -4,3 +4,4 @@ cpu.prof
 edi_messages/siemens
 gofact
 testcover.out
+/edi_messages/eancom_kermi_ord.edi

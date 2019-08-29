@@ -11,7 +11,7 @@ import (
 )
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var message = flag.String("message", "", "edifact message fiel path")
+var message = flag.String("message.edi", "", "edifact message.edi fiel path")
 var subset = flag.String("subset", "edifact", "supportet subset : eancom")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 var printTokens = flag.Bool("ptokens", false, "print tokens generatet by the lexer")
@@ -49,7 +49,7 @@ func main() {
 		err := p.ParseEdiFactMessageConcurrent()
 		fmt.Println(err)
 	} else {
-		fmt.Println("no message to parse")
+		fmt.Println("no message.edi to parse")
 	}
 
 }
