@@ -4,6 +4,9 @@ import (
 	"gofact/segment/types"
 )
 
+const SubSetDefault = "edifact"
+const SubSetEancom = "eancom"
+
 var SegmentTypeFoString = map[string]int{
 	"AAI": types.AAI,
 	"ADR": types.ADR,

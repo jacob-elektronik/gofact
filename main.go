@@ -12,6 +12,7 @@ import (
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var message = flag.String("message", "", "edifact message fiel path")
+var subset = flag.String("subset", "edifact", "supportet subset : eancom")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 var printTokens = flag.Bool("ptokens", false, "print tokens generatet by the lexer")
 var printSegments = flag.Bool("psegments", false, "print segments generatet by the parser")
@@ -43,7 +44,8 @@ func main() {
 		}
 	}
 	if *message != "" {
-		p := parser.NewParser(*message, *printSegments, *printTokens)
+		fmt.Println(*subset)
+		p := parser.NewParser(*message, *printSegments, *printTokens, *subset)
 		err := p.ParseEdiFactMessageConcurrent()
 		fmt.Println(err)
 	} else {
