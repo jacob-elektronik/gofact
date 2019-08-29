@@ -31,15 +31,7 @@ func NewLexer(filePath string) *Lexer {
 }
 
 func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
-	ctrlBytes, defaultCtrl := l.getUNABytes()
-	l.CtrlBytes = newCtrlBytes(ctrlBytes)
-	if !defaultCtrl {
-		ch <- editoken.Token{TokenType: types.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
-		ch <- editoken.Token{TokenType: types.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
-		l.lastTokenType = types.ControlChars
-		l.lexerPosition.SetColum(3 + len(ctrlBytes))
-	}
-	l.lexerPosition.ResetBytePos()
+	l.setControlToken(ch)
 	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == types.ReleaseIndicator {
@@ -54,7 +46,6 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 					break
 				}
 			}
-
 			l.lastTokenType = ctrlToken.TokenType
 			ch <- *ctrlToken
 		} else {
@@ -62,6 +53,18 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 		}
 	}
 	close(ch)
+}
+
+func (l *Lexer)setControlToken(ch chan<- editoken.Token) {
+	ctrlBytes, defaultCtrl := l.getUNABytes()
+	l.CtrlBytes = newCtrlBytes(ctrlBytes)
+	if !defaultCtrl {
+		ch <- editoken.Token{TokenType: types.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
+		ch <- editoken.Token{TokenType: types.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
+		l.lastTokenType = types.ControlChars
+		l.lexerPosition.SetColum(3 + len(ctrlBytes))
+	}
+	l.lexerPosition.ResetBytePos()
 }
 
 // findControlToken generate a control type token from current byte.

@@ -1,0 +1,1083 @@
+REF: https://www.gs1.se/eancom_2002/ean02s3/part1/part1_05.htm#EDIFACT%20Syntax%20version%203%20overview
+
+
+EANCOM® 2002, Syntax Version 3, Edition 2008
+Part I
+APPENDIX 1: UN/EDIFACT
+
+
+5.  APPENDIX 1: UN/EDIFACT
+
+5.1  Definition of UN/EDIFACT
+
+United Nation's Directories for Electronic Data Interchange for Administration, Commerce and Transport. They comprise a set of internationally agreed standards, directories and guidelines for the electronic interchange of structured data, particular as related to trade in goods and services, between independent, computerised information systems.
+
+Recommended within the framework of the United Nations, the rules are approved and published by the UN/CEFACT (United Nations Centre for Trade Facilitation and Electronic business) in the United Nations Trade Data Interchange Directory (UNTDID) and are maintained under agreed procedures. UNTDID includes:
+
+- EDIFACT – Application level syntax rules (Syntax version: 3);
+
+- Message design guidelines;
+
+- Syntax implementation guidelines;
+
+- EDIFACT Data Elements Directory, EDED (a subset of UNTDED);
+
+- EDIFACT Code list, EDCL;
+
+- EDIFACT Composite data elements Directory, EDCD;
+
+- EDIFACT standard Segments Directory, EDSD;
+
+- EDIFACT United Nations Standard Messages Directory, EDMD;
+
+- Uniform Rules of Conduct for the Interchange of Trade Data by Tele-transmission (UNCID);
+
+- Explanatory material, as appropriate.
+
+Actual information is available at www.unece.org/trade/untdid.
+
+5.2  EDIFACT Syntax version 3 overview
+
+This section is a summary of the document: "EDIFACT - Application level syntax rules (Syntax version 3)". Actual information is available at www.unece.org/cefact.
+
+The UN/EDIFACT syntax rules set the rules for structuring data into segments, segments into messages, and messages into an interchange.
+
+5.2.1 Interchange Structure
+
+An interchange may consist of the following segments:
+
+
+
+
+
+Segments starting with "UN" are called service segments. They constitute the envelope or the "packaging" of the UN/EDIFACT messages.
+
+User data segments contain the information itself, in a format specific to each message type.
+
+5.2.2 Message Structure
+
+Each data segment has a specific place within the sequence of segments in the message. They may occur in any of the following three sections of the message:
+
+a. Heading section - A segment occurring in this section relates to the entire message.
+
+b. Detail section - A segment occurring in this section relates to the detail information only.
+
+c. Summary section - Only segments containing totals or control information may occur in the summary section, e.g. invoice total amount, number of lines in a
+                                       purchase order, etc.
+
+The sequence of the three message sections can be represented by the following simple example;
+
+
+
+The same segment type may occur in more than one of the message sections, for example in the header and in the detail section, and/or more than once in the same section.
+
+Some segments may be repeated a certain number of times at their specific location in the message. The status, Mandatory or Conditional, and the maximum number of repetitions of segment types are indicated in the message structure.
+
+Within a message, specific groups of functionally related segments may be repeated; these groups are referred to as "segment groups". The maximum number of repetitions of a particular segment group at a specific location is included in the message definition.
+
+A segment group may be nested within other segment groups, provided that the inner segment group terminates before any outer segment group terminates.
+
+5.2.3 Segment structure
+
+A segment consists of:
+
+A segment tag: identifies the segment type
+Data element separators
+Simple and/or composite data elements
+A segment terminator
+Data elements can be defined as having a fixed or variable length.
+
+A composite data element contains two or more component data elements.
+
+A component data element is a simple data element used in a composite data element.
+
+A data element can be qualified by another data element, the value of which is expressed as a code that gives specific meaning to the data. The data value of a qualifier is a code taken from an agreed set of code values.
+
+5.2.4 Service characters
+
+In EANCOM®, four characters, extracted from character set level A, have a special meaning and act as the default service characters for EANCOM®;
+
+Apostrophe
+
+'
+
+=
+
+segment terminator
+
+Plus sign
+
++
+
+=
+
+segment tag and data element separator
+
+Colon
+
+:
+
+=
+
+Component data element separator (separating simple data
+elements within a composite data element)
+
+Questionmark
+
+?
+
+=
+
+Release character which, when immediately preceding one of the service characters, restores that character’s normal meaning. For example, 10?+10=20 means 10+10=20. Question mark is represented by ??
+
+Should trading partners agree to use any of the character sets from B to F (inclusive) and the default separators from UNOA, then the UNA segment must be provided to explicitly state the default separator values.
+
+When using any of the character sets A through F then the syntax version number (DE 0002) in the UNB segment should be set to 3.
+
+Example of an UN/EDIFACT segment:
+
+DTM+137:20020101:102'
+
+DTM
+
+=
+
+Tag of the "Date/Time/Period" segment;
+
++
+
+=
+
+Data element separator;
+
+137
+
+=
+
+Qualifier to indicate the date is the Document/Message Date/Time;
+
+:
+
+=
+
+Component data element separator (separating the date qualifier and the date);
+
+20020101
+
+=
+
+Date;
+
+:
+
+=
+
+Component data element separator (separating the date and the date format qualifier);
+
+102
+
+=
+
+Qualifier to indicate the format of the date (CCYYMMDD);
+
+'
+
+=
+
+Segment terminator.
+
+
+
+5.2.5 Compression of data
+
+In data elements for which the Trade Data Elements Directory specifies variable length and no other restrictions, non-significant character positions, (i.e. leading zeroes and trailing spaces) should be suppressed.
+
+TAG = segment tag; DE = data element; CE = component data element.
+
+-
+Exclusion of segments. Conditional segments containing no data should be omitted (including their segment tags).
+
+-
+Exclusion of data elements by omission. Data elements are identified by their sequential position within the segments as stated in the Segment Directory. If a conditional data element is omitted and followed by another data element, its position should be indicated by retention of its data element separator.
+
+Example:
+
+TAG+DE+DE+DE+CE:CE:CE' complete segment including all data elements
+
+TAG+DE++DE+CE:CE:CE'
+                wpeB.jpg (736 Byte) one DE has been omitted
+
+-
+
+Exclusion of data elements by truncation. If one or more conditional data elements at the end of a segment are omitted, the segment may be truncated by the segment terminator.
+
+Example:
+
+TAG+DE+DE+DE+DE' Original including all data elements
+
+TAG+DE+DE'
+                     wpeC.jpg (888 Byte) truncation
+
+-
+Exclusion of component data elements by omission. If a conditional CE is omitted and followed by another CE, its given position must be represented by its CE separator.
+
+Example:
+
+TAG+DE++DE+CE:CE:CE' Original including all CE's
+
+TAG+DE++DE+CE::CE'
+                             wpeD.jpg (731 Byte) one CE has been omitted
+
+-
+
+Exclusion of component data elements by truncation. One or more conditional CE’s at the end of a composite DE may be excluded by truncation by the DE separator or, if at the end of a segment, by the segment terminator.
+
+Example:
+
+TAG+DE++DE+CE:CE:CE' Original including last CE
+
+
+
+5.2.6 Representation of numeric values
+
+-
+
+Decimal sign. The representation for decimal sign is the point on the line (.). The decimal sign should not be counted as a character when computing the maximum field length of a data element. When a decimal sign is transmitted, there should be at least one digit before and after the decimal sign.
+
+To assist in-house file designers and data interchange partners, the following lengths may be used as a guideline:
+
+Numeric Class
+
+Format
+
+Integer Digit
+
+Decimal Digit
+
+Amounts
+
+n..18
+
+12
+
+6
+
+Control Values
+
+n..18
+
+14
+
+4
+
+Cubes
+
+n..9
+
+5
+
+4
+
+Currency Rates
+
+n..12
+
+6
+
+6
+
+Other Range Value
+
+n..18
+
+15
+
+3
+
+Percentages
+
+n..10
+
+6
+
+4
+
+Percentage Range Value
+
+n..18
+
+14
+
+4
+
+Quantities
+
+n..15
+
+12
+
+3
+
+Rate per Unit
+
+n..15
+
+12
+
+3
+
+Tax Rates
+
+n..17
+
+13
+
+4
+
+Unit Prices
+
+n..15
+
+11
+
+4
+
+Unit Price Basis
+
+n..9
+
+6
+
+3
+
+Weights
+
+n..18
+
+15
+
+3
+
+-
+Triad separator. Triad separators should not be used in the interchange. (Allowed: 2500000; Not allowed: 2,500,000 or 2.500.000 or 2 500 000).
+
+-
+
+Sign. Numeric data element values should be regarded as positive. Although a deduction is conceptually negative, it should be represented by a positive value, (e.g. in a credit note all values are positive, the application software uses the message name coded (DE 1001) to convert all values into negative). In addition, some data elements and code combinations will lead to implied negative values, (e.g. data element 5463 with code value ‘A, Allowance’ in an ALC segment in an invoice).
+
+If a value is to be represented as negative, in transmission it should be immediately preceded by a minus sign (e.g., –112). The minus sign shall not be counted as a character when computing the maximum field length of a data element.
+
+Example 1 (INVOIC)
+
+...
+BGM+381+CN52+9' INVOIC message is used as a credit note
+...
+LIN+1++4000862141404:SRV' Line item 1 identified by GTIN 4000862141404.
+...
+QTY+61:2' Return quantity is 2.
+MOA+203:200' Line item amount is 200.
+PRI+AAA:100:CA' Net price from the catalogue is 100.
+
+As DE 1001 in the header contains code value 381, the numeric values in MOA and QTY should be interpreted as negative by the in-house application.
+
+In addition, some data element and code combinations will lead to implied negative values (e.g., data element 5463 with code value 'A, Allowance' in an ALC segment in an invoice).
+
+Example 2 (INVOIC)
+
+...
+BGM+380+IN42652+9' Commercial invoice number IN42652.
+...
+LIN+1++4000862141404:SRV' Line item 1 identified by GTIN 4000862141404.
+...
+MOA+203:200' Line item amount is 200.
+...
+ALC+A' Allowances
+MOA+204:12' The numeric value is 12.
+...
+
+As DE 5463 in the ALC segment contains code value A, the numeric values in MOA below should be interpreted as negative by the in-house application.
+
+It is recommended to create one message for the invoice and one message for the credit note. As this is not always possible (e.g., an invoice for drinks with a negative deposit balance at detail level) the minus sign can be used in DE 6060 of the QTY segment and in DE 5004 of the MOA segment.
+
+This rule is applicable for debit lines in credit notes and for credit lines in invoices/debit notes.
+
+If allowances or charges are calculated backwards (credit note for a previously sent invoice) the code value in ALC DE 5463 is not changed.
+
+5.2.7 Character set
+
+Supported character sets
+
+In syntax version 3 character sets level A, B, C, D, E and F are supported. Within EANCOM® the use of character set level A is recommended. Any user, wishing to use a character set level other than A, should first obtain agreement from the intended trading partner in order to ensure correct processing by the receiving application.
+
+Character set level A
+
+Character set level A (ISO 646 7-bit single byte code, with the exception of lower case letters and certain graphic character allocations) contains the following characters:
+
+Letters, upper case
+Numerals
+Space character
+Full stop
+Comma
+Hyphen/minus sign
+Opening parentheses
+Closing parentheses
+Oblique stroke (slash)
+Equal sign
+Exclamation mark
+Quotation mark
+Percentage sign
+Ampersand
+Asterisk
+Semi-colon
+Less-than sign
+Greater-than sign
+
+A to Z
+0 to 9
+Space character
+.
+,
+-
+(
+)
+/
+=
+!
+"
+%
+&
+*
+;
+<
+>
+
+Character set level B
+
+Character set level B (ISO 646 7-bit single byte code, with the exception of certain graphic character allocations) contains the same characters as character set level A plus lower case letters ‘a’ to ‘z’.
+
+Character sets level C to F
+
+Character sets level C to F (ISO 8859 - 1,2,5,7 8-bit single byte coded graphic character sets) cover the Latin 1 - 2, Cyrillic and Greek alphabets.
+
+It is important to note that EANCOM® users often need, in addition to the recommended character set level A, the following sub-set of supplementary characters taken from ISO 8859 - 1:
+
+Number sign
+Commercial at
+Left square bracket	[
+Reverse solidus
+Right square bracket
+Circumflex accent
+Grave accent
+Left curly bracket
+Vertical line
+Right curly bracket
+
+#
+@
+[
+\
+]
+^
+`
+{
+|
+}
+
+Syntax identifier, character sets and supported languages
+
+The following table contains the code values for the syntax identifier and explains which languages are catered for in which part of ISO-8859.
+Note that the last character of the syntax identifier (data element 0001) identifies the character set level used.
+
+Syntax identifier
+
+ISO standard
+
+Languages
+
+UNOA
+
+646
+
+
+
+UNOB
+
+646
+
+
+
+UNOC
+
+8859 - 1
+
+Danish, Dutch, English, Faeroese, Finnish, French, German, Icelandic, Irish, Italian, Norwegian, Portuguese, Spanish, Swedish
+
+UNOD
+
+8859 - 2
+
+Albanian, Czech, English, Hungarian, Polish, Romanian, Serbo-Croatian, Slovak, Slovene
+
+UNOE
+
+8859 - 5
+
+Bulgarian, Byelorussian, English, Macedonian, Russian, Serbo-Croatian, Ukrainian
+
+UNOF
+
+8859 - 7
+
+Greek
+
+5.3 Directory status, version and release
+
+All EANCOM® 2002 messages are based on the UN/EDIFACT directory D.01B, which was released by UN/CEFACT in 2001. All messages contained in this directory are approved as United Nations Standard Messages (UNSM).
+
+5.4 EANCOM® message version
+
+Each EANCOM® message carries its own subset version number, which allows the unambiguous identification of different versions of the same EANCOM® message. The EANCOM® subset version number is indicated in data element 0057 in the UNG and UNH segments. It is structured as follows:
+
+GS1nnn
+
+where: GS1 = Indicates GS1 as the agency controlling the subset.
+
+nnn = Three-digit version number of the EANCOM® subset.
+
+Subset version numbers for formally released EANCOM® messages start at the number ‘001’ and are incremented by one for each subsequent version of the message.
+
+5.5 Documentation conventions
+
+5.5.1 Format and picture of data elements
+
+The following conventions apply in the present documentation:
+
+Character type:
+
+a :alphabetic characters
+n :numeric characters
+an :alpha-numeric characters
+
+Size:
+
+Fixed : all positions must be used
+Variable : positions may be used up to a specified maximum
+
+Examples:
+
+a3 :3 alphabetic characters, fixed length
+n3 :3 numeric characters, fixed length
+an3 :3 alpha-numeric characters, fixed length
+a..3 :up to 3 alphabetic characters
+n..3 :up to 3 numeric characters
+an..3 :up to 3 alpha-numeric characters
+
+5.5.2 Indicators
+
+Segment layout
+
+This section describes the layout of segments used in the EANCOM® messages. The original UN/EDIFACT segment layout is listed. The appropriate comments relevant to the EANCOM® subset are indicated.
+
+The segments are presented in the sequence in which they appear in the message. The segment or segment group tag is followed by the (M)andatory / (C)onditional indicator, the maximum number of occurrences and the segment description.
+
+Reading from left to right, in column one, the data element tags and descriptions are shown, followed by in the second column the UN/EDIFACT status (M or C), the field format, and the picture of the data elements. These first pieces of information constitute the original UN/EDIFACT segment layout.
+
+Following the UN/EDIFACT information, EANCOM® specific information is provided in the third, fourth, and fifth columns. In the third column a status indicator for the use of (C)onditional UN/EDIFACT data elements (see description below), in the fourth column the restriction indicator, and in the fifth column notes and code values used for specific data elements in the message.
+
+Status indicators
+
+(M)andatory data elements or composites in UN/EDIFACT segments retain their status in EANCOM®.
+
+Additionally, there are five types of status with a (C)onditional UN/EDIFACT status, whether for simple, component or composite data elements. They are listed below and can be identified when relevant by the abbreviations.
+
+-REQUIRED
+
+R
+
+Indicates that the entity is required and must be sent.
+
+- ADVISED
+
+A
+
+Indicates that the entity is advised or recommended.
+
+- DEPENDENT
+
+D
+
+Indicates that the entity must be sent in certain conditions, as defined by the relevant explanatory note.
+
+- OPTIONAL
+
+O
+
+Indicates that the entity is optional and may be sent at the discretion of the user.
+
+- NOT USED
+
+N
+
+Indicates that the entity is not used and should be omitted.
+
+If a composite is flagged as N, NOT USED, all data elements within that composite will have blank status indicators assigned to them.
+
+Restriction indicators
+
+-
+
+Restricted (*) A data element marked with an asterisk (*) in the fourth column of the segment details of a message indicates that the listed codes in column five are the only codes available for use with the data element at the same level as the asterisk, in the current segment, in the current message.
+
+-
+
+Open. All data elements in which coded representation of data is possible, and in which a restricted set of code values is not indicated, are open. The available codes are listed in the Data Elements and Code Sets Directory (Part III of this manual). Code values may be given as examples or there may be a note on the format or type of code to be used.
+
+Different colours are used for the code values in the HTML segment details: restricted codes are in red and open codes in blue.
+
+5.6 Message structure charts and branching diagrams
+
+Within every EANCOM® message two diagrams are presented which explain the structure and sequence of the message. These diagrams are known as the Message Structure Chart and the Message Branching Diagram.
+
+The message structure chart is a sequential chart which presents the message in the sequence in which it must be formatted for transmission. Every message is structured and consists of three sections; a header, detail, and summary section. An example of a message structure chart follows:
+
+
+
+graph05_3.jpg (62748 Byte)
+
+
+
+The structure chart should always be read from top down and left to right (please note that the message detailed is simply an example message and does not bear any relevance to real EANCOM® messages).
+
+A message branching diagram is a pictorial representation (in flow chart style) which presents the logical sequence and relationships contained within a message.
+
+Branching diagrams should be read, starting at the UNH segment, from left to right and top to bottom. The lines contained within a branching diagram should be considered as guides which must be followed in order to progress through the message.
+
+graph05_4.jpg (61688 Byte)
+
+
+
+5.7 Interchange structure and service segments
+
+The interchange structure in an UN/EDIFACT transmission is organised through several grouping levels. The service segments are the envelope of the groups.
+
+The first service segment possible in an interchange is the ‘UNA’ segment which defines the service characters being used in the interchange.
+
+The second service segment, ‘UNB’, indicates the beginning of the interchange.
+
+The next one, ‘UNG’, indicates the beginning of a group of messages of the same type, for example invoices.
+
+The last service segment, ‘UNH’, indicates the beginning of a given message.
+
+Each beginning service segment corresponds to an ending service segment (note: UNA is not a beginning segment).
+
+Service string advice: UNA
+
+Interchange envelope: UNB .... UNZ
+
+Group envelope: UNG .... UNE
+
+Message envelope: UNH .... UNT
+
+The interchange can thus be represented like this:
+
+
+
+
+
+The status of segment UNA is dependent on the character set level and service characters being used. If character set level A is being used together with the default service characters for EANCOM® then the UNA segment is not required. However, should trading partners agree to use any of the character sets level B to F (inclusive) and the default service characters for EANCOM®, then the UNA segment must be sent.
+
+Segments UNB..UNZ and UNH..UNT are mandatory.
+
+Segments UNG..UNE are conditional. Within EANCOM® the use of the UNG..UNE segments is not recommended, as the grouping of identical message types is not considered to add significant value to an interchange, (i.e., between UNB..UNZ).
+
+If the UNG..UNE segments are used, then it should be noted that it is not possible in the EANCOM® CONTRL message to report syntactically on a functional group.
+
+The message itself is structured with a Header, a Detail and a Summary section. In messages where there may be ambiguity between the sections, the UNS segment may be used as a separator.
+
+The layout of the service segments UNA, UNB - UNZ, UNG - UNE, and UNH - UNT is presented in this section.
+
+The Section Control Segment (UNS) is not shown here. Its usage is defined in those EANCOM® messages where the segment is actually used.
+
+ Segment Layout - UNA segment.
+
+UNA - C 1 -
+
+SERVICE STRING ADVICE
+
+Function :
+
+To define the characters selected for use as delimiters and indicators in the rest of the interchange that follows.
+
+Segment number :
+
+
+
+GS1
+
+*
+Description
+
+UNA1	Component data element separator	M an1	M	*	Used as a separator between component data elements contained within a composite data element (default value: ":")
+UNA2	Data element separator	M an1	M	*	Used to separate two simple or composite data elements (default value: "+" )
+UNA3	Decimal notation	M an1	M	*	Used to indicate the character used for decimal notation (default value:"." )
+UNA4	Release character	M an1	M	*	Used to restore any service character to its original specification (value: "?" ).
+UNA5	Reserved for future use	M an1	M	*	(default value: space )
+UNA6	Segment terminator	M an1	M	*	Used to indicate the end of segment data (default value: " ' ")
+Segment Notes:
+This segment is used to inform the receiver of the interchange that a set of service string characters which are different to the default characters are being used.
+
+When using the default set of service characters, the UNA segment need not be sent. If it is sent, it must immediately precede the UNB segment and contain the four service string characters (positions UNA1, UNA2, UNA4 and UNA6) selected by the interchange sender.
+
+Regardless of whether or not all of the service string characters are being changed every data element within this segment must be filled, (i.e., if some default values are being used with user defined ones, both the default and user defined values must be specified).
+
+When expressing the service string characters in the UNA segment, it is not necessary to include any element separators.
+
+The use of the UNA segment is required when using a character set other than level A.
+
+Example:
+UNA:+.? '
+
+Segment Layout - UNB segment.
+
+UNB - M 1 -	INTERCHANGE HEADER
+Function :	To start, identify and specify an interchange.
+Segment number :
+ 	EDIFACT	GS1	*	Description
+S001	SYNTAX IDENTIFIER	M	M
+0001	Syntax identifier	M a4	M	*	UNOA = UN/ECE level A
+UNOB = UN/ECE level B
+UNOC = UN/ECE level C
+UNOD = UN/ECE level D
+UNOE = UN/ECE level E
+UNOF = UN/ECE level F
+0002
+
+Syntax version number	M n1	M	*	3 = Syntax version number 3
+S002	INTERCHANGE SENDER	M	M
+0004
+
+Sender identification	M an..35	M	 	GLN (n13)
+0007
+
+Partner Identification code qualifier	C an..4	R	*	14 = GS1
+0008
+
+Address for reverse routing	C an..14	O
+S003	INTERCHANGE RECIPIENT	M	M
+0010
+
+Recipient identification	M an..35	M	 	GLN (n13)
+0007
+
+Partner Identification code qualifier	C an..4	R	*	14 = GS1
+0014
+
+Routing address	C an..14	O
+S004	DATE / TIME OF PREPARATION	M	M
+0017
+
+Date	M n6	M	 	YYMMDD
+0019
+
+Time	M n4	M	 	HHMM
+0020	Interchange control reference	M an..14	M	 	Unique reference identifying the interchange.
+Created by the interchange sender.
+S005	RECIPIENT’S REFERENCE PASSWORD	C	O
+0022
+
+Recipient’s reference/password	M an..14	M
+0025
+
+Recipient’s reference/password qualifier	C an2	O
+0026	Application reference	C an..14	O	 	Message identification if the interchange contains only one type of message.
+0029	Processing priority code	C a1	O	 	A = Highest priority
+0031	Acknowledgement request	C n1	O	 	1 = Requested
+0032	Communications agreement identification	C an..35	O	*	EANCOM......
+0035	Test indicator	C n1	O	 	1 = Interchange is a test
+Segment Notes:
+This segment is used to envelope the interchange, as well as to identify both, the party to whom the interchange is sent and the party who has sent the interchange. The principle of the UNB segment is the same as a physical envelope which covers one or more letters or documents, and which details, both the address where delivery is to take place and the address from where the envelope has come.
+
+DE 0001: The recommended (default) character set for use in EANCOM® for international exchanges is character set A (UNOA). Should users wish to use character sets other than A, an agreement on which set to use should be reached on a bilateral basis before communications begin.
+
+DE 0004 and 0010: Within EANCOM® the use of the Global Location Number (GLN), is recommended for the identification of the interchange sender and recipient.
+
+DE 0008: The address for reverse routing is provided by the interchange sender to inform the interchange recipient of the address within the sender’s system to which responding interchanges must be sent. It is recommended that the GLN be used for this purpose.
+
+DE 0014: The address for routing, provided beforehand by the interchange recipient, is used by the interchange sender to inform the recipient of the internal address, within the latter’s systems, to which the interchange should be routed. It is recommended that the GLN be used for this purpose.
+
+DE S004: The date and time specified in this composite should be the date and time at which the inter-change sender prepared the interchange. This date and time may not necessarily be the same as the date and time of contained messages.
+
+DE 0020: The interchange control reference number is generated by the interchange sender and is used to identify uniquely each interchange. Should the interchange sender wish to re-use interchange control reference numbers, it is recommended that each number be preserved for at least a period of three months before being re-used. In order to guarantee uniqueness, the interchange control reference number should always be linked to the interchange sender’s identification (DE 0004).
+
+DE S005: The use of passwords must first be agreed bilaterally by the parties exchanging the interchange.
+
+DE 0026: This data element is used to identify the application, on the interchange recipient’s system, to which the interchange is directed. This data element may only be used if the interchange contains only one type of message, (e.g. only invoices). The reference used in this data element is assigned by the interchange sender.
+
+DE 0031: This data element is used to indicate whether an acknowledgement to the interchange is required.
+The EANCOM® APERAK or CONTRL message should be used to provide acknowledgement of interchange receipt. In addition, the EANCOM® CONTRL message may be used to indicate when an interchange has been rejected due to syntax errors.
+
+DE 0032: This data element is used to identify any underlying agreements which control the exchange of data. Within EANCOM® , the identity of such agreements must start with the letters ‘EANCOM’, the remaining characters within the data element being filled according to bilateral agreements.
+
+Example:
+UNB+UNOA:3+5412345678908:14+8798765432106:14+020102:1000+12345555+++++EANCOMREF 52'
+
+Segment Layout - UNG segment.
+
+UNG - C 1 -	FUNCTIONAL GROUP HEADER
+Function :	To start, identify and specify a functional group.
+Segment number :
+ 	EDIFACT	GS1	*	Description
+0038	FUNCTIONAL GROUP IDENTIFICATION	M an..6	M	 	Identification of a message contained in the functional group, e.g. INVOIC.
+S006	APPLICATION SENDER’S IDENTIFICATION	M	M
+0040
+
+Sender identification	M an..35	M	 	GLN (n13)
+0007
+
+Identification code qualifier	C an..4	R	*	14 = GS1
+S007	INTERCHANGE RECIPIENT	M	M
+0044
+
+Recipient identification	M an..35	M	 	GLN (n13)
+0007
+
+Identification code qualifier	C an..4	R	*	14 = GS1
+S004	DATE / TIME OF PREPARATION	M	M
+0017
+
+Date	M n6	M	 	YYMMDD
+0019
+
+Time	M n4	M	 	HHMM
+0048	Functional group reference number	M an..14	M	 	Unique reference identifying the functional group. Created by the interchange sender.
+0051	Controlling agency	M an..2	M	*	UN = UN/CEFACT
+S008	MESSAGE VERSION	M	M
+0052
+
+Message type version number	M an..3	M	*	D = UN/EDIFACT directory
+0054
+
+Message type release number	M an..3	M	 	The value of this data element depends on the message type.
+0057
+
+Association assigned code	C an..6	R	 	The value of this data element depends on the message type.
+0058	Application password	C an..14	D	 	The use of this data element depends on agreements between the trading partners.
+Segment Notes:
+Within EANCOM® the use of the UNG..UNE segments is not recommended as the grouping of identical message types is not considered to add significant value to an interchange, (i.e., between UNB..UNZ).
+
+Segment Layout - UNH segment.
+
+UNH - M 1 -
+
+Message header
+
+Function :
+
+To head, identify and specify a message.
+
+Segment number :
+ 	EDIFACT	GS1	*	Description
+0062
+Message reference number
+
+M an..14
+
+M
+
+
+Unique reference number assigned to a message within an interchange by the sender.
+
+Same reference number as in DE 0062 of the UNT segment of the message.
+
+S009
+MESSAGE IDENTIFIER
+
+M
+
+M
+
+
+0065
+Message type
+
+M an..6
+
+M
+
+*
+
+Identification of a message.
+
+0052
+Message version number
+
+M an..3
+
+M
+
+*
+
+D = UN/EDIFACT Directory
+
+0054
+Message release number
+
+M an..3
+
+M
+
+*
+
+01B = Release 2001 - B
+
+0051
+Controlling agency
+
+M an..2
+
+M
+
+*
+
+UN = UN/CEFACT
+
+0057
+Association assigned code
+
+C an..6
+
+R
+
+*
+
+GS1nnn = EANCOM® subset version.
+‘GS1’ represents GS1.
+‘nnn’ is the subset version number of the EANCOM® message.
+
+0068
+Common access reference
+
+C an..35
+
+N
+
+
+S010
+STATUS OF THE
+TRANSFER
+
+C
+
+N
+
+
+0070
+Sequence of transfers
+
+M n..2
+
+
+0073
+First and last transfer
+
+C a1
+
+
+Segment Notes:
+
+This segment is used to head and uniquely identify a message in an interchange.
+
+DE 0062: It is good practice to have the message reference number both unique and incremental.
+
+S009: Identification of an EANCOM® message.
+
+The content of data elements 0065, 0052, 0054 and 0051 must be taken from the related UN/EDIFACT standard message.
+
+The content of data element 0057 is assigned by GS1 as part of the EANCOM® maintenance process.
+
+DE 0065: Data element 0065 identifies a UN/EDIFACT message whereas the exact usage of the message is specified in BGM data element 1001. E.g. UN/EDIFACT invoice message serving as a credit note: UNH DE 0065 = INVOIC, BGM DE 1001 = 381.
+
+The combination of the values carried in the data elements 0062 and S009 shall be used to uniquely identify a message within the interchange for the purpose of acknowledgement (ref. UNB – data element 0031).
+
+Example:
+UNH+1+INVOIC:D:01B:UN:GS1010'
+
+Segment Layout - UNT segment.
+
+UNT - M 1 -	Message trailer
+Function :	To end and check the completeness of a message.
+Segment number :
+ 	EDIFACT	GS1	*	Description
+0074	Number of segments in the message	M n..6	M	 	Total number of segments in a message.
+0062	Message reference number	M an..14	M	 	Same reference number as in DE 0062 of the UNH segment of the message.
+Segment Notes:
+
+This segment is used to end and provide information for checking the completeness of a message.
+
+The segment number shows the position of the segment in a message. It must always be the last segment in a message.
+
+DE 0074: Count of all segments in a message, UNH and UNT included.
+
+Example:
+UNT+103+1'
+
+Segment Layout - UNE segment.
+
+UNE - C 1 -	FUNCTIONAL GROUP TRAILER
+Function :	To end and check the completeness of a functional group.
+Segment number :
+ 	EDIFACT	GS1	*	Description
+0060	Number of messages	M n..6	M	 	Number of messages in the group.
+0048	Functional group reference number	M an..14	M	 	Identical to DE 0048 in UNG segment.
+Segment Notes:
+Within EANCOM® the use of the UNG..UNE segments is not recommended as the grouping of identical message types is not considered to add significant value to an interchange, (i.e., between UNB..UNZ).
+
+Segment Layout - UNZ segment.
+
+UNZ - M 1 -	INTERCHANGE TRAILER
+Function :	To end and check the completeness of an interchange.
+Segment number :
+ 	EDIFACT	GS1	*	Description
+0036	Interchange control count	M n..6	M	 	Number of messages or functional groups within an interchange.
+0020	Interchange control reference	M an..14	M	 	Identical to DE 0020 in UNB segment.
+Segment Notes:
+This segment is used to provide the trailer of an interchange.
+
+DE 0036: If functional groups are used, this is the number of functional groups within the interchange.
+If functional groups are not used, this is the number of messages within the interchange.
+
+Example:
+UNZ+5+12345555'
+
+Example of an interchange:
+
+An interchange contains two sets of messages: three despatch advices and two invoices. The interchange is sent on 2 January 2002 by a company identified by the GLN 5412345678908 to a company identified by the GLN 8798765432106.
+
+UNB+UNOA:3+5412345678908:14+8798765432106:14+020102:1000+12345555+++++EANCOMREF 52'
+....
+UNH+66025+DESADV:D:01B:UN:GS1007'
+.....
+.....
+UNT+35+66025'
+UNH+66420+DESADV:D:01B:UN:GS1007'
+.....
+.....
+UNT+26+66420'
+UNH+1588+INVOIC:D:01B:UN:GS1010'
+....
+....
+UNT+46+1588'
+UNH+2063+INVOIC:D:01B:UN:GS1010'
+....
+....
+UNT+87+2063'
+UNH+67020+DESADV:D:01B:UN:GS1007'
+.....
+.....
+UNT+102+67020'
+....
+UNZ+5+12345555'
+
+
+
+© Copyright GS1		Edition 2008
