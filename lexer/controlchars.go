@@ -1,7 +1,7 @@
 package lexer
 
 type ctrlBytes struct {
-	CompontentDelimiter byte
+	ComponentDelimiter byte
 	ElementDelimiter    byte
 	SegmentTerminator   byte
 	ReleaseIndicator    byte
@@ -11,13 +11,13 @@ type ctrlBytes struct {
 // newCtrlBytes generate a new control struct from the characters
 func newCtrlBytes(controlBytes []byte) *ctrlBytes {
 	if len(controlBytes) == 6 {
-		return &ctrlBytes{CompontentDelimiter: controlBytes[0], ElementDelimiter: controlBytes[1], DecimalDelimiter: controlBytes[2], ReleaseIndicator: controlBytes[3], SegmentTerminator: controlBytes[5]}
+		return &ctrlBytes{ComponentDelimiter: controlBytes[0], ElementDelimiter: controlBytes[1], DecimalDelimiter: controlBytes[2], ReleaseIndicator: controlBytes[3], SegmentTerminator: controlBytes[5]}
 	}
 	return nil
 }
 
 func (c *ctrlBytes) isCtrlByte(r byte) bool {
-	if r == c.CompontentDelimiter {
+	if r == c.ComponentDelimiter {
 		return true
 	}
 	if r == c.ElementDelimiter {

@@ -78,9 +78,9 @@ func TestLexerPosition_ResetColumn(t *testing.T) {
 	}
 }
 
-func TestLexerPosition_SetColum(t *testing.T) {
+func TestLexerPosition_SetColumn(t *testing.T) {
 	lp := NewLexerPosition()
-	lp.SetColum(2)
+	lp.SetColumn(2)
 	if lp.currentColumn != 2 {
 		t.Error("Expect col 2")
 	}
