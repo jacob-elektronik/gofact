@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/editoken/types"
 	"testing"
 
-	"gofact/editoken"
+	"github.com/jacob-elektronik/gofact/editoken"
 )
 
 func TestCompareRuneSeq(t *testing.T) {
