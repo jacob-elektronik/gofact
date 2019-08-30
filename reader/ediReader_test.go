@@ -6,7 +6,6 @@ import (
 )
 
 
-
 func TestNewEdiReader(t *testing.T) {
 	type args struct {
 		fileStr string
