@@ -1,7 +1,7 @@
 package segment
 
 import (
-	"gofact/segment/types"
+	"github.com/jacob-elektronik/gofact/segment/types"
 )
 
 // Segment edi segments

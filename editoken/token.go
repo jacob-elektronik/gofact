@@ -1,7 +1,7 @@
 package editoken
 
 import (
-	"gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/editoken/types"
 	"strconv"
 )
 

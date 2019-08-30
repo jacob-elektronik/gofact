@@ -2,12 +2,12 @@ package parser
 
 import (
 	"errors"
-	"gofact/editoken"
-	tokenTypes "gofact/editoken/types"
-	"gofact/lexer"
-	"gofact/segment"
-	segmentTypes "gofact/segment/types"
-	"gofact/utils"
+	"github.com/jacob-elektronik/gofact/editoken"
+	tokenTypes "github.com/jacob-elektronik/gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/lexer"
+	"github.com/jacob-elektronik/gofact/segment"
+	segmentTypes "github.com/jacob-elektronik/gofact/segment/types"
+	"github.com/jacob-elektronik/gofact/utils"
 	"strconv"
 )
 

@@ -1,10 +1,10 @@
 package lexer
 
 import (
-	"gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/editoken/types"
 	"testing"
 
-	"gofact/editoken"
+	"github.com/jacob-elektronik/gofact/editoken"
 )
 
 const msg = `UNA:+.? '

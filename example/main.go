@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gofact/parser"
+	"github.com/jacob-elektronik/gofact/parser"
 	"log"
 	"os"
 	"runtime"
@@ -62,7 +62,6 @@ func main() {
 					fmt.Println(err)
 				}
 			}
-
 		}
 
 		if *printSegments {
@@ -80,7 +79,7 @@ func main() {
 			}
 		}
 	} else {
-		fmt.Println("no message.edi to parse")
+		fmt.Println("no edi message to parse")
 	}
 
 }

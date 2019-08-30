@@ -1,10 +1,10 @@
 package lexer
 
 import (
-	"gofact/editoken"
-	"gofact/editoken/types"
-	"gofact/reader"
-	"gofact/utils"
+	"github.com/jacob-elektronik/gofact/editoken"
+	"github.com/jacob-elektronik/gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/reader"
+	"github.com/jacob-elektronik/gofact/utils"
 )
 
 // Lexer lexer object with functions
