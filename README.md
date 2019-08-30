@@ -6,6 +6,7 @@
     1. [Appclication](#appclication)
     2. [Library](#library)
     2. [Testing](#testing)
+3. [License](#License)
 
 ## About
 The gofact parser is an parser for *EDIFACT* messages (https://en.wikipedia.org/wiki/EDIFACT) messages written in GO.
@@ -76,4 +77,6 @@ The handling of the data fields will be implemented in a future release.
     ~~~~bash
     make show_testcover
     ~~~~
-   
+
+## License
+MIT
