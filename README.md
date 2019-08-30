@@ -9,7 +9,7 @@
 3. [License](#License)
 
 ## About
-The gofact parser is an parser for *EDIFACT* messages (https://en.wikipedia.org/wiki/EDIFACT) messages written in GO.
+The gofact parser is an parser for *EDIFACT* messages (https://en.wikipedia.org/wiki/EDIFACT) written in GO.
 The parser accomplished the lexical and syntactic analysis of *EDIFACT* messages. Documents and/or website used to 
 implement the logic can be found on the **doc** folder. Supported messages are standard EDIFACT and the EANCOM subset.
 
