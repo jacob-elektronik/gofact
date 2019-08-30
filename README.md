@@ -32,7 +32,7 @@ The handling of the data fields will be implemented in a future release.
 ### appclication
 
 - make build
-- go run example/main.go -help
+- example/gofact -help
 
     ~~~~bash
     Usage of ./gofact:
@@ -51,7 +51,7 @@ The handling of the data fields will be implemented in a future release.
     ~~~~
  - example parsing
     ~~~~bash
-    go run main.go -message ../edi_messages/eancom_ord.edi -subset eancom -psegments
+    example/gofact -message ../edi_messages/eancom_ord.edi -subset eancom -psegments
     ~~~~
  
 ### library
