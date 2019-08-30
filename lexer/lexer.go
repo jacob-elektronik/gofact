@@ -71,7 +71,7 @@ func (l *Lexer)setControlToken(ch chan<- editoken.Token) {
 		ch <- editoken.Token{TokenType: types.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
 		ch <- editoken.Token{TokenType: types.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
 		l.lastTokenType = types.ControlChars
-		l.lexerPosition.SetColum(3 + len(ctrlBytes))
+		l.lexerPosition.SetColumn(3 + len(ctrlBytes))
 	}
 	l.lexerPosition.ResetBytePos()
 }
