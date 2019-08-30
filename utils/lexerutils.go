@@ -66,6 +66,7 @@ func AddToken(tokens *[]editoken.Token, t editoken.Token) {
 	*tokens = append(*tokens, t)
 }
 
+//IsSegment func...
 func IsSegment(seq string) bool {
 	if SegmentTypeFoString[seq] == 0 {
 		return false
@@ -73,6 +74,7 @@ func IsSegment(seq string) bool {
 	return true
 }
 
+//IsServiceTag func...
 func IsServiceTag(seq string) bool {
 	if TokenTypeForStr[seq] == 0 {
 		return false

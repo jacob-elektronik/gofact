@@ -13,6 +13,7 @@ type Token struct {
 	Line       int
 }
 
+// PrintToken ...
 func (t Token) PrintToken() string {
 	ret := ""
 	switch t.TokenType {
@@ -20,8 +21,8 @@ func (t Token) PrintToken() string {
 		ret += "TokenType: ControlChars \t Value: "
 	case types.UserDataSegments:
 		ret += "TokenType: UserDataSegments \t Value: "
-	case types.CompontentDelimiter:
-		ret += "TokenType: CompontentDelimiter \t Value: "
+	case types.ComponentDelimiter:
+		ret += "TokenType: ComponentDelimiter \t Value: "
 	case types.ElementDelimiter:
 		ret += "TokenType: ElementDelimiter \t Value: "
 	case types.SegmentTag:
@@ -74,7 +75,7 @@ func (t Token) PrintToken() string {
 	case types.ObjectHeader:
 		ret += "TokenType: ObjectHeader \t Value: "
 	case types.ObjectTrailer:
-		ret += "TokenType: MessageHObjectTrailereader \t Value: "
+		ret += "TokenType: ObjectTrailer \t Value: "
 	case types.SectionControl:
 		ret += "TokenType: SectionControl \t Value: "
 

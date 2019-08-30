@@ -11,6 +11,7 @@ type Segment struct {
 	Data  string
 }
 
+// Segment.PrintSegment
 func (s Segment) PrintSegment() string {
 	ret := ""
 	switch s.SType {
@@ -487,6 +488,7 @@ func (s Segment) PrintSegment() string {
 	return ret
 }
 
+// Segment.String
 func (s Segment) String() string {
 	return s.PrintSegment()
 }

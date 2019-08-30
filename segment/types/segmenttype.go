@@ -1,6 +1,6 @@
 package types
 
-// segmentstype segment type
+// segment type
 const (
 	ServiceSegment = iota
 	AAI

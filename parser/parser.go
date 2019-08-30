@@ -59,6 +59,7 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 	return nil
 }
 
+//Parser.parseToken...
 func (p *Parser) parseToken(t editoken.Token) error {
 	seg := segment.Segment{}
 	switch t.TokenType {
@@ -70,7 +71,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		seg.Tag = t.TokenValue
 	case tokenTypes.ControlChars:
 		if p.lastTokenType != tokenTypes.ServiceStringAdvice {
-			return errors.New("Parser error, ControlChars need a UNA Messag | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
+			return errors.New("Parser error, ControlChars need a UNA Message | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
@@ -92,7 +93,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		}
 		seg.SType = segmentTypes.ServiceSegment
 		seg.Tag = t.TokenValue
-	case tokenTypes.ElementDelimiter, tokenTypes.UserDataSegments, tokenTypes.CompontentDelimiter, tokenTypes.SegmentTerminator:
+	case tokenTypes.ElementDelimiter, tokenTypes.UserDataSegments, tokenTypes.ComponentDelimiter, tokenTypes.SegmentTerminator:
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
 	case tokenTypes.SegmentTag:
@@ -136,6 +137,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 	return nil
 }
 
+//Parser.checkServiceSegmentSyntax
 func (p *Parser) checkServiceSegmentSyntax(t *editoken.Token) error {
 	switch t.TokenType {
 	case tokenTypes.InterchangeHeader:
@@ -186,11 +188,13 @@ func (p *Parser) checkServiceSegmentSyntax(t *editoken.Token) error {
 	return nil
 }
 
+//Parser.addSegment
 func (p *Parser) addSegment(s segment.Segment) {
 	p.Segments = append(p.Segments, s)
 	p.currentSegment = &p.Segments[len(p.Segments)-1]
 }
 
+//Parser.segmentTypeForSeq
 func (p *Parser) segmentTypeForSeq(seq string) int {
 	sType := utils.SegmentTypeFoString[seq]
 	if sType == 0 {

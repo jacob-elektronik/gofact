@@ -129,7 +129,7 @@ func TestGetUNABytes(t *testing.T) {
 	var ctrlArr [6]byte
 	copy(ctrlArr[:], ctrlRunes)
 	if ctrlArr != [6]byte{58, 43, 46, 63, 32, 39} {
-		t.Error("wrong crtlRunes returned")
+		t.Error("wrong ctrlRunes returned")
 	}
 	// remove UNA string from msg and test again
 	l.EdiFactMessage = l.EdiFactMessage[9:]
@@ -175,7 +175,7 @@ func TestNextByte(t *testing.T) {
 	}
 	l = NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
-	l.lexerPosition.CurrentBytePos = 8 // 1 pos befor newline
+	l.lexerPosition.CurrentBytePos = 8 // 1 pos before newline
 	if !l.nextByte() {
 		t.Error("Expect true")
 	}

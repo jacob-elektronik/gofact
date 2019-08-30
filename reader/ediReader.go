@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// EdiReader struct
 type EdiReader struct {
 	file      *os.File
 	buf       []byte
@@ -22,6 +23,7 @@ func NewEdiReader(fileStr string) *EdiReader {
 	return &r
 }
 
+// EdiReader.ReadFile
 func (r *EdiReader) ReadFile(ch chan<- []byte) {
 	for {
 		n, err := r.BufReader.Read(r.buf)

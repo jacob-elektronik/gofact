@@ -4,7 +4,7 @@ package types
 const (
 	ControlChars = iota
 	UserDataSegments
-	CompontentDelimiter
+	ComponentDelimiter
 	ElementDelimiter
 	SegmentTerminator
 	SegmentTag

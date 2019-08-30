@@ -7,7 +7,7 @@ import (
 	"github.com/jacob-elektronik/gofact/utils"
 )
 
-// Lexer lexer object with functions
+// Lexer struct ...
 type Lexer struct {
 	EdiFactMessage         []byte
 	EdiReader              *reader.EdiReader
@@ -20,6 +20,7 @@ type Lexer struct {
 	lexerPosition          *LexerPosition
 }
 
+//NewLexer function...
 func NewLexer(filePath string) *Lexer {
 	if len(filePath) <= 0 {
 		return nil
@@ -30,6 +31,7 @@ func NewLexer(filePath string) *Lexer {
 	return l
 }
 
+//GetEdiTokens . . .
 func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 	l.setControlToken(ch)
 	for l.nextByte() {
@@ -61,6 +63,7 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 	close(ch)
 }
 
+//setControlToken
 func (l *Lexer)setControlToken(ch chan<- editoken.Token) {
 	ctrlBytes, defaultCtrl := l.getUNABytes()
 	l.CtrlBytes = newCtrlBytes(ctrlBytes)
@@ -81,8 +84,8 @@ func (l *Lexer) findControlToken() *editoken.Token {
 		return nil
 	}
 	switch *l.lexerPosition.CurrentBytePtr {
-	case l.CtrlBytes.CompontentDelimiter:
-		return &editoken.Token{TokenType: types.CompontentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
+	case l.CtrlBytes.ComponentDelimiter:
+		return &editoken.Token{TokenType: types.ComponentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.ElementDelimiter:
 		return &editoken.Token{TokenType: types.ElementDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.SegmentTerminator:
@@ -92,11 +95,11 @@ func (l *Lexer) findControlToken() *editoken.Token {
 		return &editoken.Token{TokenType: types.ReleaseIndicator, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
 	case l.CtrlBytes.DecimalDelimiter:
 		return nil
-		// return &token.Token{TokenType: tokentype.DecimalDelimiter, TokenValue: string(*l.CurrentBytePtr), Column: l.currentColumn, Line: l.currentLine}
 	}
 	return nil
 }
 
+//findContentToken ...
 func (l *Lexer) findContentToken() *editoken.Token {
 	if len(l.CurrentSeq) > 0 {
 		column := l.lexerPosition.currentColumn - len(string(l.CurrentSeq))
@@ -110,6 +113,7 @@ func (l *Lexer) findContentToken() *editoken.Token {
 	return nil
 }
 
+//tokenTypeForSeq
 func (l *Lexer) tokenTypeForSeq(seq []byte) int {
 	tType := utils.TokenTypeForStr[string(seq)]
 	if tType == 0 {
@@ -129,6 +133,8 @@ func (l *Lexer) tokenTypeForSeq(seq []byte) int {
 	return tType
 }
 
+
+//getUNABytes
 func (l *Lexer) getUNABytes() ([]byte, bool) {
 	for len(l.EdiFactMessage) < 10 {
 		l.nextByte()
@@ -151,18 +157,19 @@ func (l *Lexer) isCurrentByteControlByte() bool {
 	return l.CtrlBytes.isCtrlByte(*l.lexerPosition.CurrentBytePtr)
 }
 
+//nextByte ...
 func (l *Lexer) nextByte() bool {
-	l.EdiFactMessage = l.apendNextByte()
+	l.EdiFactMessage = l.appendNextByte()
 	if l.lexerPosition.MoveToNext(l.EdiFactMessage) {
 		for l.checkForIgnoreByte() {
 			if l.isNewLine() {
-				l.EdiFactMessage = l.apendNextByte()
+				l.EdiFactMessage = l.appendNextByte()
 				return l.lexerPosition.NextLine(l.EdiFactMessage)
 			}
 			if *l.lexerPosition.CurrentBytePtr == ' ' && l.lastTokenType != types.SegmentTerminator && l.lastTokenType != types.ControlChars {
 				return true
 			}
-			l.EdiFactMessage = l.apendNextByte()
+			l.EdiFactMessage = l.appendNextByte()
 			if !l.lexerPosition.MoveToNext(l.EdiFactMessage) {
 				return false
 			}
@@ -172,11 +179,13 @@ func (l *Lexer) nextByte() bool {
 	return false
 }
 
+//isNewLine ...
 func (l *Lexer) isNewLine() bool {
 	return *l.lexerPosition.CurrentBytePtr == '\n'
 }
 
-func (l *Lexer) apendNextByte() []byte {
+//appendNextByte ...
+func (l *Lexer) appendNextByte() []byte {
 	return append(l.EdiFactMessage, <-l.MessageChan...)
 }
 

@@ -1,5 +1,6 @@
 package lexer
 
+//LexerPosition struct...
 type LexerPosition struct {
 	CurrentBytePtr         *byte
 	CurrentBytePos         int
@@ -7,6 +8,7 @@ type LexerPosition struct {
 	currentLine            int
 }
 
+//NewLexerPosition func ...
 func NewLexerPosition() *LexerPosition {
 	return &LexerPosition{
 		CurrentBytePtr: nil,
@@ -16,6 +18,7 @@ func NewLexerPosition() *LexerPosition {
 	}
 }
 
+//LexerPosition.MoveToNext
 func (lp *LexerPosition)MoveToNext(msgBuffer []byte) bool {
 	lp.IncrCol()
 	lp.IncrPos()
@@ -25,6 +28,7 @@ func (lp *LexerPosition)MoveToNext(msgBuffer []byte) bool {
 	return false
 }
 
+//LexerPosition.NextLine
 func (lp *LexerPosition)NextLine(msgBuffer []byte) bool {
 	lp.ResetColumn()
 	lp.IncrPos()
@@ -35,34 +39,42 @@ func (lp *LexerPosition)NextLine(msgBuffer []byte) bool {
 	return false
 }
 
+//LexerPosition.IncrPos
 func (lp *LexerPosition)IncrPos() {
 	lp.CurrentBytePos++
 }
 
+//LexerPosition.IncrCol
 func (lp *LexerPosition)IncrCol() {
 	lp.currentColumn++
 }
 
+////LexerPosition.IncrLine
 func (lp *LexerPosition)IncrLine() {
 	lp.currentLine++
 }
 
-func (lp *LexerPosition)SetColum(val int) {
+//LexerPosition.SetColumn
+func (lp *LexerPosition)SetColumn(val int) {
 	lp.currentColumn = val
 }
 
+//LexerPosition.SetLine
 func (lp *LexerPosition)SetLine(val int) {
 	lp.currentLine = val
 }
 
+//LexerPosition.ResetColumn
 func (lp *LexerPosition)ResetColumn() {
 	lp.currentColumn = 1
 }
 
+////LexerPosition.ResetBytePos
 func (lp *LexerPosition)ResetBytePos() {
 	lp.CurrentBytePos = -1
 }
 
+//LexerPosition.SetPointer
 func (lp *LexerPosition)SetPointer(msgBuffer []byte) bool {
 	if lp.CurrentBytePos < len(msgBuffer) {
 		lp.CurrentBytePtr = &msgBuffer[lp.CurrentBytePos]
