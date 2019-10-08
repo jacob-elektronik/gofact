@@ -1,50 +1,50 @@
 package segments
 
 type NameAddress struct {
-	PartyFunctionCodeQualifier string
+	PartyFunctionCodeQualifier                          string
 	PartyIdenNameAndAddressDescriptiontificationDetails PartyIdentificationDetails
-	NameAndAddressDescription NameAndAddressDescription
-	PartyName PartyName
-	Street Street
-	CityName string
+	NameAndAddressDescription                           NameAndAddressDescription
+	PartyName                                           PartyName
+	Street                                              Street
+	CityName                                            string
 }
 
 type PartyIdentificationDetails struct {
-	PartyIdentifier string
-	CodeListIdentificationCode string
+	PartyIdentifier               string
+	CodeListIdentificationCode    string
 	CodeListResponsibleAgencyCode string
 }
 
 type CountrySubEntityDetail struct {
-	CountrySubEntityNameCode string
-	CodeListIdentificationCode string
+	CountrySubEntityNameCode      string
+	CodeListIdentificationCode    string
 	CodeListResponsibleAgencyCode string
-	CountrySEntityName string
-	PostalIdentificationCode string
-	CountryNameCode string
+	CountrySEntityName            string
+	PostalIdentificationCode      string
+	CountryNameCode               string
 }
 
 type NameAndAddressDescription struct {
-	NameAndAddressDescription string
-	NameAndAddressDescriptionConditionalOne string
-	NameAndAddressDescriptionConditionalTwo string
+	NameAndAddressDescription                 string
+	NameAndAddressDescriptionConditionalOne   string
+	NameAndAddressDescriptionConditionalTwo   string
 	NameAndAddressDescriptionConditionalThree string
-	NameAndAddressDescriptionConditionalFour string
+	NameAndAddressDescriptionConditionalFour  string
 }
 
 type PartyName struct {
-	PartyName string
-	PartyNameConditionalOne string
-	PartyNameConditionalTwo string
+	PartyName                 string
+	PartyNameConditionalOne   string
+	PartyNameConditionalTwo   string
 	PartyNameConditionalThree string
-	PartyNameConditionalFour string
-	PartyNameConditionalFive string
-	PartyNameCode string
+	PartyNameConditionalFour  string
+	PartyNameConditionalFive  string
+	PartyNameCode             string
 }
 
 type Street struct {
-	Street string
-	StreetConditionalOne string
-	StreetConditionalTwo string
+	Street                 string
+	StreetConditionalOne   string
+	StreetConditionalTwo   string
 	StreetConditionalThree string
 }

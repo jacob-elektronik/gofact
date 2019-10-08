@@ -2,8 +2,8 @@ package segments
 
 type Reference struct {
 	ReferenceCodeQualifier string
-	ReferenceIdentifier string
+	ReferenceIdentifier    string
 	DocumentLineIdentifier string
-	VersionIdentifier string
-	RevisionIdentifier string
+	VersionIdentifier      string
+	RevisionIdentifier     string
 }

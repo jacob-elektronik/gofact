@@ -1,34 +1,34 @@
 package segments
 
 type InterchangeHeader struct {
-	SyntaxIdentifier SyntaxIdentifier
-	InterchangeSender InterchangeSender
-	InterchangeRecipient InterchangeRecipient
-	DateTime DateTime
+	SyntaxIdentifier            SyntaxIdentifier
+	InterchangeSender           InterchangeSender
+	InterchangeRecipient        InterchangeRecipient
+	DateTime                    DateTime
 	InterchangeControlReference string
 	RecipientsReferencePassword RecipientsReferencePassword
-	ApplicationReference string
-	ProcessingPriorityCode string
-	AcknowledgementRequest string
-	CommunicationsAgreementID string
-	TestIndicator string
+	ApplicationReference        string
+	ProcessingPriorityCode      string
+	AcknowledgementRequest      string
+	CommunicationsAgreementID   string
+	TestIndicator               string
 }
 
 type SyntaxIdentifier struct {
-	SyntaxIdentifier string
+	SyntaxIdentifier    string
 	SyntaxVersionNumber string
 }
 
 type InterchangeSender struct {
-	SenderIdentification string
+	SenderIdentification               string
 	PartnerIdentificationCodeQualifier string
-	AddressReverseRouting string
+	AddressReverseRouting              string
 }
 
 type InterchangeRecipient struct {
-	RecipientIdentification string
+	RecipientIdentification            string
 	PartnerIdentificationCodeQualifier string
-	RoutingAddress string
+	RoutingAddress                     string
 }
 
 type DateTime struct {
@@ -37,6 +37,6 @@ type DateTime struct {
 }
 
 type RecipientsReferencePassword struct {
-	RecipientsReferencePassword string
+	RecipientsReferencePassword          string
 	RecipientsReferencePasswordQualifier string
 }

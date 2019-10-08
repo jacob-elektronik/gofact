@@ -1,22 +1,21 @@
 package segments
 
-
 type BeginningOfMessage struct {
-	MessageName MessageName
+	MessageName           MessageName
 	MessageIdentification MessageIdentification
-	MessageFunctionCode string
-	ResponseTypeCode string
+	MessageFunctionCode   string
+	ResponseTypeCode      string
 }
 
 type MessageName struct {
-	DocumentNameCode string
-	CodeListIdentificationCode string
+	DocumentNameCode              string
+	CodeListIdentificationCode    string
 	CodeListResponsibleAgencyCode string
-	DocumentName string
+	DocumentName                  string
 }
 
 type MessageIdentification struct {
 	DocumentIdentifier string
-	VersionIdentifier string
+	VersionIdentifier  string
 	RevisionIdentifier string
 }

@@ -1,7 +1,6 @@
 package segments
 
-
 type CommunicationContact struct {
-	CommunicationAddressIdentifier string
+	CommunicationAddressIdentifier    string
 	CommunicationAddressCodeQualifier string
 }
