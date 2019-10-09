@@ -1,6 +1,7 @@
 package segments
 
 type Quantity struct {
+	QuantityDetails QuantityDetails
 }
 
 type QuantityDetails struct {

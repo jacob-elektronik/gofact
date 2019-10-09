@@ -2,7 +2,7 @@ package segments
 
 type LineItem struct {
 	LineItemIdentifier         string
-	ActionDescriptionCode      string
+	ActionCode                 string
 	ItemNumberIdentification   ItemNumberIdentification
 	SublineInformation         SublineInformation
 	ConfigurationLevelNumber   string

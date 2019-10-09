@@ -24,18 +24,16 @@ var currenPartyIndex int
 var currentReferenceNumberIndex int
 var ediFactSegments []segment.Segment
 var currentSegmentIndex int
+var currentLineItemIndex int
 
-func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
+func UnmarshalOrder(messageSegments []segment.Segment) (*Order, error) {
 	order := &Order{}
-	ediFactSegments = ediFactSegments
+	ediFactSegments = messageSegments
 	componentDelimiter := ":"
 	elementDelimiter := "+"
-	if ediFactSegments[0].Tag == "UNA" {
-		componentDelimiter = string(ediFactSegments[0].Data[0])
-		elementDelimiter = string(ediFactSegments[0].Data[1])
-	}
 	currentState = StateHeaderSection
 	currenPartyIndex = 0
+	currentLineItemIndex = 0
 	currentReferenceNumberIndex = 0
 	for i, segment := range ediFactSegments {
 		currentSegmentIndex = i
@@ -43,7 +41,8 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 		case StateHeaderSection:
 			switch segment.Tag {
 			case "UNA":
-
+				componentDelimiter = string(segment.Data[0])
+				elementDelimiter = string(segment.Data[1])
 			case "UNB":
 				order.InterchangeHeader = unmarshalUNB(segment, elementDelimiter, componentDelimiter)
 			case "UNH":
@@ -52,6 +51,10 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 				order.BeginningOfMessage = unmarshalBGM(segment, elementDelimiter)
 			case "DTM":
 				order.DateTimePeriod = unmarshalDTM(segment, componentDelimiter)
+			}
+			switch nextSegmentTag() {
+			case "UNA", "UNB", "UNH", "BGM", "DTM":
+				currentState = StateHeaderSection
 			default:
 				currentState = StateSegmentGroupOne
 			}
@@ -60,20 +63,14 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 			case "RFF":
 				order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, unmarshalRFF(segment, componentDelimiter))
 				currentReferenceNumberIndex = len(order.ReferenceNumbersOrders) - 1
-				switch nextSegmentTag() {
-				case "RFF", "DTM":
-					currentState = StateSegmentGroupOne
-				default:
-					currentState = StateSegmentGroupTwo
-				}
 			case "DTM":
 				order.ReferenceNumbersOrders[currentReferenceNumberIndex].DateTimePeriod = unmarshalDTM(segment, componentDelimiter)
-				switch nextSegmentTag() {
-				case "RFF":
-					currentState = StateSegmentGroupOne
-				default:
-					currentState = StateSegmentGroupTwo
-				}
+			}
+			switch nextSegmentTag() {
+			case "RFF", "DTM":
+				currentState = StateSegmentGroupOne
+			default:
+				currentState = StateSegmentGroupTwo
 			}
 		case StateSegmentGroupTwo:
 			switch segment.Tag {
@@ -101,7 +98,7 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 			switch nextSegmentTag() {
 			case "NAD":
 				currentState = StateSegmentGroupTwo
-			case "CTA", "COM":
+			case "CTA":
 				currentState = StateSegmentGroupFive
 			default:
 				currentState = StateSegmentGroupSeven
@@ -116,6 +113,8 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 			switch nextSegmentTag() {
 			case "NAD":
 				currentState = StateSegmentGroupTwo
+			case "COM":
+				currentState = StateSegmentGroupFive
 			default:
 				currentState = StateSegmentGroupSeven
 			}
@@ -124,7 +123,7 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 			case "CUX":
 				order.Currencies.Currencies = unmarshalCUX(segment, componentDelimiter)
 			case "DTM":
-				order.Currencies.DateTimePeriod = unmarshalDTM(segment,componentDelimiter)
+				order.Currencies.DateTimePeriod = unmarshalDTM(segment, componentDelimiter)
 			}
 			switch nextSegmentTag() {
 			case "DTM":
@@ -133,13 +132,146 @@ func UnmarshalOrder(ediFactSegments []segment.Segment) (*Order, error) {
 				currentState = StateSegmentGroupTwentyNine
 			}
 		case StateSegmentGroupTwentyNine:
+			switch segment.Tag {
+			case "LIN":
+				item := Item{}
+				item.LineItem = unmarshalLIN(segment, elementDelimiter, componentDelimiter)
+				order.Items = append(order.Items, item)
+				currentLineItemIndex = len(order.Items) - 1
+			case "PIA":
+				order.Items[currentLineItemIndex].AdditionalProductID = unmarshalPIA(segment, elementDelimiter, componentDelimiter)
+			case "IMD":
+				order.Items[currentLineItemIndex].ItemDescription = unmarshalIMD(segment, elementDelimiter, componentDelimiter)
+			case "QTY":
+				order.Items[currentLineItemIndex].Quantity = unmarshalQTY(segment, componentDelimiter)
+			}
+			switch nextSegmentTag() {
+			case "LIN", "PIA", "IMD", "QTY","DTM":
+				currentState = StateSegmentGroupTwentyNine
+			case "PRI":
+				currentState = StateSegmentGroupThirtyThree
+			}
 		case StateSegmentGroupThirtyThree:
+			switch segment.Tag {
+			case "PRI":
+
+			}
+			switch nextSegmentTag() {
+			case "UNS":
+				currentState = StateSummarySection
+			case "LIN":
+				currentState = StateSegmentGroupTwentyNine
+			}
 		case StateSummarySection:
 		case StateSegmentGroupSixtyThree:
 
 		}
 	}
 	return order, nil
+}
+
+func unmarshalQTY(s segment.Segment,componentDelimiter string) segments.Quantity {
+	qty := segments.Quantity{}
+	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
+	for idx, component := range components {
+		switch idx {
+		case 0:
+			qty.QuantityDetails.QuantityTypeCodeQualifier = component
+		case 1:
+			qty.QuantityDetails.Quantity = component
+		case 2:
+			qty.QuantityDetails.MeasurementUnitCode = component
+		}
+	}
+	return qty
+}
+
+func unmarshalIMD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ItemDescription {
+	imd := segments.ItemDescription{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for idx, element := range elements {
+		switch idx {
+		case 0:
+			imd.DescriptionFormatCode = element
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for i, component := range components {
+				switch i {
+				case 3:
+					imd.Description.Description = component
+				}
+			}
+		}
+	}
+	return imd
+}
+
+func unmarshalPIA(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.AdditionalProductID {
+	pia := segments.AdditionalProductID{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for idx, element := range elements {
+		switch idx {
+		case 0:
+			pia.ProductIdentifierCodeQualifier = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for i, component := range components {
+				switch i {
+				case 0:
+					pia.ItemNumberIdentification.ItemIdentifier = component
+				case 1:
+					pia.ItemNumberIdentification.ItemTypeIdentificationCode = component
+				case 2:
+					pia.ItemNumberIdentification.CodeListIdentificationCode = component
+				case 3:
+					pia.ItemNumberIdentification.CodeListResponsibleAgencyCode = component
+				}
+			}
+		}
+	}
+	return pia
+}
+
+func unmarshalLIN(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.LineItem {
+	lin := segments.LineItem{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for idx, element := range elements {
+		switch idx {
+		case 0:
+			lin.LineItemIdentifier = element
+		case 1:
+			lin.ActionCode = element
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for i, component := range components {
+				switch i {
+				case 0:
+					lin.ItemNumberIdentification.ItemIdentifier = component
+				case 1:
+					lin.ItemNumberIdentification.ItemTypeIdentificationCode = component
+				case 2:
+					lin.ItemNumberIdentification.CodeListIdentificationCode = component
+				case 3:
+					lin.ItemNumberIdentification.CodeListResponsibleAgencyCode = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for i, component := range components {
+				switch i {
+				case 0:
+					lin.SublineInformation.SublineIndicatorCode = component
+				case 1:
+					lin.SublineInformation.LineItemIdentifier = component
+				}
+			}
+		case 4:
+			lin.ConfigurationLevelNumber = element
+		case 5:
+			lin.ConfigurationOperationCode = element
+		}
+	}
+	return lin
 }
 
 func unmarshalCUX(s segment.Segment, componentDelimiter string) segments.Currencies {
@@ -179,6 +311,7 @@ func unmarshalCAT(s segment.Segment, elementDelimiter string, componentDelimiter
 			}
 		}
 	}
+	return cat
 }
 
 func unmarshalCOM(s segment.Segment, componentDelimiter string) segments.CommunicationContact {
@@ -287,7 +420,7 @@ func unmarshalDTM(s segment.Segment, componentDelimiter string) segments.DateTim
 		case 1:
 			dtp.DTMValue = component
 		case 2:
-			dtp.DTMFunctionCode = component
+			dtp.DTMFormatCode = component
 		}
 	}
 
@@ -339,7 +472,7 @@ func unmarshalUNB(s segment.Segment, elementDelimiter string, componentDelimiter
 		case 1:
 			components := strings.Split(element, componentDelimiter)
 			header.InterchangeSender.SenderIdentification = components[0]
-			header.InterchangeSender.AddressReverseRouting = components[1]
+			header.InterchangeSender.PartnerIdentificationCodeQualifier = components[1]
 		case 2:
 			components := strings.Split(element, componentDelimiter)
 			header.InterchangeRecipient.RecipientIdentification = components[0]
@@ -357,5 +490,5 @@ func unmarshalUNB(s segment.Segment, elementDelimiter string, componentDelimiter
 }
 
 func nextSegmentTag() string {
-	return ediFactSegments[currentSegmentIndex].Tag
+	return ediFactSegments[currentSegmentIndex+1].Tag
 }
