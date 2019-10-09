@@ -2,10 +2,10 @@ package segments
 
 type ContactInformation struct {
 	ContactFunctionCode       string
-	DepartmentEmployeeDetails DepartmentEmployeeDetails
+	ContactDetails ContactDetails
 }
 
-type DepartmentEmployeeDetails struct {
-	DepartmentEmployeeNameCode string
-	DepartmentEmployeeName     string
+type ContactDetails struct {
+	ContactIdentifier string
+	ContactName     string
 }

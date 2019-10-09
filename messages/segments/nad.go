@@ -7,6 +7,8 @@ type NameAddress struct {
 	PartyName                                           PartyName
 	Street                                              Street
 	CityName                                            string
+	Postal                                              string
+	CountryCode                                         string
 }
 
 type PartyIdentificationDetails struct {
