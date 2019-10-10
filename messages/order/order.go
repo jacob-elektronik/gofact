@@ -20,6 +20,7 @@ type Order struct {
 	SectionControl         segments.SectionControl
 	ControlTotal           []segments.ControlTotal
 	MessageTrailer         segments.MessageTrailer
+	InterchangeTrailer	   segments.InterchangeTrailer
 }
 
 type ReferenceNumber struct {
