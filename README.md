@@ -2,6 +2,7 @@
 
 ## Table of contents
 1. [About](#About)
+    1. [Messages](#Messages)
 2. [Usage](#Usage)
     1. [Application](#appclication)
     2. [Library](#library)
@@ -25,8 +26,53 @@ The output of the parser will be segments with the message tag and the related d
     Segmenttype: Contact information               |Tag :CTA   |Data: +OC+:P FORGET'
     Segmenttype: Communication contact             |Tag :COM   |Data: +0044715632478:TE'
 ```
-The handling of the data fields will be implemented in a future release.
 
+To unmarshal the various *EDIFACT* messages look at the *messages* folder.
+You can use the Unmarshal* function and pass in the segments provided by the parser.
+Actually only the *ORDERS* message is implemented. Unfortunately only a small part of it.
+See details below.
+
+### Messages
+#### ORDERS
+The *ORDERS* message was implemented with the help of the following document : https://service.unece.org/trade/untdid/d11a/trmd/orders_c.htm
+The Suported segments from the *ORDERS* message can be found in the "segments" folder under "messages/order/".
+~~~~bash
+BGM
+CNT
+COM
+CTA
+CUX
+DTM
+IMD
+LIN
+NAD
+PIA
+PRI
+QTY
+RFF
+UNB
+UNH
+UNS
+UNT
+UNZ
+~~~~
+
+And below segment groups are supported:
+
+~~~~bash
+HEADER SECTION
+Segment group 1
+Segment group 2
+Segment group 3
+Segment group 5
+Segment group 7
+Segment group 29
+Segment group 33
+SUMMARY SECTION
+Segment group 63
+~~~~
+
+Supporting additional segments or segment groups should be straight forward to implement in the available code base.
 
 ## Usage
 
@@ -65,6 +111,8 @@ The handling of the data fields will be implemented in a future release.
     ~~~~go
     p := parser.NewParser(*message, "eancom")
     err := p.ParseEdiFactMessageConcurrent()
+   // unmarshal and edifact order message
+    order := order.UnmarshalOrder(p.Segments)
     ~~~~
     
 ### testing

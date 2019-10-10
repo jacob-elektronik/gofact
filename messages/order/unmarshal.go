@@ -33,10 +33,10 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*Order, error) {
 	ediFactSegments = messageSegments
 	componentDelimiter := ":"
 	elementDelimiter := "+"
-	currentState = StateStart
 	currentPartyIndex = 0
 	currentLineItemIndex = 0
 	currentReferenceNumberIndex = 0
+	currentState = StateStart
 	for i, ediFactSegment := range ediFactSegments {
 		currentSegmentIndex = i
 		switch currentState {
