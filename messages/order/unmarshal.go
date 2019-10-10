@@ -71,26 +71,26 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*Order, error) {
 			handleStateSummarySection(ediFactSegment, order, componentDelimiter)
 			setNextState()
 		case StateSegmentGroupSixtyThree:
-			handleStateSegmentGroupSixtyThree(ediFactSegment, order, componentDelimiter)
+			handleStateSegmentGroupSixtyThree(ediFactSegment, order, elementDelimiter)
 			setNextState()
 		case StateEnd:
-			handleStateEnd(ediFactSegment, order, componentDelimiter)
+			handleStateEnd(ediFactSegment, order, elementDelimiter)
 		}
 	}
 	return order, nil
 }
 
-func handleStateEnd(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateEnd(ediFactSegment segment.Segment, order *Order, elementDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "UNZ":
-		order.InterchangeTrailer = parseUNZ(ediFactSegment, componentDelimiter)
+		order.InterchangeTrailer = parseUNZ(ediFactSegment, elementDelimiter)
 	}
 }
 
-func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *Order, elementDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "UNT":
-		order.MessageTrailer = parseUNT(ediFactSegment, componentDelimiter)
+		order.MessageTrailer = parseUNT(ediFactSegment, elementDelimiter)
 	}
 }
 
@@ -194,9 +194,9 @@ func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string,
 	return componentDelimiter, elementDelimiter
 }
 
-func parseUNZ(s segment.Segment, componentDelimiter string) segments.InterchangeTrailer {
+func parseUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTrailer {
 	unz := segments.InterchangeTrailer{}
-	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
+	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, component := range components {
 		switch idx {
 		case 0:
@@ -208,9 +208,9 @@ func parseUNZ(s segment.Segment, componentDelimiter string) segments.Interchange
 	return unz
 }
 
-func parseUNT(s segment.Segment, componentDelimiter string) segments.MessageTrailer {
+func parseUNT(s segment.Segment, elementDelimiter string) segments.MessageTrailer {
 	unt := segments.MessageTrailer{}
-	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
+	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, component := range components {
 		switch idx {
 		case 0:
@@ -240,7 +240,7 @@ func parseCNT(s segment.Segment, componentDelimiter string) segments.ControlTota
 
 func parseUNS(s segment.Segment) segments.SectionControl {
 	uns := segments.SectionControl{}
-	uns.SectionIdentification = s.Data[1:len(s.Data)-1]
+	uns.SectionIdentification = s.Data[1 : len(s.Data)-1]
 	return uns
 }
 
@@ -258,7 +258,7 @@ func parsePRI(s segment.Segment, componentDelimiter string) segments.PriceInform
 	return pri
 }
 
-func parseQTY(s segment.Segment,componentDelimiter string) segments.Quantity {
+func parseQTY(s segment.Segment, componentDelimiter string) segments.Quantity {
 	qty := segments.Quantity{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	for idx, component := range components {
@@ -645,7 +645,7 @@ func setNextState() {
 		}
 	case StateSegmentGroupTwentyNine:
 		switch nextSegmentTag() {
-		case "LIN", "PIA", "IMD", "QTY","DTM":
+		case "LIN", "PIA", "IMD", "QTY", "DTM":
 			currentState = StateSegmentGroupTwentyNine
 		case "PRI":
 			currentState = StateSegmentGroupThirtyThree
