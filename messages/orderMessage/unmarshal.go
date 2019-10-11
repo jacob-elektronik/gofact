@@ -1,4 +1,4 @@
-package order
+package orderMessage
 
 import (
 	"igitlab.jacob.de/ftomasetti/gofact/messages/segments"

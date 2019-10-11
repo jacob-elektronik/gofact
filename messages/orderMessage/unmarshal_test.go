@@ -1,4 +1,4 @@
-package order
+package orderMessage
 
 import (
 	"github.com/jacob-elektronik/gofact/messages/segments"
