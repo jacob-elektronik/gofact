@@ -1,8 +1,8 @@
 package order
 
 import (
-	"github.com/jacob-elektronik/gofact/messages/segments"
-	"github.com/jacob-elektronik/gofact/segment"
+	"igitlab.jacob.de/ftomasetti/gofact/messages/segments"
+	"igitlab.jacob.de/ftomasetti/gofact/segment"
 	"strings"
 )
 

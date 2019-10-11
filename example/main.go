@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jacob-elektronik/gofact/parser"
+	"github.com/davecgh/go-spew/spew"
+	"igitlab.jacob.de/ftomasetti/gofact/messages/order"
+	"igitlab.jacob.de/ftomasetti/gofact/parser"
 	"log"
 	"os"
 	"runtime"
@@ -78,6 +80,8 @@ func main() {
 				fmt.Println(err)
 			}
 		}
+		order, _ := order.UnmarshalOrder(p.Segments)
+		spew.Dump(order)
 	} else {
 		fmt.Println("no edi message to parse")
 	}
