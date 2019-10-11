@@ -1,4 +1,4 @@
-package orderMessage
+package messages
 
 import (
 	"igitlab.jacob.de/ftomasetti/gofact/messages/segments"
@@ -8,7 +8,7 @@ import (
 // But it should be very easy to add additional segments
 // EDIfact syntax 4
 // https://service.unece.org/trade/untdid/d11a/trmd/orders_c.htm
-type Order struct {
+type OrderMessage struct {
 	InterchangeHeader      segments.InterchangeHeader
 	MessageHeader          segments.MessageHeader
 	BeginningOfMessage     segments.BeginningOfMessage

@@ -1,4 +1,4 @@
-package orderMessage
+package messages
 
 import (
 	"igitlab.jacob.de/ftomasetti/gofact/messages/segments"
@@ -28,8 +28,8 @@ var ediFactSegments []segment.Segment
 var currentSegmentIndex int
 var currentLineItemIndex int
 
-func UnmarshalOrder(messageSegments []segment.Segment) (*Order, error) {
-	order := &Order{}
+func UnmarshalOrder(messageSegments []segment.Segment) (*OrderMessage, error) {
+	order := &OrderMessage{}
 	ediFactSegments = messageSegments
 	componentDelimiter := ":"
 	elementDelimiter := "+"
@@ -80,21 +80,21 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*Order, error) {
 	return order, nil
 }
 
-func handleStateEnd(ediFactSegment segment.Segment, order *Order, elementDelimiter string) {
+func handleStateEnd(ediFactSegment segment.Segment, order *OrderMessage, elementDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "UNZ":
 		order.InterchangeTrailer = parseUNZ(ediFactSegment, elementDelimiter)
 	}
 }
 
-func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *Order, elementDelimiter string) {
+func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *OrderMessage, elementDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "UNT":
 		order.MessageTrailer = parseUNT(ediFactSegment, elementDelimiter)
 	}
 }
 
-func handleStateSummarySection(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateSummarySection(ediFactSegment segment.Segment, order *OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "UNS":
 		order.SectionControl = parseUNS(ediFactSegment)
@@ -104,14 +104,14 @@ func handleStateSummarySection(ediFactSegment segment.Segment, order *Order, com
 	}
 }
 
-func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, order *OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "PRI":
 		order.Items[currentLineItemIndex].PriceInformation = parsePRI(ediFactSegment, componentDelimiter)
 	}
 }
 
-func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *Order) {
+func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *OrderMessage) {
 	switch ediFactSegment.Tag {
 	case "LIN":
 		item := Item{}
@@ -127,7 +127,7 @@ func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDe
 	}
 }
 
-func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "CUX":
 		order.Currencies.Currencies = parseCUX(ediFactSegment, componentDelimiter)
@@ -136,7 +136,7 @@ func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *Order, 
 	}
 }
 
-func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *Order, elementDelimiter string, componentDelimiter string) {
+func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "CTA":
 		order.Parties[currentPartyIndex].ContactDetails.ContactInformation = parseCAT(ediFactSegment, elementDelimiter, componentDelimiter)
@@ -145,14 +145,14 @@ func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *Order, e
 	}
 }
 
-func handleStateSegmentGroupThree(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateSegmentGroupThree(ediFactSegment segment.Segment, order *OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "RFF":
 		order.Parties[currentPartyIndex].ReferenceNumbersParties = parseRFF(ediFactSegment, componentDelimiter)
 	}
 }
 
-func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *Order) {
+func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *OrderMessage) {
 	switch ediFactSegment.Tag {
 	case "NAD":
 		p := Party{}
@@ -162,7 +162,7 @@ func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter
 	}
 }
 
-func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *Order, componentDelimiter string) {
+func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "RFF":
 		order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, parseRFF(ediFactSegment, componentDelimiter))
@@ -172,7 +172,7 @@ func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *Order, co
 	}
 }
 
-func handleStateHeaderSection(ediFactSegment segment.Segment, order *Order, elementDelimiter string, componentDelimiter string) {
+func handleStateHeaderSection(ediFactSegment segment.Segment, order *OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.Tag {
 	case "UNH":
 		order.MessageHeader = parseUNH(ediFactSegment, elementDelimiter, componentDelimiter)
@@ -183,7 +183,7 @@ func handleStateHeaderSection(ediFactSegment segment.Segment, order *Order, elem
 	}
 }
 
-func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *Order) (string, string) {
+func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *OrderMessage) (string, string) {
 	switch ediFactSegment.Tag {
 	case "UNA":
 		componentDelimiter = string(ediFactSegment.Data[0])

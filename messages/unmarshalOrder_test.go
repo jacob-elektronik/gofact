@@ -1,4 +1,4 @@
-package orderMessage
+package messages
 
 import (
 	"github.com/jacob-elektronik/gofact/messages/segments"
@@ -18,7 +18,7 @@ func TestUnmarshalOrder(t *testing.T) {
 		t.Errorf("Error parsing file")
 		return
 	}
-	orderWant := Order{
+	orderWant := OrderMessage{
 		InterchangeHeader:      segments.InterchangeHeader{
 			SyntaxIdentifier:            segments.SyntaxIdentifier{
 				SyntaxIdentifier:    "UNOC",
@@ -423,7 +423,7 @@ func TestUnmarshalOrder(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Order
+		want    *OrderMessage
 		wantErr bool
 	}{
 		{name:"Testorder", args:args{messageSegments:p.Segments}, want:&orderWant, wantErr:false},
