@@ -1,13 +1,14 @@
-package messages
+package model
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/messages/segments"
+	"igitlab.jacob.de/ftomasetti/gofact/messages/model/segments"
 )
 
 // EDIfact order message implemenatation. Not all segments are implemented yet.
 // But it should be very easy to add additional segments
 // EDIfact syntax 4
 // https://service.unece.org/trade/untdid/d11a/trmd/orders_c.htm
+
 type OrderMessage struct {
 	InterchangeHeader      segments.InterchangeHeader
 	MessageHeader          segments.MessageHeader
@@ -20,7 +21,7 @@ type OrderMessage struct {
 	SectionControl         segments.SectionControl
 	ControlTotal           []segments.ControlTotal
 	MessageTrailer         segments.MessageTrailer
-	InterchangeTrailer	   segments.InterchangeTrailer
+	InterchangeTrailer     segments.InterchangeTrailer
 }
 
 type ReferenceNumber struct {
@@ -40,7 +41,7 @@ type ContactDetails struct {
 }
 
 type Currencies struct {
-	Currencies segments.Currencies
+	Currencies     segments.Currencies
 	DateTimePeriod segments.DateTimePeriod
 }
 

@@ -1,9 +1,10 @@
-package messages
+package handler
 
 import (
 	"github.com/jacob-elektronik/gofact/messages/segments"
 	"github.com/jacob-elektronik/gofact/parser"
 	"github.com/jacob-elektronik/gofact/segment"
+	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
 	"reflect"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestUnmarshalOrder(t *testing.T) {
 		t.Errorf("Error parsing file")
 		return
 	}
-	orderWant := OrderMessage{
+	orderWant := model.OrderMessage{
 		InterchangeHeader:      segments.InterchangeHeader{
 			SyntaxIdentifier:            segments.SyntaxIdentifier{
 				SyntaxIdentifier:    "UNOC",
@@ -104,7 +105,7 @@ func TestUnmarshalOrder(t *testing.T) {
 			DTMValue:        "20180823",
 			DTMFormatCode:   "102",
 		},
-		ReferenceNumbersOrders: []ReferenceNumber{{
+		ReferenceNumbersOrders: []model.ReferenceNumber{{
 			Reference:      segments.Reference{
 				ReferenceCodeQualifier: "CR",
 				ReferenceIdentifier:    "CustomerRefNumber",
@@ -144,7 +145,7 @@ func TestUnmarshalOrder(t *testing.T) {
 				DTMFormatCode:   "",
 			},
 		}},
-		Parties:                []Party{{
+		Parties:                []model.Party{{
 			NameAddress:             segments.NameAddress{
 				PartyFunctionCodeQualifier:                          "SU",
 				PartyIdenNameAndAddressDescriptiontificationDetails: segments.PartyIdentificationDetails{
@@ -178,7 +179,7 @@ func TestUnmarshalOrder(t *testing.T) {
 				Postal:                                              "12345",
 				CountryCode:                                         "DE",
 			},
-			ReferenceNumbersParties: ReferenceNumber{
+			ReferenceNumbersParties: model.ReferenceNumber{
 				Reference:      segments.Reference{
 					ReferenceCodeQualifier: "VA",
 					ReferenceIdentifier:    "9876543219876",
@@ -192,10 +193,10 @@ func TestUnmarshalOrder(t *testing.T) {
 					DTMFormatCode:   "",
 				},
 			},
-			ContactDetails:          ContactDetails{
+			ContactDetails:          model.ContactDetails{
 				ContactInformation:   segments.ContactInformation{
 					ContactFunctionCode: "",
-					ContactDetails:      segments.ContactDetails{
+					model.ContactDetails:      segments.ContactDetails{
 						ContactIdentifier: "",
 						ContactName:       "",
 					},
@@ -228,7 +229,7 @@ func TestUnmarshalOrder(t *testing.T) {
 				Postal:                                              "",
 				CountryCode:                                         "DE",
 			},
-			ReferenceNumbersParties: ReferenceNumber{
+			ReferenceNumbersParties: model.ReferenceNumber{
 				Reference:      segments.Reference{
 					ReferenceCodeQualifier: "VA",
 					ReferenceIdentifier:    "56789123456789",
@@ -238,10 +239,10 @@ func TestUnmarshalOrder(t *testing.T) {
 				},
 				DateTimePeriod: segments.DateTimePeriod{},
 			},
-			ContactDetails:          ContactDetails{
+			ContactDetails:          model.ContactDetails{
 				ContactInformation:   segments.ContactInformation{
 					ContactFunctionCode: "PD",
-					ContactDetails:      segments.ContactDetails{
+					model.ContactDetails:      segments.ContactDetails{
 						ContactIdentifier: "",
 						ContactName:       "Contact name",
 					},
@@ -279,8 +280,8 @@ func TestUnmarshalOrder(t *testing.T) {
 				Postal:                                              "12345",
 				CountryCode:                                         "DE",
 			},
-			ReferenceNumbersParties: ReferenceNumber{},
-			ContactDetails:          ContactDetails{},
+			ReferenceNumbersParties: model.ReferenceNumber{},
+			ContactDetails:          model.ContactDetails{},
 		}, {
 			NameAddress:             segments.NameAddress{
 				PartyFunctionCodeQualifier:                          "DP",
@@ -309,10 +310,10 @@ func TestUnmarshalOrder(t *testing.T) {
 				Postal:                                              "12345",
 				CountryCode:                                         "DE",
 			},
-			ReferenceNumbersParties: ReferenceNumber{},
-			ContactDetails:          ContactDetails{},
+			ReferenceNumbersParties: model.ReferenceNumber{},
+			ContactDetails:          model.ContactDetails{},
 		}},
-		Currencies:             Currencies{
+		Currencies:             model.Currencies{
 			Currencies:     segments.Currencies{
 				CurrencyUsageCodeQualifier:           "2",
 				CurrencyIdentificationCode:           "EUR",
@@ -326,7 +327,7 @@ func TestUnmarshalOrder(t *testing.T) {
 				DTMFormatCode:   "",
 			},
 		},
-		Items:                  []Item{{
+		Items:                  []model.Item{{
 			LineItem:            segments.LineItem{
 				LineItemIdentifier:         "1",
 				ActionCode:                 "",
@@ -423,7 +424,7 @@ func TestUnmarshalOrder(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *OrderMessage
+		want    *model.OrderMessage
 		wantErr bool
 	}{
 		{name:"Testorder", args:args{messageSegments:p.Segments}, want:&orderWant, wantErr:false},
