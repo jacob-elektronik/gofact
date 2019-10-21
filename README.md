@@ -83,10 +83,6 @@ Supporting additional segments or segment groups should be straight forward to i
 
     ~~~~bash
     Usage of ./gofact:
-      -cpuprofile file
-            write cpu profile to file
-      -memprofile file
-            write memory profile to file
       -message string
             edifact message file path
       -psegments

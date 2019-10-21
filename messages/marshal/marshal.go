@@ -325,7 +325,6 @@ func ParseDTM(s segment.Segment, componentDelimiter string) segments.DateTimePer
 			dtp.DTMFormatCode = component
 		}
 	}
-
 	return dtp
 }
 
