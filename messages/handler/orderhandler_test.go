@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"github.com/jacob-elektronik/gofact/messages/segments"
-	"github.com/jacob-elektronik/gofact/parser"
-	"github.com/jacob-elektronik/gofact/segment"
 	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
+	"igitlab.jacob.de/ftomasetti/gofact/messages/model/segments"
+	"igitlab.jacob.de/ftomasetti/gofact/parser"
+	"igitlab.jacob.de/ftomasetti/gofact/segment"
 	"reflect"
 	"testing"
 )
@@ -196,7 +196,7 @@ func TestUnmarshalOrder(t *testing.T) {
 			ContactDetails:          model.ContactDetails{
 				ContactInformation:   segments.ContactInformation{
 					ContactFunctionCode: "",
-					model.ContactDetails:      segments.ContactDetails{
+					ContactDetails:      segments.ContactDetails{
 						ContactIdentifier: "",
 						ContactName:       "",
 					},
@@ -242,7 +242,7 @@ func TestUnmarshalOrder(t *testing.T) {
 			ContactDetails:          model.ContactDetails{
 				ContactInformation:   segments.ContactInformation{
 					ContactFunctionCode: "PD",
-					model.ContactDetails:      segments.ContactDetails{
+					ContactDetails:      segments.ContactDetails{
 						ContactIdentifier: "",
 						ContactName:       "Contact name",
 					},
