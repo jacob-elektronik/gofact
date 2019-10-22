@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/messages/parse"
 	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
+	"igitlab.jacob.de/ftomasetti/gofact/messages/parse"
 	"igitlab.jacob.de/ftomasetti/gofact/segment"
 	"igitlab.jacob.de/ftomasetti/gofact/segment/types"
 )
