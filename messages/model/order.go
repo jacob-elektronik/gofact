@@ -24,27 +24,32 @@ type OrderMessage struct {
 	InterchangeTrailer     segments.InterchangeTrailer
 }
 
+// Segment group 1
 type ReferenceNumber struct {
 	Reference      segments.Reference
 	DateTimePeriod segments.DateTimePeriod
 }
 
+// Segment group 2
 type Party struct {
 	NameAddress             segments.NameAddress
 	ReferenceNumbersParties ReferenceNumber
 	ContactDetails          ContactDetails
 }
 
+// Segment group 5
 type ContactDetails struct {
 	ContactInformation   segments.ContactInformation
 	CommunicationContact segments.CommunicationContact
 }
 
+// Segment group 7
 type Currencies struct {
 	Currencies     segments.Currencies
 	DateTimePeriod segments.DateTimePeriod
 }
 
+// Segment group 29
 type Item struct {
 	LineItem            segments.LineItem
 	AdditionalProductID segments.AdditionalProductID
