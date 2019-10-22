@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func ParseUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTrailer {
+func GetUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTrailer {
 	unz := segments.InterchangeTrailer{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, component := range components {
@@ -21,7 +21,7 @@ func ParseUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTr
 	return unz
 }
 
-func ParseUNT(s segment.Segment, elementDelimiter string) segments.MessageTrailer {
+func GetUNT(s segment.Segment, elementDelimiter string) segments.MessageTrailer {
 	unt := segments.MessageTrailer{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, component := range components {
@@ -35,7 +35,7 @@ func ParseUNT(s segment.Segment, elementDelimiter string) segments.MessageTraile
 	return unt
 }
 
-func ParseCNT(s segment.Segment, componentDelimiter string) segments.ControlTotal {
+func GetCNT(s segment.Segment, componentDelimiter string) segments.ControlTotal {
 	cnt := segments.ControlTotal{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	for idx, component := range components {
@@ -51,13 +51,13 @@ func ParseCNT(s segment.Segment, componentDelimiter string) segments.ControlTota
 	return cnt
 }
 
-func ParseUNS(s segment.Segment) segments.SectionControl {
+func GetUNS(s segment.Segment) segments.SectionControl {
 	uns := segments.SectionControl{}
 	uns.SectionIdentification = s.Data[1 : len(s.Data)-1]
 	return uns
 }
 
-func ParsePRI(s segment.Segment, componentDelimiter string) segments.PriceInformation {
+func GetPRI(s segment.Segment, componentDelimiter string) segments.PriceInformation {
 	pri := segments.PriceInformation{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	for idx, component := range components {
@@ -71,7 +71,7 @@ func ParsePRI(s segment.Segment, componentDelimiter string) segments.PriceInform
 	return pri
 }
 
-func ParseQTY(s segment.Segment, componentDelimiter string) segments.Quantity {
+func GetQTY(s segment.Segment, componentDelimiter string) segments.Quantity {
 	qty := segments.Quantity{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	for idx, component := range components {
@@ -87,7 +87,7 @@ func ParseQTY(s segment.Segment, componentDelimiter string) segments.Quantity {
 	return qty
 }
 
-func ParseIMD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ItemDescription {
+func GetIMD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ItemDescription {
 	imd := segments.ItemDescription{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, element := range elements {
@@ -107,7 +107,7 @@ func ParseIMD(s segment.Segment, elementDelimiter string, componentDelimiter str
 	return imd
 }
 
-func ParsePIA(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.AdditionalProductID {
+func GetPIA(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.AdditionalProductID {
 	pia := segments.AdditionalProductID{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, element := range elements {
@@ -133,7 +133,7 @@ func ParsePIA(s segment.Segment, elementDelimiter string, componentDelimiter str
 	return pia
 }
 
-func ParseLIN(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.LineItem {
+func GetLIN(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.LineItem {
 	lin := segments.LineItem{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, element := range elements {
@@ -175,7 +175,7 @@ func ParseLIN(s segment.Segment, elementDelimiter string, componentDelimiter str
 	return lin
 }
 
-func ParseCUX(s segment.Segment, componentDelimiter string) segments.Currencies {
+func GetCUX(s segment.Segment, componentDelimiter string) segments.Currencies {
 	cux := segments.Currencies{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	for i, component := range components {
@@ -193,7 +193,7 @@ func ParseCUX(s segment.Segment, componentDelimiter string) segments.Currencies 
 	return cux
 }
 
-func ParseCAT(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ContactInformation {
+func GetCAT(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ContactInformation {
 	cat := segments.ContactInformation{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, element := range elements {
@@ -215,7 +215,7 @@ func ParseCAT(s segment.Segment, elementDelimiter string, componentDelimiter str
 	return cat
 }
 
-func ParseCOM(s segment.Segment, componentDelimiter string) segments.CommunicationContact {
+func GetCOM(s segment.Segment, componentDelimiter string) segments.CommunicationContact {
 	com := segments.CommunicationContact{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 
@@ -231,7 +231,7 @@ func ParseCOM(s segment.Segment, componentDelimiter string) segments.Communicati
 	return com
 }
 
-func ParseNAD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.NameAddress {
+func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.NameAddress {
 	n := segments.NameAddress{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for idx, element := range elements {
@@ -296,7 +296,7 @@ func ParseNAD(s segment.Segment, elementDelimiter string, componentDelimiter str
 	return n
 }
 
-func ParseRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber {
+func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber {
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	rff := segments.Reference{}
 	refNum := model.ReferenceNumber{}
@@ -312,7 +312,7 @@ func ParseRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumbe
 	return refNum
 }
 
-func ParseDTM(s segment.Segment, componentDelimiter string) segments.DateTimePeriod {
+func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePeriod {
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	dtp := segments.DateTimePeriod{}
 	for idx, component := range components {
@@ -328,7 +328,7 @@ func ParseDTM(s segment.Segment, componentDelimiter string) segments.DateTimePer
 	return dtp
 }
 
-func ParseBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMessage {
+func GetBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMessage {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	bgm := segments.BeginningOfMessage{}
 	for idx, element := range elements {
@@ -342,7 +342,7 @@ func ParseBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMe
 	return bgm
 }
 
-func ParseUNH(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.MessageHeader {
+func GetUNH(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.MessageHeader {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	header := segments.MessageHeader{}
 	for idx, element := range elements {
@@ -361,7 +361,7 @@ func ParseUNH(s segment.Segment, elementDelimiter string, componentDelimiter str
 	return header
 }
 
-func ParseUNB(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.InterchangeHeader {
+func GetUNB(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.InterchangeHeader {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	header := segments.InterchangeHeader{}
 	for idx, element := range elements {
