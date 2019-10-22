@@ -1,4 +1,4 @@
-package marshal
+package parse
 
 import (
 	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
