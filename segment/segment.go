@@ -15,8 +15,6 @@ type Segment struct {
 func (s Segment) PrintSegment() string {
 	ret := ""
 	switch s.SType {
-	case types.ServiceSegment:
-		ret += "Segmenttype: ServiceSegment"
 	case types.AAI:
 		ret += "Segmenttype: Accommodation allocation information"
 	case types.ADI:
@@ -479,6 +477,22 @@ func (s Segment) PrintSegment() string {
 		ret += "Segmenttype: Travel product information"
 	case types.TXS:
 		ret += "Segmenttype: Taxes"
+	case types.UNA:
+		ret += "Segmenttype: Service String Advice"
+	case types.UNB:
+		ret += "Segmenttype: Interchange Header"
+	case types.UNG:
+		ret += "Segmenttype: Functional Group Header"
+	case types.UNH:
+		ret += "Segmenttype: Message Header"
+	case types.UNT:
+		ret += "Segmenttype: Message Trailer"
+	case types.UNE:
+		ret += "Segmenttype: Functional Group Trailer"
+	case types.UNZ:
+		ret += "Segmenttype: Interchange Trailer"
+	case types.UNS:
+		ret += "Segmenttype: Section control"
 	case types.VEH:
 		ret += "Segmenttype: Vehicle"
 	case types.VLI:

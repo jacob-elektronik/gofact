@@ -4,6 +4,7 @@ import (
 	"igitlab.jacob.de/ftomasetti/gofact/messages/parse"
 	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
 	"igitlab.jacob.de/ftomasetti/gofact/segment"
+	"igitlab.jacob.de/ftomasetti/gofact/segment/types"
 )
 
 const (
@@ -81,80 +82,80 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*model.OrderMessage, err
 }
 
 func handleStateEnd(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "UNZ":
+	switch ediFactSegment.SType {
+	case types.UNZ:
 		order.InterchangeTrailer = parse.GetUNZ(ediFactSegment, elementDelimiter)
 	}
 }
 
 func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "UNT":
+	switch ediFactSegment.SType {
+	case types.UNT:
 		order.MessageTrailer = parse.GetUNT(ediFactSegment, elementDelimiter)
 	}
 }
 
 func handleStateSummarySection(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "UNS":
+	switch ediFactSegment.SType {
+	case types.UNS:
 		order.SectionControl = parse.GetUNS(ediFactSegment)
-	case "CNT":
+	case types.CNT:
 		cnt := parse.GetCNT(ediFactSegment, componentDelimiter)
 		order.ControlTotal = append(order.ControlTotal, cnt)
 	}
 }
 
 func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "PRI":
+	switch ediFactSegment.SType {
+	case types.PRI:
 		order.Items[currentLineItemIndex].PriceInformation = parse.GetPRI(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
-	switch ediFactSegment.Tag {
-	case "LIN":
+	switch ediFactSegment.SType {
+	case types.LIN:
 		item := model.Item{}
 		item.LineItem = parse.GetLIN(ediFactSegment, elementDelimiter, componentDelimiter)
 		order.Items = append(order.Items, item)
 		currentLineItemIndex = len(order.Items) - 1
-	case "PIA":
+	case types.PIA:
 		order.Items[currentLineItemIndex].AdditionalProductID = parse.GetPIA(ediFactSegment, elementDelimiter, componentDelimiter)
-	case "IMD":
+	case types.IMD:
 		order.Items[currentLineItemIndex].ItemDescription = parse.GetIMD(ediFactSegment, elementDelimiter, componentDelimiter)
-	case "QTY":
+	case types.QTY:
 		order.Items[currentLineItemIndex].Quantity = parse.GetQTY(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "CUX":
+	switch ediFactSegment.SType {
+	case types.CUX:
 		order.Currencies.Currencies = parse.GetCUX(ediFactSegment, componentDelimiter)
-	case "DTM":
+	case types.DTM:
 		order.Currencies.DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "CTA":
+	switch ediFactSegment.SType {
+	case types.CTA:
 		order.Parties[currentPartyIndex].ContactDetails.ContactInformation = parse.GetCAT(ediFactSegment, elementDelimiter, componentDelimiter)
-	case "COM":
+	case types.COM:
 		order.Parties[currentPartyIndex].ContactDetails.CommunicationContact = parse.GetCOM(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateSegmentGroupThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "RFF":
+	switch ediFactSegment.SType {
+	case types.RFF:
 		order.Parties[currentPartyIndex].ReferenceNumbersParties = parse.GetRFF(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
-	switch ediFactSegment.Tag {
-	case "NAD":
+	switch ediFactSegment.SType {
+	case types.NAD:
 		p := model.Party{}
 		p.NameAddress = parse.GetNAD(ediFactSegment, elementDelimiter, componentDelimiter)
 		order.Parties = append(order.Parties, p)
@@ -163,121 +164,121 @@ func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter
 }
 
 func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "RFF":
+	switch ediFactSegment.SType {
+	case types.RFF:
 		order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, parse.GetRFF(ediFactSegment, componentDelimiter))
 		currentReferenceNumberIndex = len(order.ReferenceNumbersOrders) - 1
-	case "DTM":
+	case types.DTM:
 		order.ReferenceNumbersOrders[currentReferenceNumberIndex].DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateHeaderSection(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
-	switch ediFactSegment.Tag {
-	case "UNH":
+	switch ediFactSegment.SType {
+	case types.UNH:
 		order.MessageHeader = parse.GetUNH(ediFactSegment, elementDelimiter, componentDelimiter)
-	case "BGM":
+	case types.BGM:
 		order.BeginningOfMessage = parse.GetBGM(ediFactSegment, elementDelimiter)
-	case "DTM":
+	case types.DTM:
 		order.DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
 	}
 }
 
 func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *model.OrderMessage) (string, string) {
-	switch ediFactSegment.Tag {
-	case "UNA":
+	switch ediFactSegment.SType {
+	case types.UNA:
 		componentDelimiter = string(ediFactSegment.Data[0])
 		elementDelimiter = string(ediFactSegment.Data[1])
-	case "UNB":
+	case types.UNB:
 		order.InterchangeHeader = parse.GetUNB(ediFactSegment, elementDelimiter, componentDelimiter)
 	}
 	return componentDelimiter, elementDelimiter
 }
 
-func nextSegmentTag() string {
-	return ediFactSegments[currentSegmentIndex+1].Tag
+func nextSegmentTag() int {
+	return ediFactSegments[currentSegmentIndex+1].SType
 }
 
 func setNextState() {
 	switch currentState {
 	case StateStart:
 		switch nextSegmentTag() {
-		case "UNB":
+		case types.UNB:
 			currentState = StateStart
-		case "UNH", "BGM", "DTM":
+		case types.UNH, types.BGM, types.DTM:
 			currentState = StateHeaderSection
 		default:
 			currentState = StateSegmentGroupOne
 		}
 	case StateHeaderSection:
 		switch nextSegmentTag() {
-		case "UNA", "UNB", "UNH", "BGM", "DTM":
+		case types.UNA, types.UNB, types.UNH, types.BGM, types.DTM:
 			currentState = StateHeaderSection
 		default:
 			currentState = StateSegmentGroupOne
 		}
 	case StateSegmentGroupOne:
 		switch nextSegmentTag() {
-		case "RFF", "DTM":
+		case types.RFF, types.DTM:
 			currentState = StateSegmentGroupOne
 		default:
 			currentState = StateSegmentGroupTwo
 		}
 	case StateSegmentGroupTwo:
 		switch nextSegmentTag() {
-		case "NAD":
+		case types.NAD:
 			currentState = StateSegmentGroupTwo
-		case "RFF":
+		case types.RFF:
 			currentState = StateSegmentGroupThree
-		case "CTA", "COM":
+		case types.CTA, types.COM:
 			currentState = StateSegmentGroupFive
 		default:
 			currentState = StateSegmentGroupSeven
 		}
 	case StateSegmentGroupThree:
 		switch nextSegmentTag() {
-		case "NAD":
+		case types.NAD:
 			currentState = StateSegmentGroupTwo
-		case "CTA":
+		case types.CTA:
 			currentState = StateSegmentGroupFive
 		default:
 			currentState = StateSegmentGroupSeven
 		}
 	case StateSegmentGroupFive:
 		switch nextSegmentTag() {
-		case "NAD":
+		case types.NAD:
 			currentState = StateSegmentGroupTwo
-		case "COM":
+		case types.COM:
 			currentState = StateSegmentGroupFive
 		default:
 			currentState = StateSegmentGroupSeven
 		}
 	case StateSegmentGroupSeven:
 		switch nextSegmentTag() {
-		case "DTM":
+		case types.DTM:
 			currentState = StateSegmentGroupSeven
 		default:
 			currentState = StateSegmentGroupTwentyNine
 		}
 	case StateSegmentGroupTwentyNine:
 		switch nextSegmentTag() {
-		case "LIN", "PIA", "IMD", "QTY", "DTM":
+		case types.LIN, types.PIA, types.IMD, types.QTY, types.DTM:
 			currentState = StateSegmentGroupTwentyNine
-		case "PRI":
+		case types.PRI:
 			currentState = StateSegmentGroupThirtyThree
 		}
 	case StateSegmentGroupThirtyThree:
 		switch nextSegmentTag() {
-		case "UNS":
+		case types.UNS:
 			currentState = StateSummarySection
-		case "LIN":
+		case types.LIN:
 			currentState = StateSegmentGroupTwentyNine
 		default:
 			currentState = StateSummarySection
 		}
 	case StateSummarySection:
 		switch nextSegmentTag() {
-		case "CNT":
+		case types.CNT:
 			currentState = StateSummarySection
 		default:
 			currentState = StateSegmentGroupSixtyThree
