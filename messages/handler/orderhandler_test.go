@@ -20,22 +20,22 @@ func TestUnmarshalOrder(t *testing.T) {
 		return
 	}
 	orderWant := model.OrderMessage{
-		InterchangeHeader:      segments.InterchangeHeader{
-			SyntaxIdentifier:            segments.SyntaxIdentifier{
+		InterchangeHeader: segments.InterchangeHeader{
+			SyntaxIdentifier: segments.SyntaxIdentifier{
 				SyntaxIdentifier:    "UNOC",
 				SyntaxVersionNumber: "3",
 			},
-			InterchangeSender:           segments.InterchangeSender{
+			InterchangeSender: segments.InterchangeSender{
 				SenderIdentification:               "1234567891234",
 				PartnerIdentificationCodeQualifier: "14",
 				AddressReverseRouting:              "",
 			},
-			InterchangeRecipient:        segments.InterchangeRecipient{
+			InterchangeRecipient: segments.InterchangeRecipient{
 				RecipientIdentification:            "9876543219876",
 				PartnerIdentificationCodeQualifier: "92",
 				RoutingAddress:                     "",
 			},
-			DateTime:                    segments.DateTime{
+			DateTime: segments.DateTime{
 				DateOfPreparation: "180907",
 				TimeOfPreparation: "1418",
 			},
@@ -44,15 +44,15 @@ func TestUnmarshalOrder(t *testing.T) {
 				RecipientsReferencePassword:          "",
 				RecipientsReferencePasswordQualifier: "",
 			},
-			ApplicationReference:        "",
-			ProcessingPriorityCode:      "",
-			AcknowledgementRequest:      "",
-			CommunicationsAgreementID:   "",
-			TestIndicator:               "",
+			ApplicationReference:      "",
+			ProcessingPriorityCode:    "",
+			AcknowledgementRequest:    "",
+			CommunicationsAgreementID: "",
+			TestIndicator:             "",
 		},
-		MessageHeader:          segments.MessageHeader{
-			MessageReferenceNumber:                       "1",
-			MessageIdentifier:                            segments.MessageIdentifier{
+		MessageHeader: segments.MessageHeader{
+			MessageReferenceNumber: "1",
+			MessageIdentifier: segments.MessageIdentifier{
 				MessageType:                          "ORDERS",
 				MessageVersionNumber:                 "D",
 				MessageReleaseNumber:                 "96A",
@@ -61,12 +61,12 @@ func TestUnmarshalOrder(t *testing.T) {
 				CodeLisDirectoryVersionNumber:        "",
 				MessageTypeSubFunctioIdentificationn: "",
 			},
-			CommonAccessReference:                        "",
-			StatusOfTransfer:                             segments.StatusOfTransfer{
+			CommonAccessReference: "",
+			StatusOfTransfer: segments.StatusOfTransfer{
 				SequenceOfTransfers:  "",
 				FirstAndLastTransfer: "",
 			},
-			MessageSubsetIdentification:                  segments.MessageSubsetIdentification{
+			MessageSubsetIdentification: segments.MessageSubsetIdentification{
 				MessageSubsetIdentification: "",
 				MessageSubsetVersionNumber:  "",
 				MessageSubsetReleaseNumber:  "",
@@ -78,15 +78,15 @@ func TestUnmarshalOrder(t *testing.T) {
 				MessageImplementationGuidelineReleaseNumber:  "",
 				ControllingAgency: "",
 			},
-			ScenarioIdentification:                       segments.ScenarioIdentification{
+			ScenarioIdentification: segments.ScenarioIdentification{
 				ScenarioIdentification: "",
 				ScenarioVersionNumber:  "",
 				ScenarioReleaseNumber:  "",
 				ControllingAgency:      "",
 			},
 		},
-		BeginningOfMessage:     segments.BeginningOfMessage{
-			MessageName:           segments.MessageName{
+		BeginningOfMessage: segments.BeginningOfMessage{
+			MessageName: segments.MessageName{
 				DocumentNameCode:              "226",
 				CodeListIdentificationCode:    "",
 				CodeListResponsibleAgencyCode: "",
@@ -97,16 +97,16 @@ func TestUnmarshalOrder(t *testing.T) {
 				VersionIdentifier:  "",
 				RevisionIdentifier: "",
 			},
-			MessageFunctionCode:   "",
-			ResponseTypeCode:      "",
+			MessageFunctionCode: "",
+			ResponseTypeCode:    "",
 		},
-		DateTimePeriod:         segments.DateTimePeriod{
+		DateTimePeriod: segments.DateTimePeriod{
 			DTMFunctionCode: "137",
 			DTMValue:        "20180823",
 			DTMFormatCode:   "102",
 		},
 		ReferenceNumbersOrders: []model.ReferenceNumber{{
-			Reference:      segments.Reference{
+			Reference: segments.Reference{
 				ReferenceCodeQualifier: "CR",
 				ReferenceIdentifier:    "CustomerRefNumber",
 				DocumentLineIdentifier: "",
@@ -119,7 +119,7 @@ func TestUnmarshalOrder(t *testing.T) {
 				DTMFormatCode:   "",
 			},
 		}, {
-			Reference:      segments.Reference{
+			Reference: segments.Reference{
 				ReferenceCodeQualifier: "IT",
 				ReferenceIdentifier:    "InternalOrderNumber",
 				DocumentLineIdentifier: "",
@@ -132,7 +132,7 @@ func TestUnmarshalOrder(t *testing.T) {
 				DTMFormatCode:   "",
 			},
 		}, {
-			Reference:      segments.Reference{
+			Reference: segments.Reference{
 				ReferenceCodeQualifier: "CT",
 				ReferenceIdentifier:    "ContractNumber",
 				DocumentLineIdentifier: "",
@@ -145,22 +145,22 @@ func TestUnmarshalOrder(t *testing.T) {
 				DTMFormatCode:   "",
 			},
 		}},
-		Parties:                []model.Party{{
-			NameAddress:             segments.NameAddress{
-				PartyFunctionCodeQualifier:                          "SU",
+		Parties: []model.Party{{
+			NameAddress: segments.NameAddress{
+				PartyFunctionCodeQualifier: "SU",
 				PartyIdenNameAndAddressDescriptiontificationDetails: segments.PartyIdentificationDetails{
 					PartyIdentifier:               "9876543219876",
 					CodeListIdentificationCode:    "",
 					CodeListResponsibleAgencyCode: "92",
 				},
-				NameAndAddressDescription:                           segments.NameAndAddressDescription{
+				NameAndAddressDescription: segments.NameAndAddressDescription{
 					NameAndAddressDescription:                 "",
 					NameAndAddressDescriptionConditionalOne:   "",
 					NameAndAddressDescriptionConditionalTwo:   "",
 					NameAndAddressDescriptionConditionalThree: "",
 					NameAndAddressDescriptionConditionalFour:  "",
 				},
-				PartyName:                                           segments.PartyName{
+				PartyName: segments.PartyName{
 					PartyName:                 "party name",
 					PartyNameConditionalOne:   "",
 					PartyNameConditionalTwo:   "",
@@ -169,18 +169,18 @@ func TestUnmarshalOrder(t *testing.T) {
 					PartyNameConditionalFive:  "",
 					PartyNameCode:             "",
 				},
-				Street:                                              segments.Street{
+				Street: segments.Street{
 					Street:                 "teststreet",
 					StreetConditionalOne:   "",
 					StreetConditionalTwo:   "",
 					StreetConditionalThree: "",
 				},
-				CityName:                                            "testcity",
-				Postal:                                              "12345",
-				CountryCode:                                         "DE",
+				CityName:    "testcity",
+				Postal:      "12345",
+				CountryCode: "DE",
 			},
 			ReferenceNumbersParties: model.ReferenceNumber{
-				Reference:      segments.Reference{
+				Reference: segments.Reference{
 					ReferenceCodeQualifier: "VA",
 					ReferenceIdentifier:    "9876543219876",
 					DocumentLineIdentifier: "",
@@ -193,10 +193,10 @@ func TestUnmarshalOrder(t *testing.T) {
 					DTMFormatCode:   "",
 				},
 			},
-			ContactDetails:          model.ContactDetails{
-				ContactInformation:   segments.ContactInformation{
+			ContactDetails: model.ContactDetails{
+				ContactInformation: segments.ContactInformation{
 					ContactFunctionCode: "",
-					ContactDetails:      segments.ContactDetails{
+					ContactDetails: segments.ContactDetails{
 						ContactIdentifier: "",
 						ContactName:       "",
 					},
@@ -207,15 +207,15 @@ func TestUnmarshalOrder(t *testing.T) {
 				},
 			},
 		}, {
-			NameAddress:             segments.NameAddress{
-				PartyFunctionCodeQualifier:                          "BY",
+			NameAddress: segments.NameAddress{
+				PartyFunctionCodeQualifier: "BY",
 				PartyIdenNameAndAddressDescriptiontificationDetails: segments.PartyIdentificationDetails{
 					PartyIdentifier:               "1234567891234",
 					CodeListIdentificationCode:    "",
 					CodeListResponsibleAgencyCode: "9",
 				},
-				NameAndAddressDescription:                           segments.NameAndAddressDescription{},
-				PartyName:                                           segments.PartyName{
+				NameAndAddressDescription: segments.NameAndAddressDescription{},
+				PartyName: segments.PartyName{
 					PartyName:                 "party name",
 					PartyNameConditionalOne:   "party name2",
 					PartyNameConditionalTwo:   "",
@@ -224,13 +224,13 @@ func TestUnmarshalOrder(t *testing.T) {
 					PartyNameConditionalFive:  "",
 					PartyNameCode:             "",
 				},
-				Street:                                              segments.Street{},
-				CityName:                                            "",
-				Postal:                                              "",
-				CountryCode:                                         "DE",
+				Street:      segments.Street{},
+				CityName:    "",
+				Postal:      "",
+				CountryCode: "DE",
 			},
 			ReferenceNumbersParties: model.ReferenceNumber{
-				Reference:      segments.Reference{
+				Reference: segments.Reference{
 					ReferenceCodeQualifier: "VA",
 					ReferenceIdentifier:    "56789123456789",
 					DocumentLineIdentifier: "",
@@ -239,10 +239,10 @@ func TestUnmarshalOrder(t *testing.T) {
 				},
 				DateTimePeriod: segments.DateTimePeriod{},
 			},
-			ContactDetails:          model.ContactDetails{
-				ContactInformation:   segments.ContactInformation{
+			ContactDetails: model.ContactDetails{
+				ContactInformation: segments.ContactInformation{
 					ContactFunctionCode: "PD",
-					ContactDetails:      segments.ContactDetails{
+					ContactDetails: segments.ContactDetails{
 						ContactIdentifier: "",
 						ContactName:       "Contact name",
 					},
@@ -253,15 +253,15 @@ func TestUnmarshalOrder(t *testing.T) {
 				},
 			},
 		}, {
-			NameAddress:             segments.NameAddress{
-				PartyFunctionCodeQualifier:                          "IV",
+			NameAddress: segments.NameAddress{
+				PartyFunctionCodeQualifier: "IV",
 				PartyIdenNameAndAddressDescriptiontificationDetails: segments.PartyIdentificationDetails{
 					PartyIdentifier:               "1233411223219",
 					CodeListIdentificationCode:    "",
 					CodeListResponsibleAgencyCode: "9",
 				},
-				NameAndAddressDescription:                           segments.NameAndAddressDescription{},
-				PartyName:                                           segments.PartyName{
+				NameAndAddressDescription: segments.NameAndAddressDescription{},
+				PartyName: segments.PartyName{
 					PartyName:                 "party name",
 					PartyNameConditionalOne:   "",
 					PartyNameConditionalTwo:   "",
@@ -270,28 +270,28 @@ func TestUnmarshalOrder(t *testing.T) {
 					PartyNameConditionalFive:  "",
 					PartyNameCode:             "",
 				},
-				Street:                                              segments.Street{
+				Street: segments.Street{
 					Street:                 "teststreet",
 					StreetConditionalOne:   "",
 					StreetConditionalTwo:   "",
 					StreetConditionalThree: "",
 				},
-				CityName:                                            "testcity",
-				Postal:                                              "12345",
-				CountryCode:                                         "DE",
+				CityName:    "testcity",
+				Postal:      "12345",
+				CountryCode: "DE",
 			},
 			ReferenceNumbersParties: model.ReferenceNumber{},
 			ContactDetails:          model.ContactDetails{},
 		}, {
-			NameAddress:             segments.NameAddress{
-				PartyFunctionCodeQualifier:                          "DP",
+			NameAddress: segments.NameAddress{
+				PartyFunctionCodeQualifier: "DP",
 				PartyIdenNameAndAddressDescriptiontificationDetails: segments.PartyIdentificationDetails{
 					PartyIdentifier:               "1233411666666",
 					CodeListIdentificationCode:    "",
 					CodeListResponsibleAgencyCode: "9",
 				},
-				NameAndAddressDescription:                           segments.NameAndAddressDescription{},
-				PartyName:                                           segments.PartyName{
+				NameAndAddressDescription: segments.NameAndAddressDescription{},
+				PartyName: segments.PartyName{
 					PartyName:                 "party name",
 					PartyNameConditionalOne:   "party name2",
 					PartyNameConditionalTwo:   "",
@@ -300,21 +300,21 @@ func TestUnmarshalOrder(t *testing.T) {
 					PartyNameConditionalFive:  "",
 					PartyNameCode:             "",
 				},
-				Street:                                              segments.Street{
+				Street: segments.Street{
 					Street:                 "teststreet",
 					StreetConditionalOne:   "",
 					StreetConditionalTwo:   "",
 					StreetConditionalThree: "",
 				},
-				CityName:                                            "testcity",
-				Postal:                                              "12345",
-				CountryCode:                                         "DE",
+				CityName:    "testcity",
+				Postal:      "12345",
+				CountryCode: "DE",
 			},
 			ReferenceNumbersParties: model.ReferenceNumber{},
 			ContactDetails:          model.ContactDetails{},
 		}},
-		Currencies:             model.Currencies{
-			Currencies:     segments.Currencies{
+		Currencies: model.Currencies{
+			Currencies: segments.Currencies{
 				CurrencyUsageCodeQualifier:           "2",
 				CurrencyIdentificationCode:           "EUR",
 				CurrencyTypeCodeQualifier:            "9",
@@ -327,8 +327,8 @@ func TestUnmarshalOrder(t *testing.T) {
 				DTMFormatCode:   "",
 			},
 		},
-		Items:                  []model.Item{{
-			LineItem:            segments.LineItem{
+		Items: []model.Item{{
+			LineItem: segments.LineItem{
 				LineItemIdentifier:         "1",
 				ActionCode:                 "",
 				ItemNumberIdentification:   segments.ItemNumberIdentification{},
@@ -337,8 +337,8 @@ func TestUnmarshalOrder(t *testing.T) {
 				ConfigurationOperationCode: "",
 			},
 			AdditionalProductID: segments.AdditionalProductID{
-				ProductIdentifierCodeQualifier:           "555",
-				ItemNumberIdentification:                 segments.ItemNumberIdentification{
+				ProductIdentifierCodeQualifier: "555",
+				ItemNumberIdentification: segments.ItemNumberIdentification{
 					ItemIdentifier:                "123456",
 					ItemTypeIdentificationCode:    "SA",
 					CodeListIdentificationCode:    "",
@@ -349,23 +349,23 @@ func TestUnmarshalOrder(t *testing.T) {
 				ItemNumberIdentificationConditionalThree: segments.ItemNumberIdentification{},
 				ItemNumberIdentificationConditionalFour:  segments.ItemNumberIdentification{},
 			},
-			ItemDescription:     segments.ItemDescription{
+			ItemDescription: segments.ItemDescription{
 				DescriptionFormatCode: "F",
-				Description:           segments.Description{Description:"Item description"},
+				Description:           segments.Description{Description: "Item description"},
 			},
-			Quantity:            segments.Quantity{QuantityDetails:segments.QuantityDetails{
+			Quantity: segments.Quantity{QuantityDetails: segments.QuantityDetails{
 				QuantityTypeCodeQualifier: "21",
 				Quantity:                  "1",
 				MeasurementUnitCode:       "PCE",
 			}},
-			PriceInformation:    segments.PriceInformation{
+			PriceInformation: segments.PriceInformation{
 				PriceCodeQualifier:  "AAA",
 				PriceAmount:         "40.98765",
 				UnitPriceBasisValue: "",
 				MeasurementUnitCode: "",
 			},
 		}, {
-			LineItem:            segments.LineItem{
+			LineItem: segments.LineItem{
 				LineItemIdentifier:         "2",
 				ActionCode:                 "",
 				ItemNumberIdentification:   segments.ItemNumberIdentification{},
@@ -374,8 +374,8 @@ func TestUnmarshalOrder(t *testing.T) {
 				ConfigurationOperationCode: "",
 			},
 			AdditionalProductID: segments.AdditionalProductID{
-				ProductIdentifierCodeQualifier:           "555",
-				ItemNumberIdentification:                 segments.ItemNumberIdentification{
+				ProductIdentifierCodeQualifier: "555",
+				ItemNumberIdentification: segments.ItemNumberIdentification{
 					ItemIdentifier:                "654321",
 					ItemTypeIdentificationCode:    "SA",
 					CodeListIdentificationCode:    "",
@@ -386,37 +386,37 @@ func TestUnmarshalOrder(t *testing.T) {
 				ItemNumberIdentificationConditionalThree: segments.ItemNumberIdentification{},
 				ItemNumberIdentificationConditionalFour:  segments.ItemNumberIdentification{},
 			},
-			ItemDescription:     segments.ItemDescription{
+			ItemDescription: segments.ItemDescription{
 				DescriptionFormatCode: "F",
-				Description:           segments.Description{Description:"Item descrition"},
+				Description:           segments.Description{Description: "Item descrition"},
 			},
-			Quantity:            segments.Quantity{QuantityDetails:segments.QuantityDetails{
+			Quantity: segments.Quantity{QuantityDetails: segments.QuantityDetails{
 				QuantityTypeCodeQualifier: "21",
 				Quantity:                  "1",
 				MeasurementUnitCode:       "PCE",
 			}},
-			PriceInformation:    segments.PriceInformation{
+			PriceInformation: segments.PriceInformation{
 				PriceCodeQualifier:  "AAA",
 				PriceAmount:         "20.12346",
 				UnitPriceBasisValue: "",
 				MeasurementUnitCode: "",
 			},
 		}},
-		SectionControl:         segments.SectionControl{SectionIdentification:"S"},
-		ControlTotal:           []segments.ControlTotal{segments.ControlTotal{
+		SectionControl: segments.SectionControl{SectionIdentification: "S"},
+		ControlTotal: []segments.ControlTotal{{
 			ControlTotalTypeCodeQualifier: "1",
 			ControlTotalQuantity:          "2",
 			MeasurementUnitcode:           "",
-		}, segments.ControlTotal{
+		}, {
 			ControlTotalTypeCodeQualifier: "2",
 			ControlTotalQuantity:          "2",
 			MeasurementUnitcode:           "",
 		}},
-		MessageTrailer:         segments.MessageTrailer{
+		MessageTrailer: segments.MessageTrailer{
 			NumberOfSegmentsInMessage: "29",
 			MessageReferenceNumber:    "1",
 		},
-		InterchangeTrailer:     segments.InterchangeTrailer{
+		InterchangeTrailer: segments.InterchangeTrailer{
 			InterchangeControlCount:     "1",
 			InterchangeControlReference: "ORD12345678",
 		},
@@ -427,7 +427,7 @@ func TestUnmarshalOrder(t *testing.T) {
 		want    *model.OrderMessage
 		wantErr bool
 	}{
-		{name:"Testorder", args:args{messageSegments:p.Segments}, want:&orderWant, wantErr:false},
+		{name: "Testorder", args: args{messageSegments: p.Segments}, want: &orderWant, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

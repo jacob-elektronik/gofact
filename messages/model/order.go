@@ -57,5 +57,3 @@ type Item struct {
 	Quantity            segments.Quantity
 	PriceInformation    segments.PriceInformation
 }
-
-
