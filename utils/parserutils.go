@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/segment/types"
+	"github.com/jacob-elektronik/gofact/segment/types"
 )
 
 const SubSetDefault = "edifact"

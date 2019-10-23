@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
-	"igitlab.jacob.de/ftomasetti/gofact/messages/parse"
-	"igitlab.jacob.de/ftomasetti/gofact/segment"
-	"igitlab.jacob.de/ftomasetti/gofact/segment/types"
+	"github.com/jacob-elektronik/gofact/messages/model"
+	"github.com/jacob-elektronik/gofact/messages/parse"
+	"github.com/jacob-elektronik/gofact/segment"
+	"github.com/jacob-elektronik/gofact/segment/types"
 )
 
 const (

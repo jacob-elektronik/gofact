@@ -1,7 +1,7 @@
 package model
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/messages/model/segments"
+	"github.com/jacob-elektronik/gofact/messages/model/segments"
 )
 
 // EDIfact order message implemenatation. Not all segments are implemented yet.

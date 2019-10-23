@@ -1,10 +1,10 @@
 package lexer
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/editoken"
-	"igitlab.jacob.de/ftomasetti/gofact/editoken/types"
-	"igitlab.jacob.de/ftomasetti/gofact/reader"
-	"igitlab.jacob.de/ftomasetti/gofact/utils"
+	"github.com/jacob-elektronik/gofact/editoken"
+	"github.com/jacob-elektronik/gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/reader"
+	"github.com/jacob-elektronik/gofact/utils"
 )
 
 // Lexer struct ...

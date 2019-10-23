@@ -2,12 +2,12 @@ package parser
 
 import (
 	"errors"
-	"igitlab.jacob.de/ftomasetti/gofact/editoken"
-	tokenTypes "igitlab.jacob.de/ftomasetti/gofact/editoken/types"
-	"igitlab.jacob.de/ftomasetti/gofact/lexer"
-	"igitlab.jacob.de/ftomasetti/gofact/segment"
-	segmentTypes "igitlab.jacob.de/ftomasetti/gofact/segment/types"
-	"igitlab.jacob.de/ftomasetti/gofact/utils"
+	"github.com/jacob-elektronik/gofact/editoken"
+	tokenTypes "github.com/jacob-elektronik/gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/lexer"
+	"github.com/jacob-elektronik/gofact/segment"
+	segmentTypes "github.com/jacob-elektronik/gofact/segment/types"
+	"github.com/jacob-elektronik/gofact/utils"
 	"strconv"
 )
 

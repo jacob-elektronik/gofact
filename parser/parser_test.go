@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/utils"
+	"github.com/jacob-elektronik/gofact/utils"
 	"reflect"
 	"testing"
 )

@@ -1,9 +1,9 @@
 package parse
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
-	"igitlab.jacob.de/ftomasetti/gofact/messages/model/segments"
-	"igitlab.jacob.de/ftomasetti/gofact/segment"
+	"github.com/jacob-elektronik/gofact/messages/model"
+	"github.com/jacob-elektronik/gofact/messages/model/segments"
+	"github.com/jacob-elektronik/gofact/segment"
 	"strings"
 )
 
@@ -24,8 +24,8 @@ func GetUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTrai
 func GetUNT(s segment.Segment, elementDelimiter string) segments.MessageTrailer {
 	unt := segments.MessageTrailer{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
-	for idx, component := range components {
-		switch idx {
+	for elementIDX, component := range components {
+		switch elementIDX {
 		case 0:
 			unt.NumberOfSegmentsInMessage = component
 		case 1:
@@ -38,8 +38,8 @@ func GetUNT(s segment.Segment, elementDelimiter string) segments.MessageTrailer 
 func GetCNT(s segment.Segment, componentDelimiter string) segments.ControlTotal {
 	cnt := segments.ControlTotal{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
-	for idx, component := range components {
-		switch idx {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			cnt.ControlTotalTypeCodeQualifier = component
 		case 1:
@@ -60,8 +60,8 @@ func GetUNS(s segment.Segment) segments.SectionControl {
 func GetPRI(s segment.Segment, componentDelimiter string) segments.PriceInformation {
 	pri := segments.PriceInformation{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
-	for idx, component := range components {
-		switch idx {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			pri.PriceCodeQualifier = component
 		case 1:
@@ -74,8 +74,8 @@ func GetPRI(s segment.Segment, componentDelimiter string) segments.PriceInformat
 func GetQTY(s segment.Segment, componentDelimiter string) segments.Quantity {
 	qty := segments.Quantity{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
-	for idx, component := range components {
-		switch idx {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			qty.QuantityDetails.QuantityTypeCodeQualifier = component
 		case 1:
@@ -90,14 +90,14 @@ func GetQTY(s segment.Segment, componentDelimiter string) segments.Quantity {
 func GetIMD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ItemDescription {
 	imd := segments.ItemDescription{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			imd.DescriptionFormatCode = element
 		case 2:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 3:
 					imd.Description.Description = component
 				}
@@ -110,14 +110,14 @@ func GetIMD(s segment.Segment, elementDelimiter string, componentDelimiter strin
 func GetPIA(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.AdditionalProductID {
 	pia := segments.AdditionalProductID{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			pia.ProductIdentifierCodeQualifier = element
 		case 1:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					pia.ItemNumberIdentification.ItemIdentifier = component
 				case 1:
@@ -136,16 +136,16 @@ func GetPIA(s segment.Segment, elementDelimiter string, componentDelimiter strin
 func GetLIN(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.LineItem {
 	lin := segments.LineItem{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			lin.LineItemIdentifier = element
 		case 1:
 			lin.ActionCode = element
 		case 2:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					lin.ItemNumberIdentification.ItemIdentifier = component
 				case 1:
@@ -158,8 +158,8 @@ func GetLIN(s segment.Segment, elementDelimiter string, componentDelimiter strin
 			}
 		case 3:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					lin.SublineInformation.SublineIndicatorCode = component
 				case 1:
@@ -178,8 +178,8 @@ func GetLIN(s segment.Segment, elementDelimiter string, componentDelimiter strin
 func GetCUX(s segment.Segment, componentDelimiter string) segments.Currencies {
 	cux := segments.Currencies{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
-	for i, component := range components {
-		switch i {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			cux.CurrencyUsageCodeQualifier = component
 		case 1:
@@ -196,14 +196,14 @@ func GetCUX(s segment.Segment, componentDelimiter string) segments.Currencies {
 func GetCAT(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.ContactInformation {
 	cat := segments.ContactInformation{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			cat.ContactFunctionCode = element
 		case 1:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					cat.ContactDetails.ContactIdentifier = component
 				case 1:
@@ -219,8 +219,8 @@ func GetCOM(s segment.Segment, componentDelimiter string) segments.Communication
 	com := segments.CommunicationContact{}
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 
-	for i, component := range components {
-		switch i {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			com.CommunicationAddressIdentifier = component
 		case 1:
@@ -234,14 +234,14 @@ func GetCOM(s segment.Segment, componentDelimiter string) segments.Communication
 func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.NameAddress {
 	n := segments.NameAddress{}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			n.PartyFunctionCodeQualifier = element
 		case 1:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					n.PartyIdenNameAndAddressDescriptiontificationDetails.PartyIdentifier = component
 				case 2:
@@ -252,8 +252,8 @@ func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter strin
 			// not implemented
 		case 3:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					n.PartyName.PartyName = component
 				case 1:
@@ -272,8 +272,8 @@ func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter strin
 			}
 		case 4:
 			components := strings.Split(element, componentDelimiter)
-			for i, component := range components {
-				switch i {
+			for componentIDX, component := range components {
+				switch componentIDX {
 				case 0:
 					n.Street.Street = component
 				case 1:
@@ -300,8 +300,8 @@ func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber 
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	rff := segments.Reference{}
 	refNum := model.ReferenceNumber{}
-	for idx, component := range components {
-		switch idx {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			rff.ReferenceCodeQualifier = component
 		case 1:
@@ -315,8 +315,8 @@ func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber 
 func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePeriod {
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	dtp := segments.DateTimePeriod{}
-	for idx, component := range components {
-		switch idx {
+	for componentIDX, component := range components {
+		switch componentIDX {
 		case 0:
 			dtp.DTMFunctionCode = component
 		case 1:
@@ -331,8 +331,8 @@ func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePerio
 func GetBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMessage {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	bgm := segments.BeginningOfMessage{}
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			bgm.MessageName.DocumentNameCode = element
 		case 1:
@@ -345,8 +345,8 @@ func GetBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMess
 func GetUNH(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.MessageHeader {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	header := segments.MessageHeader{}
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			header.MessageReferenceNumber = element
 		case 1:
@@ -364,8 +364,8 @@ func GetUNH(s segment.Segment, elementDelimiter string, componentDelimiter strin
 func GetUNB(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.InterchangeHeader {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	header := segments.InterchangeHeader{}
-	for idx, element := range elements {
-		switch idx {
+	for elementIDX, element := range elements {
+		switch elementIDX {
 		case 0:
 			components := strings.Split(element, componentDelimiter)
 			header.SyntaxIdentifier.SyntaxIdentifier = components[0]

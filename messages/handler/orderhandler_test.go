@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"igitlab.jacob.de/ftomasetti/gofact/messages/model"
-	"igitlab.jacob.de/ftomasetti/gofact/messages/model/segments"
-	"igitlab.jacob.de/ftomasetti/gofact/parser"
-	"igitlab.jacob.de/ftomasetti/gofact/segment"
+	"github.com/jacob-elektronik/gofact/messages/model"
+	"github.com/jacob-elektronik/gofact/messages/model/segments"
+	"github.com/jacob-elektronik/gofact/parser"
+	"github.com/jacob-elektronik/gofact/segment"
 	"reflect"
 	"testing"
 )

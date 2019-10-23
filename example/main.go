@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"igitlab.jacob.de/ftomasetti/gofact/messages/handler"
-	"igitlab.jacob.de/ftomasetti/gofact/parser"
+	"github.com/jacob-elektronik/gofact/messages/handler"
+	"github.com/jacob-elektronik/gofact/parser"
 	"os"
 	"text/tabwriter"
 )
