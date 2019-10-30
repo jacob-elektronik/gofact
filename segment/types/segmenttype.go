@@ -2,7 +2,11 @@ package types
 
 // segment type
 const (
-	ServiceSegment = iota
+	Unknown = iota
+	UNA
+	UNB
+	UNG
+	UNH
 	AAI
 	ADI
 	ADR
@@ -238,10 +242,10 @@ const (
 	UGT
 	UIH
 	UIT
-	UNH
-	UNS
 	UNT
+	UNE
+	UNS
+	UNZ
 	VEH
 	VLI
-	Unknown
 )

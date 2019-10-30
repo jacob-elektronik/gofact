@@ -67,7 +67,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		if len(p.Segments) > 0 {
 			return errors.New("Parser error, ServiceStringAdvice(UNA) on wrong position | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		seg.SType = segmentTypes.ServiceSegment
+		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	case tokenTypes.ControlChars:
 		if p.lastTokenType != tokenTypes.ServiceStringAdvice {
@@ -81,7 +81,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 				return err
 			}
 			if p.lastTokenType == -1 || p.lastTokenType == tokenTypes.ControlChars {
-				seg.SType = segmentTypes.ServiceSegment
+				seg.SType = p.segmentTypeForSeq(t.TokenValue)
 				seg.Tag = t.TokenValue
 			} else {
 				return errors.New("Parser error, InterchangeHeader only after ControlChars ord at first line | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
@@ -91,7 +91,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		if err := p.checkServiceSegmentSyntax(&t); err != nil {
 			return err
 		}
-		seg.SType = segmentTypes.ServiceSegment
+		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	case tokenTypes.ElementDelimiter, tokenTypes.UserDataSegments, tokenTypes.ComponentDelimiter, tokenTypes.SegmentTerminator:
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
@@ -109,7 +109,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		if p.lastTokenType != tokenTypes.SegmentTerminator {
 			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
-		seg.SType = segmentTypes.ServiceSegment
+		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	case tokenTypes.EOF:
 		if p.messageHeaderOpen {
@@ -121,11 +121,12 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		if p.interChangeHeaderOpen {
 			return errors.New("Parser error, Interchange Header Head not closed | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
+		return nil
 	default:
 		if err := p.checkServiceSegmentSyntax(&t); err != nil {
 			return err
 		}
-		seg.SType = segmentTypes.ServiceSegment
+		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	}
 	if p.lastTokenType != -1 && p.lastTokenType != tokenTypes.ServiceStringAdvice &&

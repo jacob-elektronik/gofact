@@ -3,3 +3,5 @@
 cpu.prof
 gofact
 testcover.out
+example/edi_messages/*
+go.sum
