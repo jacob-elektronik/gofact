@@ -28,11 +28,6 @@ func (r *EdiReader) ReadFile(ch chan<- []byte) {
 	for {
 		n, err := r.BufReader.Read(r.buf)
 
-		if n > 0 {
-			ch <- append([]byte{}, r.buf[:n]...)
-
-		}
-
 		if err != nil {
 			log.Printf("read %d bytes: %v", n, err)
 			err = r.file.Close()
@@ -50,5 +45,11 @@ func (r *EdiReader) ReadFile(ch chan<- []byte) {
 			}
 			break
 		}
+
+		if n > 0 {
+			ch <- append([]byte{}, r.buf[:n]...)
+
+		}
+
 	}
 }
