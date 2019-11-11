@@ -37,6 +37,10 @@ func (r *EdiReader) ReadFile(ch chan<- []byte) {
 			break
 		}
 
+		if n > 0 {
+			ch <- append([]byte{}, r.buf[:n]...)
+		}
+
 		if err == io.EOF {
 			close(ch)
 			err = r.file.Close()
@@ -46,10 +50,7 @@ func (r *EdiReader) ReadFile(ch chan<- []byte) {
 			break
 		}
 
-		if n > 0 {
-			ch <- append([]byte{}, r.buf[:n]...)
 
-		}
 
 	}
 }
