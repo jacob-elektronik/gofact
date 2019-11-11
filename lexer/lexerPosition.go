@@ -22,10 +22,7 @@ func NewLexerPosition() *LexerPosition {
 func (lp *LexerPosition)MoveToNext(msgBuffer []byte) bool {
 	lp.IncrCol()
 	lp.IncrPos()
-	if lp.SetPointer(msgBuffer) {
-		return true
-	}
-	return false
+	return lp.SetPointer(msgBuffer)
 }
 
 //LexerPosition.NextLine
@@ -33,10 +30,7 @@ func (lp *LexerPosition)NextLine(msgBuffer []byte) bool {
 	lp.ResetColumn()
 	lp.IncrPos()
 	lp.IncrLine()
-	if lp.SetPointer(msgBuffer) {
-		return true
-	}
-	return false
+	return lp.SetPointer(msgBuffer)
 }
 
 //LexerPosition.IncrPos
