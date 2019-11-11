@@ -33,8 +33,8 @@ func (r *EdiReader) ReadFile(ch chan<- []byte) {
 
 		}
 
-		if err != nil {
-			log.Printf("read %d bytes: %v", n, err)
+		if err == io.EOF {
+			close(ch)
 			err = r.file.Close()
 			if err != nil {
 				log.Printf("read %d bytes: %v", n, err)
@@ -42,8 +42,8 @@ func (r *EdiReader) ReadFile(ch chan<- []byte) {
 			break
 		}
 
-		if err == io.EOF {
-			close(ch)
+		if err != nil {
+			log.Printf("read %d bytes: %v", n, err)
 			err = r.file.Close()
 			if err != nil {
 				log.Printf("read %d bytes: %v", n, err)
