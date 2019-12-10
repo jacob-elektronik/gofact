@@ -227,7 +227,6 @@ func GetCOM(s segment.Segment, componentDelimiter string) segments.Communication
 			com.CommunicationAddressCodeQualifier = component
 		}
 	}
-
 	return com
 }
 
@@ -328,6 +327,66 @@ func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePerio
 	return dtp
 }
 
+func GetUNG(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.GroupHeader {
+	ung := segments.GroupHeader{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			ung.MessageGroupIdentification = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.ApplicationSenderIdentification.ApplicationSenderIdentification = component
+				case 1:
+					ung.ApplicationSenderIdentification.IdentificationCodeQualifier = component
+				}
+			}
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.ApplicationRecipientIdentification.ApplicationRecipientIdentification = component
+				case 1:
+					ung.ApplicationRecipientIdentification.IdentificationCodeQualifier = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.DateAndTimeOfPreparation.Date = component
+				case 1:
+					ung.DateAndTimeOfPreparation.Time = component
+				}
+			}
+		case 4:
+			ung.GroupReferenceNumberm = element
+		case 5:
+			ung.ControllingAgency = element
+		case 6:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.MessageVersion.MessageVersionNumber = component
+				case 1:
+					ung.MessageVersion.MessageReleaseNumber = component
+				case 2:
+					ung.MessageVersion.AssociationAssignedCode = component
+				}
+			}
+		case 7:
+			ung.ApplicationPassword = element
+		}
+	}
+	return ung
+}
+
 func GetBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMessage {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	bgm := segments.BeginningOfMessage{}
@@ -388,4 +447,8 @@ func GetUNB(s segment.Segment, elementDelimiter string, componentDelimiter strin
 	}
 
 	return header
+}
+
+func getTDT(s segment.Segment, elementDelimiter string, componentDelimiter string) {
+
 }

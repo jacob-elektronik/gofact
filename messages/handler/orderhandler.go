@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/jacob-elektronik/gofact/messages/model"
 	"github.com/jacob-elektronik/gofact/messages/parse"
 	"github.com/jacob-elektronik/gofact/segment"
 	"github.com/jacob-elektronik/gofact/segment/types"
+	"github.com/jacob-elektronik/gofact/utils"
 )
 
 const (
@@ -15,6 +17,8 @@ const (
 	StateSegmentGroupThree
 	StateSegmentGroupFive
 	StateSegmentGroupSeven
+	StateSegmentGroupTen
+	StateSegmentGroupTwentyFive
 	StateSegmentGroupTwentyNine
 	StateSegmentGroupThirtyThree
 	StateSummarySection
@@ -29,11 +33,13 @@ var ediFactSegments []segment.Segment
 var currentSegmentIndex int
 var currentLineItemIndex int
 
-func UnmarshalOrder(messageSegments []segment.Segment) (*model.OrderMessage, error) {
+func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes) (*model.OrderMessage, error) {
 	order := &model.OrderMessage{}
 	ediFactSegments = messageSegments
-	componentDelimiter := ":"
-	elementDelimiter := "+"
+	componentDelimiter := string(ctrlBytes.ComponentDelimiter)
+	elementDelimiter := string(ctrlBytes.ElementDelimiter)
+	fmt.Print(componentDelimiter)
+	fmt.Println(elementDelimiter)
 	currentPartyIndex = 0
 	currentLineItemIndex = 0
 	currentReferenceNumberIndex = 0
@@ -42,7 +48,7 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*model.OrderMessage, err
 		currentSegmentIndex = i
 		switch currentState {
 		case StateStart:
-			componentDelimiter, elementDelimiter = handleStateStart(ediFactSegment, componentDelimiter, elementDelimiter, order)
+			handleStateStart(ediFactSegment, componentDelimiter, elementDelimiter, order)
 			setNextState()
 		case StateHeaderSection:
 			handleStateHeaderSection(ediFactSegment, order, elementDelimiter, componentDelimiter)
@@ -62,6 +68,12 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*model.OrderMessage, err
 		case StateSegmentGroupSeven:
 			handleStateSegmentGroupSeven(ediFactSegment, order, componentDelimiter)
 			setNextState()
+		case StateSegmentGroupTen:
+			handleStateSegmentGroupTen(ediFactSegment, order, elementDelimiter, componentDelimiter)
+			setNextState()
+		case StateSegmentGroupTwentyFive:
+			handleStateSegmentGroupTwentyFive(ediFactSegment, order, elementDelimiter, componentDelimiter)
+			setNextState()
 		case StateSegmentGroupTwentyNine:
 			handleStateSegmentGroupTwentyNine(ediFactSegment, elementDelimiter, componentDelimiter, order)
 			setNextState()
@@ -79,6 +91,21 @@ func UnmarshalOrder(messageSegments []segment.Segment) (*model.OrderMessage, err
 		}
 	}
 	return order, nil
+}
+
+func handleStateSegmentGroupTwentyFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.TDT:
+
+	}
+}
+
+func handleStateSegmentGroupTen(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.RCS:
+	case types.RFF:
+
+	}
 }
 
 func handleStateEnd(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
@@ -140,9 +167,9 @@ func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *model.O
 func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.CTA:
-		order.Parties[currentPartyIndex].ContactDetails.ContactInformation = parse.GetCAT(ediFactSegment, elementDelimiter, componentDelimiter)
+		order.Parties[currentPartyIndex].ContactDetails.ContactInformation = append(order.Parties[currentPartyIndex].ContactDetails.ContactInformation, parse.GetCAT(ediFactSegment, elementDelimiter, componentDelimiter))
 	case types.COM:
-		order.Parties[currentPartyIndex].ContactDetails.CommunicationContact = parse.GetCOM(ediFactSegment, componentDelimiter)
+		order.Parties[currentPartyIndex].ContactDetails.CommunicationContact = append(order.Parties[currentPartyIndex].ContactDetails.CommunicationContact, parse.GetCOM(ediFactSegment, componentDelimiter))
 	}
 }
 
@@ -187,10 +214,11 @@ func handleStateHeaderSection(ediFactSegment segment.Segment, order *model.Order
 func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *model.OrderMessage) (string, string) {
 	switch ediFactSegment.SType {
 	case types.UNA:
-		componentDelimiter = string(ediFactSegment.Data[0])
-		elementDelimiter = string(ediFactSegment.Data[1])
+		break
 	case types.UNB:
 		order.InterchangeHeader = parse.GetUNB(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.UNG:
+		order.GroupHeader = parse.GetUNG(ediFactSegment, elementDelimiter, componentDelimiter)
 	}
 	return componentDelimiter, elementDelimiter
 }
@@ -203,7 +231,7 @@ func setNextState() {
 	switch currentState {
 	case StateStart:
 		switch nextSegmentTag() {
-		case types.UNB:
+		case types.UNB, types.UNG:
 			currentState = StateStart
 		case types.UNH, types.BGM, types.DTM:
 			currentState = StateHeaderSection
@@ -239,7 +267,7 @@ func setNextState() {
 		switch nextSegmentTag() {
 		case types.NAD:
 			currentState = StateSegmentGroupTwo
-		case types.CTA:
+		case types.CTA, types.COM:
 			currentState = StateSegmentGroupFive
 		default:
 			currentState = StateSegmentGroupSeven
@@ -248,7 +276,7 @@ func setNextState() {
 		switch nextSegmentTag() {
 		case types.NAD:
 			currentState = StateSegmentGroupTwo
-		case types.COM:
+		case types.COM, types.CTA:
 			currentState = StateSegmentGroupFive
 		default:
 			currentState = StateSegmentGroupSeven

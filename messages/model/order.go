@@ -12,6 +12,7 @@ import (
 type OrderMessage struct {
 	InterchangeHeader      segments.InterchangeHeader
 	MessageHeader          segments.MessageHeader
+	GroupHeader            segments.GroupHeader
 	BeginningOfMessage     segments.BeginningOfMessage
 	DateTimePeriod         segments.DateTimePeriod
 	ReferenceNumbersOrders []ReferenceNumber
@@ -39,8 +40,8 @@ type Party struct {
 
 // Segment group 5
 type ContactDetails struct {
-	ContactInformation   segments.ContactInformation
-	CommunicationContact segments.CommunicationContact
+	ContactInformation   []segments.ContactInformation
+	CommunicationContact []segments.CommunicationContact
 }
 
 // Segment group 7
