@@ -21,6 +21,7 @@ const (
 	StateSegmentGroupTwentyFive
 	StateSegmentGroupTwentyNine
 	StateSegmentGroupThirtyThree
+	StateSegmentGroupFiftySeven
 	StateSummarySection
 	StateSegmentGroupSixtyThree
 	StateEnd
@@ -79,6 +80,9 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 			setNextState()
 		case StateSegmentGroupThirtyThree:
 			handleStateSegmentGroupThirtyThree(ediFactSegment, order, componentDelimiter)
+			setNextState()
+		case StateSegmentGroupFiftySeven:
+			handleStateSegmentGroupFiftySeven(ediFactSegment, order, elementDelimiter, componentDelimiter)
 			setNextState()
 		case StateSummarySection:
 			handleStateSummarySection(ediFactSegment, order, componentDelimiter)
@@ -139,8 +143,18 @@ func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, order *m
 	switch ediFactSegment.SType {
 	case types.PRI:
 		order.Items[currentLineItemIndex].PriceInformation = parse.GetPRI(ediFactSegment, componentDelimiter)
+	case types.CUX:
+		order.Items[currentLineItemIndex].Currencies = parse.GetCUX(ediFactSegment, componentDelimiter)
 	}
 }
+
+func handleStateSegmentGroupFiftySeven(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.RCS:
+		order.Items[currentLineItemIndex].RequirementsAndConditions = append(order.Items[currentLineItemIndex].RequirementsAndConditions, parse.GetRCS(ediFactSegment, elementDelimiter, componentDelimiter))
+	}
+}
+
 
 func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
 	switch ediFactSegment.SType {
@@ -155,6 +169,8 @@ func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDe
 		order.Items[currentLineItemIndex].ItemDescription = parse.GetIMD(ediFactSegment, elementDelimiter, componentDelimiter)
 	case types.QTY:
 		order.Items[currentLineItemIndex].Quantity = parse.GetQTY(ediFactSegment, componentDelimiter)
+	case types.DTM:
+		order.Items[currentLineItemIndex].DateTimePeriod = append(order.Items[currentLineItemIndex].DateTimePeriod, parse.GetDTM(ediFactSegment, componentDelimiter))
 	}
 }
 
@@ -320,6 +336,21 @@ func setNextState() {
 		}
 	case StateSegmentGroupThirtyThree:
 		switch nextSegmentTag() {
+		case types.CUX:
+			currentState = StateSegmentGroupThirtyThree
+		case types.RCS:
+			currentState = StateSegmentGroupFiftySeven
+		case types.UNS:
+			currentState = StateSummarySection
+		case types.LIN:
+			currentState = StateSegmentGroupTwentyNine
+		default:
+			currentState = StateSummarySection
+		}
+	case StateSegmentGroupFiftySeven:
+		switch nextSegmentTag() {
+		case types.RCS:
+			currentState = StateSegmentGroupFiftySeven
 		case types.UNS:
 			currentState = StateSummarySection
 		case types.LIN:

@@ -65,5 +65,11 @@ type Item struct {
 	AdditionalProductID segments.AdditionalProductID
 	ItemDescription     segments.ItemDescription
 	Quantity            segments.Quantity
+	DateTimePeriod 		[]segments.DateTimePeriod
+	// Segment group 33
 	PriceInformation    segments.PriceInformation
+	Currencies     		segments.Currencies
+	// Segment group 57
+	RequirementsAndConditions []segments.RequirementsAndConditions
+
 }
