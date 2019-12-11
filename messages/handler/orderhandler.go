@@ -93,18 +93,21 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 	return order, nil
 }
 
-func handleStateSegmentGroupTwentyFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+func handleStateSegmentGroupTen(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.TDT:
-
+		order.TransportDetails = parse.GetTDT(ediFactSegment, elementDelimiter, componentDelimiter)
 	}
 }
 
-func handleStateSegmentGroupTen(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+func handleStateSegmentGroupTwentyFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.RCS:
+		order.Requirements = append(order.Requirements, model.Requirements{
+			RequirementsAndConditions: parse.GetRCS(ediFactSegment, elementDelimiter, componentDelimiter),
+		})
 	case types.RFF:
-
+		order.Requirements[len(order.Requirements)-1].Reference = parse.GetRFF(ediFactSegment, componentDelimiter)
 	}
 }
 
@@ -176,7 +179,9 @@ func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *model.Or
 func handleStateSegmentGroupThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.RFF:
-		order.Parties[currentPartyIndex].ReferenceNumbersParties = parse.GetRFF(ediFactSegment, componentDelimiter)
+		order.Parties[currentPartyIndex].ReferenceNumbersParties = model.ReferenceNumber{
+			Reference:      parse.GetRFF(ediFactSegment, componentDelimiter),
+		}
 	}
 }
 
@@ -193,7 +198,9 @@ func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter
 func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.RFF:
-		order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, parse.GetRFF(ediFactSegment, componentDelimiter))
+		order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, model.ReferenceNumber{
+			Reference: parse.GetRFF(ediFactSegment, componentDelimiter),
+		})
 		currentReferenceNumberIndex = len(order.ReferenceNumbersOrders) - 1
 	case types.DTM:
 		order.ReferenceNumbersOrders[currentReferenceNumberIndex].DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
@@ -285,6 +292,22 @@ func setNextState() {
 		switch nextSegmentTag() {
 		case types.DTM:
 			currentState = StateSegmentGroupSeven
+		case types.TDT:
+			currentState = StateSegmentGroupTen
+		default:
+			currentState = StateSegmentGroupTwentyNine
+		}
+	case StateSegmentGroupTen:
+		switch nextSegmentTag() {
+		case types.RCS:
+			currentState = StateSegmentGroupTwentyFive
+		default:
+			currentState = StateSegmentGroupTwentyNine
+		}
+	case StateSegmentGroupTwentyFive:
+		switch nextSegmentTag() {
+		case types.RFF, types.RCS:
+			currentState = StateSegmentGroupTwentyFive
 		default:
 			currentState = StateSegmentGroupTwentyNine
 		}

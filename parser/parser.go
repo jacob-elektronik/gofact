@@ -22,6 +22,7 @@ type Parser struct {
 	lastTokenType             int
 	subSet                    string
 	Tokens                    []editoken.Token
+	CtrlBytes                 utils.CtrlBytes
 }
 
 // NewParser generate a new Parser object
@@ -55,7 +56,7 @@ func (p *Parser) ParseEdiFactMessageConcurrent() error {
 		p.lastTokenType = t.TokenType
 
 	}
-
+	p.CtrlBytes = *ediLexer.CtrlBytes
 	return nil
 }
 

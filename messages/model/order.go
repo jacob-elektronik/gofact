@@ -18,6 +18,8 @@ type OrderMessage struct {
 	ReferenceNumbersOrders []ReferenceNumber
 	Parties                []Party
 	Currencies             Currencies
+	TransportDetails       segments.DetailsOfTransport
+	Requirements           []Requirements
 	Items                  []Item
 	SectionControl         segments.SectionControl
 	ControlTotal           []segments.ControlTotal
@@ -48,6 +50,13 @@ type ContactDetails struct {
 type Currencies struct {
 	Currencies     segments.Currencies
 	DateTimePeriod segments.DateTimePeriod
+}
+
+
+// Segment group 25
+type Requirements struct {
+	RequirementsAndConditions segments.RequirementsAndConditions
+	Reference                 segments.Reference
 }
 
 // Segment group 29

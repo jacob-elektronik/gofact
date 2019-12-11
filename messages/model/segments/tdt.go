@@ -1,6 +1,6 @@
 package segments
 
-type TransportInformation struct {
+type DetailsOfTransport struct {
 	TransportStageCodeQualifiier         string
 	MeansOfTransportJourneyIdentifier    string
 	ModeOfTransport                      ModeOfTransport

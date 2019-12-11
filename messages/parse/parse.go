@@ -295,7 +295,7 @@ func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter strin
 	return n
 }
 
-func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber {
+func GetRFF(s segment.Segment, componentDelimiter string) segments.Reference {
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	rff := segments.Reference{}
 	refNum := model.ReferenceNumber{}
@@ -308,7 +308,7 @@ func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber 
 		}
 	}
 	refNum.Reference = rff
-	return refNum
+	return rff
 }
 
 func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePeriod {
@@ -449,6 +449,101 @@ func GetUNB(s segment.Segment, elementDelimiter string, componentDelimiter strin
 	return header
 }
 
-func getTDT(s segment.Segment, elementDelimiter string, componentDelimiter string) {
+func GetTDT(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.DetailsOfTransport {
+	tdt := segments.DetailsOfTransport{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			tdt.TransportStageCodeQualifiier = element
+		case 1:
+			tdt.MeansOfTransportJourneyIdentifier = element
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					tdt.ModeOfTransport.TransportModeNameCode = component
+				case 1:
+					tdt.ModeOfTransport.TransportModeName = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					tdt.Carrier.CarrierIdentifier = component
+				case 1:
+					tdt.Carrier.CodeListIdentificationCode = component
+				case 2:
+					tdt.Carrier.CodeListResponsibleAgencyCode = component
+				case 3:
+					tdt.Carrier.CarrierName = component
+				}
+			}
+		case 4:
+			tdt.TransitDirectionIIndicatorCode = element
+		case 5:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+					case 0:
+						tdt.ExcessTransportationInformation.ExcessTransportationReasonCode = component
+					case 1:
+						tdt.ExcessTransportationInformation.ExcessTransportationResponsibilityCode = component
+					case 2:
+						tdt.ExcessTransportationInformation.CustomerShipmentAuthorisationIdentifier = component
+					}
+				}
+		case 6:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					tdt.TransportIdentification.TransportMeansIdentificationNameidentifier = component
+				case 1:
+					tdt.TransportIdentification.CodeListIdentificationCode = component
+				case 2:
+					tdt.TransportIdentification.CodeListResponsibleAgencyCode = component
+				case 3:
+					tdt.TransportIdentification.TransportMeansIdentificationName = component
+				case 4:
+					tdt.TransportIdentification.TransportMeansNationalityCode = component
+				}
+			}
+		}
+	}
+	return tdt
+}
 
+func GetRCS(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.RequirementsAndConditions {
+	rcs := segments.RequirementsAndConditions{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			rcs.SectorAreaIdentificationCodeQualifier = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					rcs.RequirementsIdentification.RequirementOrConditionDescriptionIdentifier = component
+				case 1:
+					rcs.RequirementsIdentification.CodeListIdentificationCode = component
+				case 2:
+					rcs.RequirementsIdentification.CodeListResponsibleAgencyCode = component
+				case 3:
+					rcs.RequirementsIdentification.RequirementOrConditionDescription = component
+				}
+			}
+		case 2:
+			rcs.ActionDescriptionCode = element
+		case 3:
+			rcs.CountryNameCode = element
+
+		}
+	}
+	return rcs
 }
