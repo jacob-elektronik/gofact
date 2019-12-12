@@ -50,7 +50,7 @@ func TestFindControlToken(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = utils.newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	// test all control runes from msg string
 	r := byte(':')
@@ -108,7 +108,7 @@ func TestFindContentToken(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = utils.newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	l.CurrentSeq = []byte("ABCD")
 	if cToken := l.findContentToken(); cToken == nil {
@@ -144,7 +144,7 @@ func TestIsCurrentByteControlByte(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = utils.newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	r := byte('+')
 	l.lexerPosition.CurrentBytePtr = &r
@@ -163,7 +163,7 @@ func TestNextByte(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = utils.newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	l.lexerPosition.CurrentBytePos = 40
 	if !l.nextByte() {

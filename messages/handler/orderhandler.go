@@ -20,6 +20,7 @@ const (
 	StateSegmentGroupTen
 	StateSegmentGroupTwentyFive
 	StateSegmentGroupTwentyNine
+	StateSegmentGroupThirty
 	StateSegmentGroupThirtyThree
 	StateSegmentGroupFiftySeven
 	StateSummarySection
@@ -78,6 +79,9 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 		case StateSegmentGroupTwentyNine:
 			handleStateSegmentGroupTwentyNine(ediFactSegment, elementDelimiter, componentDelimiter, order)
 			setNextState()
+		case StateSegmentGroupThirty:
+			handleStateSegmentGroupThirty(ediFactSegment, elementDelimiter, componentDelimiter, order)
+			setNextState()
 		case StateSegmentGroupThirtyThree:
 			handleStateSegmentGroupThirtyThree(ediFactSegment, order, componentDelimiter)
 			setNextState()
@@ -97,6 +101,84 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 	return order, nil
 }
 
+func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *model.OrderMessage) (string, string) {
+	switch ediFactSegment.SType {
+	case types.UNA:
+		break
+	case types.UNB:
+		order.InterchangeHeader = parse.GetUNB(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.UNG:
+		order.GroupHeader = parse.GetUNG(ediFactSegment, elementDelimiter, componentDelimiter)
+	}
+	return componentDelimiter, elementDelimiter
+}
+
+func handleStateHeaderSection(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.UNH:
+		order.MessageHeader = parse.GetUNH(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.BGM:
+		order.BeginningOfMessage = parse.GetBGM(ediFactSegment, elementDelimiter)
+	case types.DTM:
+		order.DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
+	}
+}
+
+// Segment Group #1
+func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.RFF:
+		order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, model.ReferenceNumber{
+			Reference: parse.GetRFF(ediFactSegment, componentDelimiter),
+		})
+		currentReferenceNumberIndex = len(order.ReferenceNumbersOrders) - 1
+	case types.DTM:
+		order.ReferenceNumbersOrders[currentReferenceNumberIndex].DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
+	}
+}
+
+// Segment Group #2
+func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
+	switch ediFactSegment.SType {
+	case types.NAD:
+		p := model.Party{}
+		p.NameAddress = parse.GetNAD(ediFactSegment, elementDelimiter, componentDelimiter)
+		order.Parties = append(order.Parties, p)
+		currentPartyIndex = len(order.Parties) - 1
+	}
+}
+
+// Segment Group #3
+func handleStateSegmentGroupThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.RFF:
+		order.Parties[currentPartyIndex].ReferenceNumbersParties = model.ReferenceNumber{
+			Reference:      parse.GetRFF(ediFactSegment, componentDelimiter),
+		}
+	}
+}
+
+// Segment Group #5
+func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.CTA:
+		order.Parties[currentPartyIndex].ContactDetails.ContactInformation = append(order.Parties[currentPartyIndex].ContactDetails.ContactInformation, parse.GetCAT(ediFactSegment, elementDelimiter, componentDelimiter))
+	case types.COM:
+		order.Parties[currentPartyIndex].ContactDetails.CommunicationContact = append(order.Parties[currentPartyIndex].ContactDetails.CommunicationContact, parse.GetCOM(ediFactSegment, componentDelimiter))
+	}
+}
+
+// Segment Group #7
+func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.CUX:
+		order.Currencies.Currencies = parse.GetCUX(ediFactSegment, componentDelimiter)
+	case types.DTM:
+		order.Currencies.DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
+	}
+}
+
+// Segment Group #10
 func handleStateSegmentGroupTen(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.TDT:
@@ -104,6 +186,7 @@ func handleStateSegmentGroupTen(ediFactSegment segment.Segment, order *model.Ord
 	}
 }
 
+// Segment Group #25
 func handleStateSegmentGroupTwentyFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
 	case types.RCS:
@@ -115,47 +198,7 @@ func handleStateSegmentGroupTwentyFive(ediFactSegment segment.Segment, order *mo
 	}
 }
 
-func handleStateEnd(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
-	switch ediFactSegment.SType {
-	case types.UNZ:
-		order.InterchangeTrailer = parse.GetUNZ(ediFactSegment, elementDelimiter)
-	}
-}
-
-func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
-	switch ediFactSegment.SType {
-	case types.UNT:
-		order.MessageTrailer = parse.GetUNT(ediFactSegment, elementDelimiter)
-	}
-}
-
-func handleStateSummarySection(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.SType {
-	case types.UNS:
-		order.SectionControl = parse.GetUNS(ediFactSegment)
-	case types.CNT:
-		cnt := parse.GetCNT(ediFactSegment, componentDelimiter)
-		order.ControlTotal = append(order.ControlTotal, cnt)
-	}
-}
-
-func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
-	switch ediFactSegment.SType {
-	case types.PRI:
-		order.Items[currentLineItemIndex].PriceInformation = parse.GetPRI(ediFactSegment, componentDelimiter)
-	case types.CUX:
-		order.Items[currentLineItemIndex].Currencies = parse.GetCUX(ediFactSegment, componentDelimiter)
-	}
-}
-
-func handleStateSegmentGroupFiftySeven(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
-	switch ediFactSegment.SType {
-	case types.RCS:
-		order.Items[currentLineItemIndex].RequirementsAndConditions = append(order.Items[currentLineItemIndex].RequirementsAndConditions, parse.GetRCS(ediFactSegment, elementDelimiter, componentDelimiter))
-	}
-}
-
-
+// Segment Group #29
 func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
 	switch ediFactSegment.SType {
 	case types.LIN:
@@ -171,79 +214,64 @@ func handleStateSegmentGroupTwentyNine(ediFactSegment segment.Segment, elementDe
 		order.Items[currentLineItemIndex].Quantity = parse.GetQTY(ediFactSegment, componentDelimiter)
 	case types.DTM:
 		order.Items[currentLineItemIndex].DateTimePeriod = append(order.Items[currentLineItemIndex].DateTimePeriod, parse.GetDTM(ediFactSegment, componentDelimiter))
+	case types.FTX:
+		order.Items[currentLineItemIndex].FreeText = parse.GetFTX(ediFactSegment, elementDelimiter, componentDelimiter)
 	}
 }
 
-func handleStateSegmentGroupSeven(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+// Segment Group #30
+func handleStateSegmentGroupThirty(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
 	switch ediFactSegment.SType {
+	case types.CCI:
+		order.Items[currentLineItemIndex].CharacteristicClass = parse.GetCCI(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.CAV:
+		order.Items[currentLineItemIndex].CharacteristicValue = parse.GetCAV(ediFactSegment, elementDelimiter, componentDelimiter)
+	}
+}
+
+// Segment Group #33
+func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.PRI:
+		order.Items[currentLineItemIndex].PriceInformation = parse.GetPRI(ediFactSegment, componentDelimiter)
 	case types.CUX:
-		order.Currencies.Currencies = parse.GetCUX(ediFactSegment, componentDelimiter)
-	case types.DTM:
-		order.Currencies.DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
+		order.Items[currentLineItemIndex].Currencies = parse.GetCUX(ediFactSegment, componentDelimiter)
 	}
 }
 
-func handleStateSegmentGroupFive(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
+// Segment Group #57
+func handleStateSegmentGroupFiftySeven(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
-	case types.CTA:
-		order.Parties[currentPartyIndex].ContactDetails.ContactInformation = append(order.Parties[currentPartyIndex].ContactDetails.ContactInformation, parse.GetCAT(ediFactSegment, elementDelimiter, componentDelimiter))
-	case types.COM:
-		order.Parties[currentPartyIndex].ContactDetails.CommunicationContact = append(order.Parties[currentPartyIndex].ContactDetails.CommunicationContact, parse.GetCOM(ediFactSegment, componentDelimiter))
+	case types.RCS:
+		order.Items[currentLineItemIndex].RequirementsAndConditions = append(order.Items[currentLineItemIndex].RequirementsAndConditions, parse.GetRCS(ediFactSegment, elementDelimiter, componentDelimiter))
 	}
 }
 
-func handleStateSegmentGroupThree(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+// Segment Group summary
+func handleStateSummarySection(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
 	switch ediFactSegment.SType {
-	case types.RFF:
-		order.Parties[currentPartyIndex].ReferenceNumbersParties = model.ReferenceNumber{
-			Reference:      parse.GetRFF(ediFactSegment, componentDelimiter),
-		}
+	case types.UNS:
+		order.SectionControl = parse.GetUNS(ediFactSegment)
+	case types.CNT:
+		cnt := parse.GetCNT(ediFactSegment, componentDelimiter)
+		order.ControlTotal = append(order.ControlTotal, cnt)
 	}
 }
 
-func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, order *model.OrderMessage) {
+// Segment Group #63
+func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
 	switch ediFactSegment.SType {
-	case types.NAD:
-		p := model.Party{}
-		p.NameAddress = parse.GetNAD(ediFactSegment, elementDelimiter, componentDelimiter)
-		order.Parties = append(order.Parties, p)
-		currentPartyIndex = len(order.Parties) - 1
+	case types.UNT:
+		order.MessageTrailer = parse.GetUNT(ediFactSegment, elementDelimiter)
 	}
 }
 
-func handleStateSegmentGroupOne(ediFactSegment segment.Segment, order *model.OrderMessage, componentDelimiter string) {
+// Segment Group #End
+func handleStateEnd(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
 	switch ediFactSegment.SType {
-	case types.RFF:
-		order.ReferenceNumbersOrders = append(order.ReferenceNumbersOrders, model.ReferenceNumber{
-			Reference: parse.GetRFF(ediFactSegment, componentDelimiter),
-		})
-		currentReferenceNumberIndex = len(order.ReferenceNumbersOrders) - 1
-	case types.DTM:
-		order.ReferenceNumbersOrders[currentReferenceNumberIndex].DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
+	case types.UNZ:
+		order.InterchangeTrailer = parse.GetUNZ(ediFactSegment, elementDelimiter)
 	}
-}
-
-func handleStateHeaderSection(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string, componentDelimiter string) {
-	switch ediFactSegment.SType {
-	case types.UNH:
-		order.MessageHeader = parse.GetUNH(ediFactSegment, elementDelimiter, componentDelimiter)
-	case types.BGM:
-		order.BeginningOfMessage = parse.GetBGM(ediFactSegment, elementDelimiter)
-	case types.DTM:
-		order.DateTimePeriod = parse.GetDTM(ediFactSegment, componentDelimiter)
-	}
-}
-
-func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *model.OrderMessage) (string, string) {
-	switch ediFactSegment.SType {
-	case types.UNA:
-		break
-	case types.UNB:
-		order.InterchangeHeader = parse.GetUNB(ediFactSegment, elementDelimiter, componentDelimiter)
-	case types.UNG:
-		order.GroupHeader = parse.GetUNG(ediFactSegment, elementDelimiter, componentDelimiter)
-	}
-	return componentDelimiter, elementDelimiter
 }
 
 func nextSegmentTag() int {
@@ -329,9 +357,18 @@ func setNextState() {
 		}
 	case StateSegmentGroupTwentyNine:
 		switch nextSegmentTag() {
-		case types.LIN, types.PIA, types.IMD, types.QTY, types.DTM:
+		case types.LIN, types.PIA, types.IMD, types.QTY, types.DTM, types.FTX:
 			currentState = StateSegmentGroupTwentyNine
+		case types.CCI:
+			currentState = StateSegmentGroupThirty
 		case types.PRI:
+			currentState = StateSegmentGroupThirtyThree
+		}
+	case StateSegmentGroupThirty:
+		switch nextSegmentTag() {
+		case types.CAV:
+			currentState = StateSegmentGroupThirty
+		default:
 			currentState = StateSegmentGroupThirtyThree
 		}
 	case StateSegmentGroupThirtyThree:

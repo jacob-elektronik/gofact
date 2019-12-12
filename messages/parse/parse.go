@@ -542,8 +542,110 @@ func GetRCS(s segment.Segment, elementDelimiter string, componentDelimiter strin
 			rcs.ActionDescriptionCode = element
 		case 3:
 			rcs.CountryNameCode = element
-
 		}
 	}
 	return rcs
+}
+
+func GetFTX(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.FreeText {
+	ftx := segments.FreeText{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			ftx.TextSubjectCodeQualifier = element
+		case 1:
+			ftx.FreeTextFormatCode = element
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ftx.TextReference.FreeTextDescriptionCode = component
+				case 1:
+					ftx.TextReference.CodeListIdentificationCode = component
+				case 2:
+					ftx.TextReference.CodeListResponsibleAgencyCode = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0, 1, 2, 3, 4:
+					ftx.TextLitteral.FreeText = append(ftx.TextLitteral.FreeText, component)
+
+				}
+			}
+		case 4:
+			ftx.LanguageNameCode = element
+		case 5:
+			ftx.FreeTextFormatCode = element
+		}
+	}
+	return ftx
+}
+
+func GetCCI(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.CharacteristicClass {
+	cci := segments.CharacteristicClass{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			cci.ClassTypeCode = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					cci.MeasurementDetails.MeasuredAttributeCode = component
+				case 1:
+					cci.MeasurementDetails.MeasurementSignificanceCode = component
+				case 2:
+					cci.MeasurementDetails.NonDiscreteMeasurementNameCode = component
+				case 3:
+					cci.MeasurementDetails.NonDiscreteMeasurementName = component
+				}
+			}
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					cci.CharacterDescription.CharacteristicDescriptionCode = component
+				case 1:
+					cci.CharacterDescription.CodeListIdentificationCode = component
+				case 2:
+					cci.CharacterDescription.CodeListResponsibleAgencyCode = component
+				case 3, 4:
+					cci.CharacterDescription.CharacteristicDescription = append(cci.CharacterDescription.CharacteristicDescription, component)
+				}
+			}
+		}
+	}
+	return cci
+}
+
+func GetCAV(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.CharacteristicValue {
+	cav := segments.CharacteristicValue{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					cav.CharacteristicValueDescriptionCode = component
+				case 1:
+					cav.CodeListIdentificationCode = component
+				case 2:
+					cav.CodeListResponsibleAgencyCode = component
+				case 3, 4:
+					cav.CharacteristicValueDescription = append(cav.CharacteristicValueDescription, component)
+				}
+			}
+		}
+	}
+	return cav
 }
