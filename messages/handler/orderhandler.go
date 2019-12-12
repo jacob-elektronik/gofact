@@ -24,6 +24,7 @@ const (
 	StateSegmentGroupFiftySeven
 	StateSummarySection
 	StateSegmentGroupSixtyThree
+	StateGroupTrailer
 	StateEnd
 )
 
@@ -90,6 +91,9 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 			setNextState()
 		case StateSegmentGroupSixtyThree:
 			handleStateSegmentGroupSixtyThree(ediFactSegment, order, elementDelimiter)
+			setNextState()
+		case StateGroupTrailer:
+			handleStateGroupTrailer(ediFactSegment, order, elementDelimiter)
 			setNextState()
 		case StateEnd:
 			handleStateEnd(ediFactSegment, order, elementDelimiter)
@@ -264,6 +268,13 @@ func handleStateSegmentGroupSixtyThree(ediFactSegment segment.Segment, order *mo
 	}
 }
 
+func handleStateGroupTrailer(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
+	switch ediFactSegment.SType {
+		case types.UNE:
+			order.Messages[len(order.Messages)-1].GroupTrailer = parse.GetUNE(ediFactSegment, elementDelimiter)
+	}
+}
+
 // Segment Group #End
 func handleStateEnd(ediFactSegment segment.Segment, order *model.OrderMessage, elementDelimiter string) {
 	switch ediFactSegment.SType {
@@ -404,6 +415,13 @@ func setNextState() {
 		switch nextSegmentTag() {
 		case types.UNH:
 			currentState = StateHeaderSection
+		case types.UNE:
+			currentState = StateGroupTrailer
+		default:
+			currentState = StateEnd
+		}
+	case StateGroupTrailer:
+		switch nextSegmentTag() {
 		default:
 			currentState = StateEnd
 		}

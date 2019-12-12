@@ -387,6 +387,20 @@ func GetUNG(s segment.Segment, elementDelimiter string, componentDelimiter strin
 	return ung
 }
 
+func GetUNE(s segment.Segment, elementDelimiter string) segments.GroupTrailer {
+	une := segments.GroupTrailer{}
+	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for idx, component := range components {
+		switch idx {
+		case 0:
+			une.GroupControlCount = component
+		case 1:
+			une.GroupReferenceNumber = component
+		}
+	}
+	return une
+}
+
 func GetBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMessage {
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	bgm := segments.BeginningOfMessage{}

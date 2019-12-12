@@ -28,6 +28,7 @@ type Message struct {
 	SectionControl         segments.SectionControl
 	ControlTotal           []segments.ControlTotal
 	MessageTrailer         segments.MessageTrailer
+	GroupTrailer           segments.GroupTrailer
 	InterchangeTrailer     segments.InterchangeTrailer
 }
 
