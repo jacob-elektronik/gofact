@@ -10,9 +10,13 @@ import (
 // https://service.unece.org/trade/untdid/d11a/trmd/orders_c.htm
 
 type OrderMessage struct {
-	InterchangeHeader      segments.InterchangeHeader
+	InterchangeHeader segments.InterchangeHeader
+	GroupHeader       segments.GroupHeader
+	Messages          []Message
+}
+
+type Message struct {
 	MessageHeader          segments.MessageHeader
-	GroupHeader            segments.GroupHeader
 	BeginningOfMessage     segments.BeginningOfMessage
 	DateTimePeriod         segments.DateTimePeriod
 	ReferenceNumbersOrders []ReferenceNumber
