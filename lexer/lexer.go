@@ -12,7 +12,7 @@ type Lexer struct {
 	EdiFactMessage         []byte
 	EdiReader              *reader.EdiReader
 	CurrentSeq             []byte
-	CtrlBytes              *ctrlBytes
+	CtrlBytes              *utils.CtrlBytes
 	releaseIndicatorActive bool
 	lastTokenType          int
 	segmentTagOpen         bool
@@ -66,7 +66,7 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 //setControlToken
 func (l *Lexer)setControlToken(ch chan<- editoken.Token) {
 	ctrlBytes, defaultCtrl := l.getUNABytes()
-	l.CtrlBytes = newCtrlBytes(ctrlBytes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlBytes)
 	if !defaultCtrl {
 		ch <- editoken.Token{TokenType: types.ServiceStringAdvice, TokenValue: "UNA", Column: 1, Line: 1}
 		ch <- editoken.Token{TokenType: types.ControlChars, TokenValue: string(ctrlBytes), Column: 3, Line: 1}
@@ -154,7 +154,7 @@ func (l *Lexer) getUNABytes() ([]byte, bool) {
 
 // checkControlChar checks if the current byte is a control byte
 func (l *Lexer) isCurrentByteControlByte() bool {
-	return l.CtrlBytes.isCtrlByte(*l.lexerPosition.CurrentBytePtr)
+	return l.CtrlBytes.IsCtrlByte(*l.lexerPosition.CurrentBytePtr)
 }
 
 //nextByte ...

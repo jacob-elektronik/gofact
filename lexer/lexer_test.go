@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"github.com/jacob-elektronik/gofact/editoken/types"
+	"github.com/jacob-elektronik/gofact/utils"
 	"testing"
 
 	"github.com/jacob-elektronik/gofact/editoken"
@@ -49,7 +50,7 @@ func TestFindControlToken(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	// test all control runes from msg string
 	r := byte(':')
@@ -107,7 +108,7 @@ func TestFindContentToken(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	l.CurrentSeq = []byte("ABCD")
 	if cToken := l.findContentToken(); cToken == nil {
@@ -124,7 +125,7 @@ func TestGetUNABytes(t *testing.T) {
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, defaultCtrl := l.getUNABytes()
 	if defaultCtrl == true {
-		t.Error("Expect none default ctrlBytes")
+		t.Error("Expect none default CtrlBytes")
 	}
 	var ctrlArr [6]byte
 	copy(ctrlArr[:], ctrlRunes)
@@ -135,7 +136,7 @@ func TestGetUNABytes(t *testing.T) {
 	l.EdiFactMessage = l.EdiFactMessage[9:]
 	ctrlRunes, defaultCtrl = l.getUNABytes()
 	if defaultCtrl == false {
-		t.Error("Expect default ctrlBytes")
+		t.Error("Expect default CtrlBytes")
 	}
 }
 
@@ -143,7 +144,7 @@ func TestIsCurrentByteControlByte(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	r := byte('+')
 	l.lexerPosition.CurrentBytePtr = &r
@@ -162,7 +163,7 @@ func TestNextByte(t *testing.T) {
 	l := NewLexer("../edi_messages/message.edi")
 	go l.EdiReader.ReadFile(l.MessageChan)
 	ctrlRunes, _ := l.getUNABytes()
-	l.CtrlBytes = newCtrlBytes(ctrlRunes)
+	l.CtrlBytes = utils.NewCtrlBytes(ctrlRunes)
 
 	l.lexerPosition.CurrentBytePos = 40
 	if !l.nextByte() {

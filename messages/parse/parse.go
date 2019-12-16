@@ -227,7 +227,6 @@ func GetCOM(s segment.Segment, componentDelimiter string) segments.Communication
 			com.CommunicationAddressCodeQualifier = component
 		}
 	}
-
 	return com
 }
 
@@ -296,7 +295,7 @@ func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter strin
 	return n
 }
 
-func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber {
+func GetRFF(s segment.Segment, componentDelimiter string) segments.Reference {
 	components := strings.Split(s.Data[1:len(s.Data)-1], componentDelimiter)
 	rff := segments.Reference{}
 	refNum := model.ReferenceNumber{}
@@ -309,7 +308,7 @@ func GetRFF(s segment.Segment, componentDelimiter string) model.ReferenceNumber 
 		}
 	}
 	refNum.Reference = rff
-	return refNum
+	return rff
 }
 
 func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePeriod {
@@ -326,6 +325,80 @@ func GetDTM(s segment.Segment, componentDelimiter string) segments.DateTimePerio
 		}
 	}
 	return dtp
+}
+
+func GetUNG(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.GroupHeader {
+	ung := segments.GroupHeader{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			ung.MessageGroupIdentification = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.ApplicationSenderIdentification.ApplicationSenderIdentification = component
+				case 1:
+					ung.ApplicationSenderIdentification.IdentificationCodeQualifier = component
+				}
+			}
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.ApplicationRecipientIdentification.ApplicationRecipientIdentification = component
+				case 1:
+					ung.ApplicationRecipientIdentification.IdentificationCodeQualifier = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.DateAndTimeOfPreparation.Date = component
+				case 1:
+					ung.DateAndTimeOfPreparation.Time = component
+				}
+			}
+		case 4:
+			ung.GroupReferenceNumberm = element
+		case 5:
+			ung.ControllingAgency = element
+		case 6:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ung.MessageVersion.MessageVersionNumber = component
+				case 1:
+					ung.MessageVersion.MessageReleaseNumber = component
+				case 2:
+					ung.MessageVersion.AssociationAssignedCode = component
+				}
+			}
+		case 7:
+			ung.ApplicationPassword = element
+		}
+	}
+	return ung
+}
+
+func GetUNE(s segment.Segment, elementDelimiter string) segments.GroupTrailer {
+	une := segments.GroupTrailer{}
+	components := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for idx, component := range components {
+		switch idx {
+		case 0:
+			une.GroupControlCount = component
+		case 1:
+			une.GroupReferenceNumber = component
+		}
+	}
+	return une
 }
 
 func GetBGM(s segment.Segment, elementDelimiter string) segments.BeginningOfMessage {
@@ -388,4 +461,205 @@ func GetUNB(s segment.Segment, elementDelimiter string, componentDelimiter strin
 	}
 
 	return header
+}
+
+func GetTDT(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.DetailsOfTransport {
+	tdt := segments.DetailsOfTransport{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			tdt.TransportStageCodeQualifiier = element
+		case 1:
+			tdt.MeansOfTransportJourneyIdentifier = element
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					tdt.ModeOfTransport.TransportModeNameCode = component
+				case 1:
+					tdt.ModeOfTransport.TransportModeName = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					tdt.Carrier.CarrierIdentifier = component
+				case 1:
+					tdt.Carrier.CodeListIdentificationCode = component
+				case 2:
+					tdt.Carrier.CodeListResponsibleAgencyCode = component
+				case 3:
+					tdt.Carrier.CarrierName = component
+				}
+			}
+		case 4:
+			tdt.TransitDirectionIIndicatorCode = element
+		case 5:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+					case 0:
+						tdt.ExcessTransportationInformation.ExcessTransportationReasonCode = component
+					case 1:
+						tdt.ExcessTransportationInformation.ExcessTransportationResponsibilityCode = component
+					case 2:
+						tdt.ExcessTransportationInformation.CustomerShipmentAuthorisationIdentifier = component
+					}
+				}
+		case 6:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					tdt.TransportIdentification.TransportMeansIdentificationNameidentifier = component
+				case 1:
+					tdt.TransportIdentification.CodeListIdentificationCode = component
+				case 2:
+					tdt.TransportIdentification.CodeListResponsibleAgencyCode = component
+				case 3:
+					tdt.TransportIdentification.TransportMeansIdentificationName = component
+				case 4:
+					tdt.TransportIdentification.TransportMeansNationalityCode = component
+				}
+			}
+		}
+	}
+	return tdt
+}
+
+func GetRCS(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.RequirementsAndConditions {
+	rcs := segments.RequirementsAndConditions{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			rcs.SectorAreaIdentificationCodeQualifier = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					rcs.RequirementsIdentification.RequirementOrConditionDescriptionIdentifier = component
+				case 1:
+					rcs.RequirementsIdentification.CodeListIdentificationCode = component
+				case 2:
+					rcs.RequirementsIdentification.CodeListResponsibleAgencyCode = component
+				case 3:
+					rcs.RequirementsIdentification.RequirementOrConditionDescription = component
+				}
+			}
+		case 2:
+			rcs.ActionDescriptionCode = element
+		case 3:
+			rcs.CountryNameCode = element
+		}
+	}
+	return rcs
+}
+
+func GetFTX(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.FreeText {
+	ftx := segments.FreeText{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			ftx.TextSubjectCodeQualifier = element
+		case 1:
+			ftx.FreeTextFormatCode = element
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					ftx.TextReference.FreeTextDescriptionCode = component
+				case 1:
+					ftx.TextReference.CodeListIdentificationCode = component
+				case 2:
+					ftx.TextReference.CodeListResponsibleAgencyCode = component
+				}
+			}
+		case 3:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0, 1, 2, 3, 4:
+					ftx.TextLitteral.FreeText = append(ftx.TextLitteral.FreeText, component)
+
+				}
+			}
+		case 4:
+			ftx.LanguageNameCode = element
+		case 5:
+			ftx.FreeTextFormatCode = element
+		}
+	}
+	return ftx
+}
+
+func GetCCI(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.CharacteristicClass {
+	cci := segments.CharacteristicClass{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			cci.ClassTypeCode = element
+		case 1:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					cci.MeasurementDetails.MeasuredAttributeCode = component
+				case 1:
+					cci.MeasurementDetails.MeasurementSignificanceCode = component
+				case 2:
+					cci.MeasurementDetails.NonDiscreteMeasurementNameCode = component
+				case 3:
+					cci.MeasurementDetails.NonDiscreteMeasurementName = component
+				}
+			}
+		case 2:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					cci.CharacterDescription.CharacteristicDescriptionCode = component
+				case 1:
+					cci.CharacterDescription.CodeListIdentificationCode = component
+				case 2:
+					cci.CharacterDescription.CodeListResponsibleAgencyCode = component
+				case 3, 4:
+					cci.CharacterDescription.CharacteristicDescription = append(cci.CharacterDescription.CharacteristicDescription, component)
+				}
+			}
+		}
+	}
+	return cci
+}
+
+func GetCAV(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.CharacteristicValue {
+	cav := segments.CharacteristicValue{}
+	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	for elementIDX, element := range elements {
+		switch elementIDX {
+		case 0:
+			components := strings.Split(element, componentDelimiter)
+			for componentIDX, component := range components {
+				switch componentIDX {
+				case 0:
+					cav.CharacteristicValueDescriptionCode = component
+				case 1:
+					cav.CodeListIdentificationCode = component
+				case 2:
+					cav.CodeListResponsibleAgencyCode = component
+				case 3, 4:
+					cav.CharacteristicValueDescription = append(cav.CharacteristicValueDescription, component)
+				}
+			}
+		}
+	}
+	return cav
 }

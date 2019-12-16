@@ -10,17 +10,25 @@ import (
 // https://service.unece.org/trade/untdid/d11a/trmd/orders_c.htm
 
 type OrderMessage struct {
-	InterchangeHeader      segments.InterchangeHeader
+	InterchangeHeader segments.InterchangeHeader
+	GroupHeader       segments.GroupHeader
+	Messages          []Message
+}
+
+type Message struct {
 	MessageHeader          segments.MessageHeader
 	BeginningOfMessage     segments.BeginningOfMessage
 	DateTimePeriod         segments.DateTimePeriod
 	ReferenceNumbersOrders []ReferenceNumber
 	Parties                []Party
 	Currencies             Currencies
+	TransportDetails       segments.DetailsOfTransport
+	Requirements           []Requirements
 	Items                  []Item
 	SectionControl         segments.SectionControl
 	ControlTotal           []segments.ControlTotal
 	MessageTrailer         segments.MessageTrailer
+	GroupTrailer           segments.GroupTrailer
 	InterchangeTrailer     segments.InterchangeTrailer
 }
 
@@ -39,8 +47,8 @@ type Party struct {
 
 // Segment group 5
 type ContactDetails struct {
-	ContactInformation   segments.ContactInformation
-	CommunicationContact segments.CommunicationContact
+	ContactInformation   []segments.ContactInformation
+	CommunicationContact []segments.CommunicationContact
 }
 
 // Segment group 7
@@ -49,11 +57,26 @@ type Currencies struct {
 	DateTimePeriod segments.DateTimePeriod
 }
 
+// Segment group 25
+type Requirements struct {
+	RequirementsAndConditions segments.RequirementsAndConditions
+	Reference                 segments.Reference
+}
+
 // Segment group 29
 type Item struct {
 	LineItem            segments.LineItem
 	AdditionalProductID segments.AdditionalProductID
 	ItemDescription     segments.ItemDescription
 	Quantity            segments.Quantity
-	PriceInformation    segments.PriceInformation
+	DateTimePeriod      []segments.DateTimePeriod
+	FreeText            segments.FreeText
+	// Segment group 33
+	CharacteristicClass segments.CharacteristicClass
+	CharacteristicValue segments.CharacteristicValue
+	// Segment group 33
+	PriceInformation segments.PriceInformation
+	Currencies       segments.Currencies
+	// Segment group 57
+	RequirementsAndConditions []segments.RequirementsAndConditions
 }

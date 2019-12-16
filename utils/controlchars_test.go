@@ -1,43 +1,41 @@
-package lexer
+package utils
 
 import (
 	"testing"
-
-	"github.com/jacob-elektronik/gofact/utils"
 )
 
 func TestNewCtrlBytes(t *testing.T) {
-	c := newCtrlBytes([]byte(utils.DefaultCtrlString))
+	c := NewCtrlBytes([]byte(DefaultCtrlString))
 	if c == nil {
 		t.Error("Expect none nil value")
 	}
 	errorStr := ":+.'"
-	c = newCtrlBytes([]byte(errorStr))
+	c = NewCtrlBytes([]byte(errorStr))
 	if c != nil {
 		t.Error("Expect nil value")
 	}
 	errorStr = ":+.'!@#$%"
-	c = newCtrlBytes([]byte(errorStr))
+	c = NewCtrlBytes([]byte(errorStr))
 	if c != nil {
 		t.Error("Expect nil value")
 	}
 }
 func TestIsCtrlByte(t *testing.T) {
-	c := newCtrlBytes([]byte(utils.DefaultCtrlString))
-	if !c.isCtrlByte(':') {
+	c := NewCtrlBytes([]byte(DefaultCtrlString))
+	if !c.IsCtrlByte(':') {
 		t.Error("Expect true")
 	}
-	if !c.isCtrlByte('+') {
+	if !c.IsCtrlByte('+') {
 		t.Error("Expect true")
 	}
-	if !c.isCtrlByte('.') {
+	if !c.IsCtrlByte('.') {
 		t.Error("Expect true")
 	}
-	if !c.isCtrlByte('\'') {
+	if !c.IsCtrlByte('\'') {
 		t.Error("Expect true")
 	}
 
-	if c.isCtrlByte('#') {
+	if c.IsCtrlByte('#') {
 		t.Error("Expect false")
 	}
 }
