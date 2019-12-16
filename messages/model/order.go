@@ -71,7 +71,7 @@ type Item struct {
 	Quantity            segments.Quantity
 	DateTimePeriod      []segments.DateTimePeriod
 	FreeText            segments.FreeText
-	// Segment group 33
+	// Segment group 30
 	CharacteristicClass segments.CharacteristicClass
 	CharacteristicValue segments.CharacteristicValue
 	// Segment group 33
