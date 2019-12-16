@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/jacob-elektronik/gofact/messages/handler"
 	"github.com/jacob-elektronik/gofact/parser"
 	"os"
 	"text/tabwriter"
+	//"github.com/davecgh/go-spew/spew"
 )
 
 var message = flag.String("message", "", "edifact message.edi file path")
@@ -51,8 +53,9 @@ func main() {
 				fmt.Println(err)
 			}
 		}
-		order, _ := handler.UnmarshalOrder(p.Segments)
-		fmt.Println(order)
+		order, _ := handler.UnmarshalOrder(p.Segments, p.CtrlBytes)
+		//fmt.Println(order)
+		spew.Dump(order)
 	} else {
 		fmt.Println("no edi message to parse")
 	}
