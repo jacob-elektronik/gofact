@@ -38,19 +38,26 @@ The *ORDERS* message was implemented with the help of the following document : h
 The Suported segments from the *ORDERS* message can be found in the "segments" folder under "messages/order/".
 ~~~~bash
 BGM
+CAV
+CCI
 CNT
 COM
 CTA
 CUX
 DTM
+FTX
 IMD
 LIN
 NAD
 PIA
 PRI
 QTY
+RCS
 RFF
+TDT
 UNB
+UNE
+UNG
 UNH
 UNS
 UNT
@@ -66,8 +73,11 @@ Segment group 2
 Segment group 3
 Segment group 5
 Segment group 7
+Segment group 25
 Segment group 29
+Segment group 30
 Segment group 33
+Segment group 57
 SUMMARY SECTION
 Segment group 63
 ~~~~
