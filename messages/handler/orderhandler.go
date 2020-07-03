@@ -421,6 +421,8 @@ func setNextState() {
 		}
 	case StateGroupTrailer:
 		switch nextSegmentTag() {
+		case types.UNG:
+			currentState = StateHeaderSection
 		default:
 			currentState = StateEnd
 		}
