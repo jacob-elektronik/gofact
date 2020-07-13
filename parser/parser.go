@@ -117,6 +117,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
+		seg.Tag = t.TokenValue
 	case tokenTypes.EOF:
 		if p.messageHeaderOpen {
 			return errors.New("Parser error, Message Head not closed | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
