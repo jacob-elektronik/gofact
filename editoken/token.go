@@ -5,12 +5,18 @@ import (
 	"strconv"
 )
 
+type ReleaseIndicator struct {
+	Value string
+	Column int
+}
+
 // Token struct
 type Token struct {
 	TokenType  int
 	TokenValue string
 	Column     int
 	Line       int
+	ReleaseIndicator *ReleaseIndicator
 }
 
 // PrintToken ...

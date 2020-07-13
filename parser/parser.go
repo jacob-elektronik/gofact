@@ -95,6 +95,12 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
 	case tokenTypes.ElementDelimiter, tokenTypes.UserDataSegments, tokenTypes.ComponentDelimiter, tokenTypes.SegmentTerminator:
+		if t.ReleaseIndicator != nil {
+			p.currentSegment.ReleaseIndicator = &editoken.ReleaseIndicator{
+				Value:  t.ReleaseIndicator.Value,
+				Column: t.ReleaseIndicator.Column,
+			}
+		}
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
 	case tokenTypes.SegmentTag:
@@ -111,7 +117,6 @@ func (p *Parser) parseToken(t editoken.Token) error {
 			return errors.New("Parser error, " + t.TokenValue + " only after SegmentTerminator | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))
 		}
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
-		seg.Tag = t.TokenValue
 	case tokenTypes.EOF:
 		if p.messageHeaderOpen {
 			return errors.New("Parser error, Message Head not closed | Line: " + strconv.Itoa(t.Line) + " Column: " + strconv.Itoa(t.Column))

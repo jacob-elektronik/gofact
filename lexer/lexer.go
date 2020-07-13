@@ -14,6 +14,7 @@ type Lexer struct {
 	CurrentSeq             []byte
 	CtrlBytes              *utils.CtrlBytes
 	releaseIndicatorActive bool
+	releaseIndicator *editoken.ReleaseIndicator
 	lastTokenType          int
 	segmentTagOpen         bool
 	MessageChan            chan []byte
@@ -38,12 +39,23 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
 			if ctrlToken.TokenType == types.ReleaseIndicator {
 				l.releaseIndicatorActive = true
+				l.releaseIndicator = &editoken.ReleaseIndicator{
+					Value:  ctrlToken.TokenValue,
+					Column: len(l.CurrentSeq),
+				}
 				continue
 			}
 			for {
 				if contentToken := l.findContentToken(); contentToken != nil {
 					l.lastTokenType = contentToken.TokenType
+					if l.releaseIndicator != nil {
+						contentToken.ReleaseIndicator = &editoken.ReleaseIndicator{
+							Value:  l.releaseIndicator.Value,
+							Column: l.releaseIndicator.Column,
+						}
+					}
 					ch <- *contentToken
+					l.releaseIndicator = nil
 				} else {
 					break
 				}

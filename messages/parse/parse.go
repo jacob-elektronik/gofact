@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"fmt"
 	"github.com/jacob-elektronik/gofact/messages/model"
 	"github.com/jacob-elektronik/gofact/messages/model/segments"
 	"github.com/jacob-elektronik/gofact/segment"
@@ -232,6 +233,9 @@ func GetCOM(s segment.Segment, componentDelimiter string) segments.Communication
 
 func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.NameAddress {
 	n := segments.NameAddress{}
+	if s.ReleaseIndicator != nil {
+		fmt.Println("yoyoyoyo")
+	}
 	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
 	for elementIDX, element := range elements {
 		switch elementIDX {
