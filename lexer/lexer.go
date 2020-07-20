@@ -36,10 +36,6 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 	l.setControlToken(ch)
 	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
-			if ctrlToken.TokenType == types.ReleaseIndicator {
-				l.releaseIndicatorActive = true
-				continue
-			}
 			for {
 				if contentToken := l.findContentToken(); contentToken != nil {
 					l.lastTokenType = contentToken.TokenType
@@ -79,10 +75,6 @@ func (l *Lexer)setControlToken(ch chan<- editoken.Token) {
 // findControlToken generate a control type token from current byte.
 // If the lexer found a release indicator we will not generate a control token here.
 func (l *Lexer) findControlToken() *editoken.Token {
-	if l.releaseIndicatorActive {
-		l.releaseIndicatorActive = false
-		return nil
-	}
 	switch *l.lexerPosition.CurrentBytePtr {
 	case l.CtrlBytes.ComponentDelimiter:
 		return &editoken.Token{TokenType: types.ComponentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}

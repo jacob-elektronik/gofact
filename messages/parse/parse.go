@@ -4,8 +4,11 @@ import (
 	"github.com/jacob-elektronik/gofact/messages/model"
 	"github.com/jacob-elektronik/gofact/messages/model/segments"
 	"github.com/jacob-elektronik/gofact/segment"
+	"regexp"
 	"strings"
 )
+
+var releaseIndicatorRegEx = `(?m)((?:\{RE}\{Delimiter}|[^{Delimiter}])+)` // https://regex101.com/r/fSSkVL/1
 
 func GetUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTrailer {
 	unz := segments.InterchangeTrailer{}
@@ -230,10 +233,14 @@ func GetCOM(s segment.Segment, componentDelimiter string) segments.Communication
 	return com
 }
 
-func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.NameAddress {
+func GetNAD(s segment.Segment, elementDelimiter string, componentDelimiter string, releaseIndicator string) segments.NameAddress {
 	n := segments.NameAddress{}
-	elements := strings.Split(s.Data[1:len(s.Data)-1], elementDelimiter)
+	reg := strings.Replace(releaseIndicatorRegEx, "{Delimiter}", elementDelimiter, -1)
+	reg = strings.Replace(reg, "{RE}", releaseIndicator, -1)
+	var re = regexp.MustCompile(reg)
+	elements := re.FindAllString(s.Data[1:len(s.Data)-1], -1)
 	for elementIDX, element := range elements {
+		element = strings.Replace(element, releaseIndicator+elementDelimiter, elementDelimiter, -1)
 		switch elementIDX {
 		case 0:
 			n.PartyFunctionCodeQualifier = element

@@ -94,7 +94,7 @@ func (p *Parser) parseToken(t editoken.Token) error {
 		}
 		seg.SType = p.segmentTypeForSeq(t.TokenValue)
 		seg.Tag = t.TokenValue
-	case tokenTypes.ElementDelimiter, tokenTypes.UserDataSegments, tokenTypes.ComponentDelimiter, tokenTypes.SegmentTerminator:
+	case tokenTypes.ElementDelimiter, tokenTypes.UserDataSegments, tokenTypes.ComponentDelimiter, tokenTypes.SegmentTerminator, tokenTypes.ReleaseIndicator:
 		p.currentSegment.Data = p.currentSegment.Data + t.TokenValue
 		return nil
 	case tokenTypes.SegmentTag:

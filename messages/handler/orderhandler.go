@@ -41,6 +41,7 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 	ediFactSegments = messageSegments
 	componentDelimiter := string(ctrlBytes.ComponentDelimiter)
 	elementDelimiter := string(ctrlBytes.ElementDelimiter)
+	releaseIndicator := string(ctrlBytes.ReleaseIndicator)
 	currentState = StateStart
 	for i, ediFactSegment := range ediFactSegments {
 		currentSegmentIndex = i
@@ -55,7 +56,7 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 			handleStateSegmentGroupOne(ediFactSegment, componentDelimiter)
 			setNextState()
 		case StateSegmentGroupTwo:
-			handleStateSegmentGroupTwo(ediFactSegment, elementDelimiter, componentDelimiter)
+			handleStateSegmentGroupTwo(ediFactSegment, elementDelimiter, componentDelimiter, releaseIndicator)
 			setNextState()
 		case StateSegmentGroupThree:
 			handleStateSegmentGroupThree(ediFactSegment, componentDelimiter)
@@ -139,11 +140,11 @@ func handleStateSegmentGroupOne(ediFactSegment segment.Segment, componentDelimit
 }
 
 // Segment Group #2
-func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string) {
+func handleStateSegmentGroupTwo(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string, releaseIndicator string) {
 	switch ediFactSegment.SType {
 	case types.NAD:
 		p := model.Party{}
-		p.NameAddress = parse.GetNAD(ediFactSegment, elementDelimiter, componentDelimiter)
+		p.NameAddress = parse.GetNAD(ediFactSegment, elementDelimiter, componentDelimiter, releaseIndicator)
 		currentMessagePtr.Parties = append(currentMessagePtr.Parties, p)
 		currentPartyPtr = &currentMessagePtr.Parties[len(currentMessagePtr.Parties) - 1]
 	}
