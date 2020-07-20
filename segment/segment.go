@@ -1,7 +1,6 @@
 package segment
 
 import (
-	"github.com/jacob-elektronik/gofact/editoken"
 	"github.com/jacob-elektronik/gofact/segment/types"
 )
 
@@ -10,7 +9,6 @@ type Segment struct {
 	SType int
 	Tag   string
 	Data  string
-	ReleaseIndicator *editoken.ReleaseIndicator
 }
 
 // Segment.PrintSegment

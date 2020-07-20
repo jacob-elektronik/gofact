@@ -14,7 +14,6 @@ type Lexer struct {
 	CurrentSeq             []byte
 	CtrlBytes              *utils.CtrlBytes
 	releaseIndicatorActive bool
-	releaseIndicator *editoken.ReleaseIndicator
 	lastTokenType          int
 	segmentTagOpen         bool
 	MessageChan            chan []byte
@@ -37,25 +36,10 @@ func (l *Lexer) GetEdiTokens(ch chan<- editoken.Token) {
 	l.setControlToken(ch)
 	for l.nextByte() {
 		if ctrlToken := l.findControlToken(); ctrlToken != nil {
-			if ctrlToken.TokenType == types.ReleaseIndicator {
-				l.releaseIndicatorActive = true
-				l.releaseIndicator = &editoken.ReleaseIndicator{
-					Value:  ctrlToken.TokenValue,
-					Column: len(l.CurrentSeq),
-				}
-				continue
-			}
 			for {
 				if contentToken := l.findContentToken(); contentToken != nil {
 					l.lastTokenType = contentToken.TokenType
-					if l.releaseIndicator != nil {
-						contentToken.ReleaseIndicator = &editoken.ReleaseIndicator{
-							Value:  l.releaseIndicator.Value,
-							Column: l.releaseIndicator.Column,
-						}
-					}
 					ch <- *contentToken
-					l.releaseIndicator = nil
 				} else {
 					break
 				}
@@ -91,10 +75,6 @@ func (l *Lexer)setControlToken(ch chan<- editoken.Token) {
 // findControlToken generate a control type token from current byte.
 // If the lexer found a release indicator we will not generate a control token here.
 func (l *Lexer) findControlToken() *editoken.Token {
-	if l.releaseIndicatorActive {
-		l.releaseIndicatorActive = false
-		return nil
-	}
 	switch *l.lexerPosition.CurrentBytePtr {
 	case l.CtrlBytes.ComponentDelimiter:
 		return &editoken.Token{TokenType: types.ComponentDelimiter, TokenValue: string(*l.lexerPosition.CurrentBytePtr), Column: l.lexerPosition.currentColumn, Line: l.lexerPosition.currentLine}
