@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var releaseIndicatorRegEx = `(?m)((?:\{RE}\{Delimiter}|[^{Delimiter}])+)`
+var releaseIndicatorRegEx = `(?m)((?:\{RE}\{Delimiter}|[^{Delimiter}])+)` // https://regex101.com/r/fSSkVL/1
 
 func GetUNZ(s segment.Segment, elementDelimiter string) segments.InterchangeTrailer {
 	unz := segments.InterchangeTrailer{}
