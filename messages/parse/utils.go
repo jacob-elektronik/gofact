@@ -15,9 +15,14 @@ func handleIndicator(s string, indicator string, delimiter string) []string {
 		}
 	}
 
+	var lastIdx int
 	for _, i := range relIndex {
+		if lastIdx+1 == i {
+			elementsStr[lastIdx] = elementsStr[lastIdx] + delimiter + elementsStr[i+1]
+		}
 		elementsStr[i] = elementsStr[i] + delimiter + elementsStr[i+1]
 		indexToDelete = append(indexToDelete, i+1)
+		lastIdx = i
 	}
 
 	for j, i := range indexToDelete {
