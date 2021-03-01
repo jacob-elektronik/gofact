@@ -77,6 +77,13 @@ type Item struct {
 	// Segment group 33
 	PriceInformation segments.PriceInformation
 	Currencies       segments.Currencies
+	// Segment group 45
+	AllowanceOrCharge              segments.AllowanceOrCharge
+	AdditionalInformation          segments.AdditionalInformation
+	DateTimePeriodAllowanceOrCharge []segments.DateTimePeriod
+	// Segment group 48
+	MonetaryAmount  segments.MonetaryAmount
+	RangeDetails segments.RangeDetails
 	// Segment group 57
 	RequirementsAndConditions []segments.RequirementsAndConditions
 }
