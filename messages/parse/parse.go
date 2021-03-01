@@ -1,10 +1,10 @@
 package parse
 
 import (
-	"github.com/jacob-elektronik/gofact/messages/model"
-	"github.com/jacob-elektronik/gofact/messages/model/segments"
-	"github.com/jacob-elektronik/gofact/segment"
-	"strings"
+"github.com/jacob-elektronik/gofact/messages/model"
+"github.com/jacob-elektronik/gofact/messages/model/segments"
+"github.com/jacob-elektronik/gofact/segment"
+"strings"
 )
 
 
@@ -507,14 +507,14 @@ func GetTDT(s segment.Segment, elementDelimiter string, componentDelimiter strin
 			components := strings.Split(element, componentDelimiter)
 			for componentIDX, component := range components {
 				switch componentIDX {
-					case 0:
-						tdt.ExcessTransportationInformation.ExcessTransportationReasonCode = component
-					case 1:
-						tdt.ExcessTransportationInformation.ExcessTransportationResponsibilityCode = component
-					case 2:
-						tdt.ExcessTransportationInformation.CustomerShipmentAuthorisationIdentifier = component
-					}
+				case 0:
+					tdt.ExcessTransportationInformation.ExcessTransportationReasonCode = component
+				case 1:
+					tdt.ExcessTransportationInformation.ExcessTransportationResponsibilityCode = component
+				case 2:
+					tdt.ExcessTransportationInformation.CustomerShipmentAuthorisationIdentifier = component
 				}
+			}
 		case 6:
 			components := strings.Split(element, componentDelimiter)
 			for componentIDX, component := range components {
@@ -667,4 +667,24 @@ func GetCAV(s segment.Segment, elementDelimiter string, componentDelimiter strin
 		}
 	}
 	return cav
+}
+
+func GetALC(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.AllowanceOrCharge {
+	// TODO Implement ALC segment
+	return segments.AllowanceOrCharge{}
+}
+
+func GetALI(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.AdditionalInformation {
+	// TODO Implement ALI segment
+	return segments.AdditionalInformation{}
+}
+
+func GetMOA(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.MonetaryAmount {
+	// TODO Implement MOA segment
+	return segments.MonetaryAmount{}
+}
+
+func GetRNG(s segment.Segment, elementDelimiter string, componentDelimiter string) segments.RangeDetails {
+	// TODO Implement RNG segment
+	return segments.RangeDetails{}
 }

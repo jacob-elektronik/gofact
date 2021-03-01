@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/jacob-elektronik/gofact/messages/model"
 	"github.com/jacob-elektronik/gofact/messages/parse"
 	"github.com/jacob-elektronik/gofact/segment"
@@ -21,6 +22,8 @@ const (
 	StateSegmentGroupTwentyNine
 	StateSegmentGroupThirty
 	StateSegmentGroupThirtyThree
+	StateSegmentGroupFortyFive
+	StateSegmentGroupFortyEight
 	StateSegmentGroupFiftySeven
 	StateSummarySection
 	StateSegmentGroupSixtyThree
@@ -82,6 +85,12 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 		case StateSegmentGroupThirtyThree:
 			handleStateSegmentGroupThirtyThree(ediFactSegment, componentDelimiter)
 			setNextState()
+		case StateSegmentGroupFortyFive:
+			handleStateSegmentGroupFortyFive(ediFactSegment, elementDelimiter, componentDelimiter)
+			setNextState()
+		case StateSegmentGroupFortyEight:
+			handleStateSegmentGroupFortyEight(ediFactSegment, elementDelimiter, componentDelimiter)
+			setNextState()
 		case StateSegmentGroupFiftySeven:
 			handleStateSegmentGroupFiftySeven(ediFactSegment, elementDelimiter, componentDelimiter)
 			setNextState()
@@ -100,6 +109,8 @@ func UnmarshalOrder(messageSegments []segment.Segment, ctrlBytes utils.CtrlBytes
 	}
 	return order, nil
 }
+
+
 
 func handleStateStart(ediFactSegment segment.Segment, componentDelimiter string, elementDelimiter string, order *model.OrderMessage) (string, string) {
 	switch ediFactSegment.SType {
@@ -241,6 +252,26 @@ func handleStateSegmentGroupThirtyThree(ediFactSegment segment.Segment, componen
 	}
 }
 
+func handleStateSegmentGroupFortyFive(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.ALC:
+		currentLineItemPtr.AllowanceOrCharge = parse.GetALC(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.ALI:
+		currentLineItemPtr.AdditionalInformation = parse.GetALI(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.DTM:
+		
+	}
+}
+
+func handleStateSegmentGroupFortyEight(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string) {
+	switch ediFactSegment.SType {
+	case types.MOA:
+		currentLineItemPtr.MonetaryAmount = parse.GetMOA(ediFactSegment, elementDelimiter, componentDelimiter)
+	case types.RNG:
+		currentLineItemPtr.RangeDetails = parse.GetRNG(ediFactSegment, elementDelimiter, componentDelimiter)
+	}
+}
+
 // Segment Group #57
 func handleStateSegmentGroupFiftySeven(ediFactSegment segment.Segment, elementDelimiter string, componentDelimiter string) {
 	switch ediFactSegment.SType {
@@ -365,6 +396,7 @@ func setNextState() {
 			currentState = StateSegmentGroupTwentyNine
 		}
 	case StateSegmentGroupTwentyNine:
+		fmt.Println(nextSegmentTag())
 		switch nextSegmentTag() {
 		case types.LIN, types.PIA, types.IMD, types.QTY, types.DTM, types.FTX:
 			currentState = StateSegmentGroupTwentyNine
@@ -384,6 +416,36 @@ func setNextState() {
 		switch nextSegmentTag() {
 		case types.CUX:
 			currentState = StateSegmentGroupThirtyThree
+		case types.ALC:
+			currentState = StateSegmentGroupFortyFive
+		case types.RCS:
+			currentState = StateSegmentGroupFiftySeven
+		case types.UNS:
+			currentState = StateSummarySection
+		case types.LIN:
+			currentState = StateSegmentGroupTwentyNine
+		default:
+			currentState = StateSummarySection
+		}
+	case StateSegmentGroupFortyFive:
+		switch nextSegmentTag() {
+		case types.ADI, types.DTM:
+			currentState = StateSegmentGroupFortyFive
+		case types.MOA:
+			currentState = StateSegmentGroupFortyEight
+		case types.RCS:
+			currentState = StateSegmentGroupFiftySeven
+		case types.UNS:
+			currentState = StateSummarySection
+		case types.LIN:
+			currentState = StateSegmentGroupTwentyNine
+		default:
+			currentState = StateSummarySection
+		}
+	case StateSegmentGroupFortyEight:
+		switch nextSegmentTag() {
+		case types.RNG:
+			currentState = StateSegmentGroupFortyEight
 		case types.RCS:
 			currentState = StateSegmentGroupFiftySeven
 		case types.UNS:
