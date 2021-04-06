@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/jacob-elektronik/gofact/messages/model"
 	"github.com/jacob-elektronik/gofact/messages/parse"
 	"github.com/jacob-elektronik/gofact/segment"
@@ -396,7 +395,6 @@ func setNextState() {
 			currentState = StateSegmentGroupTwentyNine
 		}
 	case StateSegmentGroupTwentyNine:
-		fmt.Println(nextSegmentTag())
 		switch nextSegmentTag() {
 		case types.LIN, types.PIA, types.IMD, types.QTY, types.DTM, types.FTX:
 			currentState = StateSegmentGroupTwentyNine
